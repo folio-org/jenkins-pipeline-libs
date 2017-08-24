@@ -32,7 +32,7 @@ def call(String buildStatus = 'STARTED') {
       to: 'malc@indexdata.com',
       subject: subject,
       body: details,
-      recipientProviders: [[$class: 'DevelopersRecipientProvider']]
+      recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'UpstreamComitterRecipientProvider'], [$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']]
     )
   }
   else if (buildStatus == 'ABORTED') {
@@ -46,7 +46,8 @@ def call(String buildStatus = 'STARTED') {
       to: 'john@malconian.net',
       subject: subject,
       body: details,
-      recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'UpstreamComitterRecipientProvider'], [$class: 'CulpritsRecipientProvider']]
+      recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'UpstreamComitterRecipientProvider'], [$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']]
+
     )
   }
 
