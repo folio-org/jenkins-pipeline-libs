@@ -46,7 +46,7 @@ def call(String buildStatus = 'STARTED') {
       to: 'john@malconian.net',
       subject: subject,
       body: details,
-      recipientProviders: [[$class: 'DevelopersRecipientProvider']]
+      recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'UpstreamComitterRecipientProvider'], [$class: 'CulpritsRecipientProvider']]
     )
   }
 
