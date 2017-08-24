@@ -22,7 +22,7 @@ def call(String buildStatus = 'STARTED') {
   } 
   else if (buildStatus == 'SUCCESSFUL') {
     // Green
-    colorCode = '#008000'
+    colorCode = '#32CD32'
   } 
   else if (buildStatus == 'UNSTABLE') {
     // Yellow
