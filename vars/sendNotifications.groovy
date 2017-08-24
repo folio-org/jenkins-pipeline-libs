@@ -17,8 +17,8 @@ def call(String buildStatus = 'STARTED') {
 
   // Override default values based on build status
   if (buildStatus == 'STARTED') {
-    // Black
-    colorCode = '#000000'
+    // Grey
+    colorCode = '#808080'
   } 
   else if (buildStatus == 'SUCCESSFUL') {
     // Green
@@ -35,8 +35,8 @@ def call(String buildStatus = 'STARTED') {
     )
   }
   else if (buildStatus == 'ABORTED') {
-    // Grey
-    colorCode = '#808080'
+    // Black
+    colorCode = '#000000'
   }
   else {
     // Build failed. Red
