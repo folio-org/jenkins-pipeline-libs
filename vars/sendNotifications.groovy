@@ -12,8 +12,8 @@ def call(String buildStatus = 'STARTED') {
   // Default values
   def color = 'RED'
   def colorCode = '#FF0000'
-  def subject = "${buildStatus}: '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
-  def summary = "${subject} (${env.BUILD_URL})"
+  def subject = "${buildStatus}: '${env.JOB_NAME} #${env.BUILD_NUMBER}'"
+  def summary = "${subject} (<${env.BUILD_URL}|Open>)"
 
   // Override default values based on build status
   if (buildStatus == 'STARTED') {
