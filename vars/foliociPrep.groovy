@@ -8,8 +8,8 @@ def call(body) {
   body.delegate = config
   body()
 
-  currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.JOB_BASE_NAME}"
-  sendNotifications 'STARTED'
+  setBuildDisplayName()  
+  // sendNotifications 'STARTED'
 
 }
  
