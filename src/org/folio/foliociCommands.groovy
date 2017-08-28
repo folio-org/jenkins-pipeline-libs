@@ -2,7 +2,7 @@
 
 package org.folio
 
-import com.cloudbees.groovy.cps.NonCPS
+// import com.cloudbees.groovy.cps.NonCPS
 import jenkins.model.Jenkins
 
 
