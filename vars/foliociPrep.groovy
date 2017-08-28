@@ -8,7 +8,8 @@ def call(body) {
   body.delegate = config
   body()
 
-  setBuildDisplayName()  
+  def s = new org.folio.foliociCommands() 
+  s.setBuildDisplayName()
   // sendNotifications 'STARTED'
 
 }
