@@ -15,7 +15,9 @@ def call() {
         steps {
           script {
             currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.JOB_BASE_NAME}"
+          }
         }
+      }
 
       stage('Mvn Build') {
         steps {
