@@ -55,8 +55,10 @@ def call(body) {
 !target/*.jar
 EOF
           """
-          sh "docker build -t $config.dockerImage:${snapshot_version} ."
-          sh "docker tag $config.dockerImage:${snapshot_version} ${config.dockerImage}:latest"
+          //sh "docker build -t ${config.dockerImage}:${snapshot_version} ."
+          sh 'echo "${config.dockerImage}:${snapshot_version}"'
+          sh 'echo "${config.dockerImage}:${env.snapshot_version}"'
+          //sh "docker tag ${config.dockerImage}:${snapshot_version} ${config.dockerImage}:latest"
         }
       }
 
