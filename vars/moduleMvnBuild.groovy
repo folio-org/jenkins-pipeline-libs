@@ -49,11 +49,11 @@ def call(body) {
           echo "Building Docker Image: ${config.dockerImage}:${env.snapshot_version}"
           sh """
             cat > .dockerignore <<EOF
-            *
-            !Dockerfile
-            !docker
-            !target/*.jar
-            EOF
+*
+!Dockerfile
+!docker
+!target/*.jar
+EOF
           """
           sh 'cat .dockerignore'
    
