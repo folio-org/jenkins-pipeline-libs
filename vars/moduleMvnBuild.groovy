@@ -9,12 +9,6 @@ def call(body) {
 
   pipeline {
 
-    environment {
-      MVN_ARTIFACT = readMavenPom().getArtifactId()
-      MVN_VERSION  = readMavenPom().getVersion()
-      SNAPHOT_VERSION = "${env.MVN_VERSION}}.${env.BUILD_NUMBER}"
-    }
-
     agent {
       node {
         label 'folio-jenkins-slave-docker'
@@ -33,12 +27,18 @@ def call(body) {
 
       stage('Mvn Build') {
         steps {
+          script {
+            def mvn_artifact = readMavenPom().getArtifactId() 
+            def mvn_version =  readMavenPom().getVersion()
+            def snapshot_version = "${mvn_version}.${env.BUILD_NUMBER}"
+          }
+            
           withMaven(jdk: 'OpenJDK 8 on Ubuntu Docker Slave Node',
                     maven: 'Maven on Ubuntu Docker Slave Node',
                     options: [junitPublisher(disabled: false,
                     ignoreAttachments: false),
                     artifactsPublisher(disabled: false)]) {
-            echo "Building Maven artifact: ${env.MVN_ARTIFACT} Version: ${env.SNAPSHOT_VERSION}"
+            echo "Building Maven artifact: ${mvn_artifact} Version: $snapshot_version}"
             sh 'mvn -DskipTests integration-test'
           }
         }
@@ -46,7 +46,7 @@ def call(body) {
 
       stage('Build Docker Image') {
         steps {
-          echo "Building Docker Image: ${config.dockerImage}:${env.SNAPSHOT_VERSION}"
+          echo "Building Docker Image: ${config.dockerImage}:${snapshot_version}"
           sh """
             cat > .dockerignore << EOF
 *
@@ -56,7 +56,7 @@ def call(body) {
 EOF
           """
           //sh "docker build -t ${config.dockerImage}:${snapshot_version} ."
-          echo "${config.dockerImage}:${env.SNAPSHOT_VERSION}"
+          echo "${config.dockerImage}:${snapshot_version}"
           //sh "docker tag ${config.dockerImage}:${snapshot_version} ${config.dockerImage}:latest"
         }
       }
