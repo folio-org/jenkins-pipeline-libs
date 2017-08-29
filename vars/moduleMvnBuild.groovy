@@ -48,7 +48,7 @@ def call(body) {
         steps {
           echo "Building Docker Image: ${config.dockerImage}:${env.snapshot_version}"
           sh """
-            cat > .dockerignore <<EOF
+            cat > .dockerignore << EOF
 *
 !Dockerfile
 !docker
