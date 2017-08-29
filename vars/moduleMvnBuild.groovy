@@ -16,6 +16,7 @@ def call() {
           script {
             currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.JOB_BASE_NAME}"
           }
+        sendNotifications 'STARTED'
         }
       }
 
