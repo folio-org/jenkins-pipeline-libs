@@ -1,7 +1,11 @@
 #!/usr/bin/groovy
 
 
-def call() {
+def call(body) {
+  def config = [:]
+  body.resolveStrategy = Closure.DELEGATE_FIRST
+  body.delegate = config
+  body()
 
   pipeline {
     agent {
@@ -30,6 +34,12 @@ def call() {
 
             sh 'mvn -DskipTests integration-test'
           }
+        }
+      }
+
+      stage('Build Docker Image') {
+        steps {
+          echo "Building Docker Image: ${config.dockerImage}"
         }
       }
 
