@@ -10,9 +10,9 @@ def call(body) {
   pipeline {
 
     environment {
-      mvn_artifact = readMavenPom().getArtifactId()
-      mvn_version  = readMavenPom().getVersion()
-      snapshot_version = "${env.mvn_version}.${env.BUILD_NUMBER}"
+      MVN_ARTIFACT = readMavenPom().getArtifactId()
+      MVN_VERSION  = readMavenPom().getVersion()
+      SNAPHOT_VERSION = "${env.MVN_VERSION}}.${env.BUILD_NUMBER}"
     }
 
     agent {
@@ -38,7 +38,7 @@ def call(body) {
                     options: [junitPublisher(disabled: false,
                     ignoreAttachments: false),
                     artifactsPublisher(disabled: false)]) {
-
+            echo "Building Maven artifact: ${env.MVN_ARTIFACT} Version: ${env.SNAPSHOT_VERSION}"
             sh 'mvn -DskipTests integration-test'
           }
         }
@@ -46,7 +46,7 @@ def call(body) {
 
       stage('Build Docker Image') {
         steps {
-          echo "Building Docker Image: ${config.dockerImage}:${env.snapshot_version}"
+          echo "Building Docker Image: ${config.dockerImage}:${env.SNAPSHOT_VERSION}"
           sh """
             cat > .dockerignore << EOF
 *
@@ -56,8 +56,7 @@ def call(body) {
 EOF
           """
           //sh "docker build -t ${config.dockerImage}:${snapshot_version} ."
-          sh 'echo "${config.dockerImage}:${snapshot_version}"'
-          sh 'echo "${config.dockerImage}:${env.snapshot_version}"'
+          echo "${config.dockerImage}:${env.SNAPSHOT_VERSION}"
           //sh "docker tag ${config.dockerImage}:${snapshot_version} ${config.dockerImage}:latest"
         }
       }
