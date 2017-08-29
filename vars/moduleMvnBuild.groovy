@@ -30,15 +30,19 @@ def call(body) {
           script {
             def mvn_artifact = readMavenPom().getArtifactId() 
             def mvn_version =  readMavenPom().getVersion()
-            def snapshot_version = "${mvn_version}.${env.BUILD_NUMBER}"
+            def snapshot_version = "${mvn_version}.${env.BUILD_NUMBER}" 
+
+            env.mvn_artifact = mvn_artifact
+            env.mvn_version = mvn_version
+            env.snapshot_version = snapshot_version
           }
+          echo "Building Maven artifact: ${env.mvn_artifact} Version: ${env.snapshot_version}"
             
           withMaven(jdk: 'OpenJDK 8 on Ubuntu Docker Slave Node',
                     maven: 'Maven on Ubuntu Docker Slave Node',
                     options: [junitPublisher(disabled: false,
                     ignoreAttachments: false),
                     artifactsPublisher(disabled: false)]) {
-            echo "Building Maven artifact: ${mvn_artifact} Version: ${snapshot_version}"
             sh 'mvn -DskipTests integration-test'
           }
         }
