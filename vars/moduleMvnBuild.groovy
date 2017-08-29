@@ -55,13 +55,20 @@ def call(body) {
 !target/*.jar
 EOF
           """
-          sh 'cat .dockerignore'
-   
+          sh "docker build -t $config.dockerImage:${snapshot_version}"
+          sh "docker tag $config.dockerImage:${snapshot_version} $config.dockerImage:latest"
         }
       }
 
     } // end stages
 
+    post {
+      always {
+        sh "docker rmi $config.dockerImage:${snapshot_version} || exit 0"
+        sh "docker rmi $config.dockerImage:latest || exit 0"
+      }
+    }
+    
   } // end pipeline
  
 } 
