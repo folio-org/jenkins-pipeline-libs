@@ -8,6 +8,13 @@ def call(body) {
   body()
 
   pipeline {
+
+    environment {
+      mvn_artifact = readMavenPom().getArtifactId()
+      mvn_version  = readMavenPom().getVersion()
+      snapshot_version = "${env.mvn_version}.{env.BUILD_NUMBER}"
+    }
+
     agent {
       node {
         label 'folio-jenkins-slave-docker'
@@ -39,7 +46,17 @@ def call(body) {
 
       stage('Build Docker Image') {
         steps {
-          echo "Building Docker Image: ${config.dockerImage}"
+          echo "Building Docker Image: ${config.dockerImage}:${env.snapshot_version}"
+          sh """
+            cat > .dockerignore <<EOF
+            *
+            !Dockerfile
+            !docker
+            !target/*.jar
+            EOF
+          """
+          sh 'cat .dockerignore'
+   
         }
       }
 
