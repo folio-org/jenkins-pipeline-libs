@@ -51,10 +51,10 @@ def call(body) {
 
       stage('Docker Build') {
         when {
-          expression { return config.docker ==~ /(?i)(Y|YES|T|TRUE|ON|RUN)/ }
+          expression { $config.docker ==~ /(?i)(Y|YES|T|TRUE|ON|RUN)/ }
         }
         steps {
-          echo "Building Docker Image: ${config.dockerImage}:${env.snapshot_version}"
+          echo "Building Docker Image: ${env.mvn_artifact}:${env.snapshot_version}"
           sh """
             cat > .dockerignore << EOF
 *
@@ -63,8 +63,8 @@ def call(body) {
 !target/*.jar
 EOF
           """
-          sh "docker build -t ${config.dockerImage}:${env.snapshot_version} ."
-          sh "docker tag ${config.dockerImage}:${env.snapshot_version} ${config.dockerImage}:latest"
+          sh "docker build -t ${env.mvn_artifact}:${env.snapshot_version} ."
+          sh "docker tag ${env.mvn_artifact}:${env.snapshot_version} ${env.mvn_artifact}:latest"
         }
       }
   
@@ -76,8 +76,8 @@ EOF
 
     post {
       always {
-        sh "docker rmi ${config.dockerImage}:${snapshot_version} || exit 0"
-        sh "docker rmi ${config.dockerImage}:latest || exit 0"
+        sh "docker rmi ${env.mvn_artifact}:${env.snapshot_version} || exit 0"
+        sh "docker rmi ${env.mvn_artifact}:latest || exit 0"
       }
     }
     
