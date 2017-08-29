@@ -52,6 +52,7 @@ def call(body) {
       stage('Docker Build') {
         when {
           expression { ${config.docker} == true }
+        }
         steps {
           echo "Building Docker Image: ${config.dockerImage}:${env.snapshot_version}"
           sh """
@@ -84,4 +85,3 @@ EOF
  
 } 
 
-  
