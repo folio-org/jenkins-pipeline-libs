@@ -1,6 +1,5 @@
-#!/usr/bin/groovy
+#!/usr/bin/env groovy
 
-//import org.folio.foliociCommands
 
 def call(body) {
   def config = [:]
@@ -8,10 +7,9 @@ def call(body) {
   body.delegate = config
   body()
 
-  //def s = new org.folio.foliociCommands() 
-  //s.setBuildDisplayName()
-  sendNotifications 'STARTED'
-
+  node {
+    echo "hello test message: ${config.message}"
+  }
 }
  
   
