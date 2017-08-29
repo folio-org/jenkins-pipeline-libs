@@ -17,6 +17,7 @@ def call(body) {
           script {
             currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.JOB_BASE_NAME}"
           }
+        echo "buildDocker is: $config.buildDocker"
         }
       }
 
