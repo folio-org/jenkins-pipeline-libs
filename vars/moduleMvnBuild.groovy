@@ -25,7 +25,7 @@ def call(body) {
         }
       }
 
-      stage('Mvn Build') {
+      stage('Maven Build') {
         steps {
           script {
             def mvn_artifact = readMavenPom().getArtifactId() 
@@ -49,7 +49,9 @@ def call(body) {
         }
       }
 
-      stage('Build Docker Image') {
+      stage('Docker Build') {
+        when {
+          expression { ${config.docker} == true }
         steps {
           echo "Building Docker Image: ${config.dockerImage}:${env.snapshot_version}"
           sh """
@@ -64,6 +66,10 @@ EOF
           sh "docker tag ${config.dockerImage}:${env.snapshot_version} ${config.dockerImage}:latest"
         }
       }
+  
+      // stage('Docker Publish') {
+      //  when { 
+      // echo "Publishing Docker image ${env.docker_image}:${env.POM_VERSION} to Docker Hub..."
 
     } // end stages
 
