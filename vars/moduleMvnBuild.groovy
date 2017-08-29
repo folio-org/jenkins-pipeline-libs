@@ -36,6 +36,7 @@ def call(body) {
             env.mvn_version = mvn_version
             env.snapshot_version = snapshot_version
           }
+
           echo "Building Maven artifact: ${env.mvn_artifact} Version: ${env.snapshot_version}"
             
           withMaven(jdk: 'OpenJDK 8 on Ubuntu Docker Slave Node',
@@ -50,7 +51,7 @@ def call(body) {
 
       stage('Build Docker Image') {
         steps {
-          echo "Building Docker Image: ${config.dockerImage}:${snapshot_version}"
+          echo "Building Docker Image: ${config.dockerImage}:${env.snapshot_version}"
           sh """
             cat > .dockerignore << EOF
 *
@@ -59,9 +60,8 @@ def call(body) {
 !target/*.jar
 EOF
           """
-          //sh "docker build -t ${config.dockerImage}:${snapshot_version} ."
-          echo "${config.dockerImage}:${snapshot_version}"
-          //sh "docker tag ${config.dockerImage}:${snapshot_version} ${config.dockerImage}:latest"
+          sh "docker build -t ${config.dockerImage}:${env.snapshot_version} ."
+          sh "docker tag ${config.dockerImage}:${env.snapshot_version} ${config.dockerImage}:latest"
         }
       }
 
@@ -69,8 +69,8 @@ EOF
 
     post {
       always {
-        sh "docker rmi $config.dockerImage:${snapshot_version} || exit 0"
-        sh "docker rmi $config.dockerImage:latest || exit 0"
+        sh "docker rmi ${config.dockerImage}:${snapshot_version} || exit 0"
+        sh "docker rmi ${config.dockerImage}:latest || exit 0"
       }
     }
     
