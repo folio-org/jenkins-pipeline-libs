@@ -38,7 +38,7 @@ def call(body) {
                     options: [junitPublisher(disabled: false,
                     ignoreAttachments: false),
                     artifactsPublisher(disabled: false)]) {
-            echo "Building Maven artifact: ${mvn_artifact} Version: $snapshot_version}"
+            echo "Building Maven artifact: ${mvn_artifact} Version: ${snapshot_version}"
             sh 'mvn -DskipTests integration-test'
           }
         }
