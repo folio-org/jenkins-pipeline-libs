@@ -18,16 +18,13 @@ def call(body) {
             currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.JOB_BASE_NAME}"
           }
           echo "buildDocker is: $config.buildDocker"
-          script {
-            def boolean doDocker = config.buildDocker
-          }
         
         }
       }
 
       stage('test') {
          when {
-           expression { return doDocker ==~ /(?i)(Y|YES|T|TRUE|ON|RUN)/ }
+           expression { return config.buildDocker ==~ /(?i)(Y|YES|T|TRUE|ON|RUN)/ }
          }
         steps {
            echo "It's true!"
