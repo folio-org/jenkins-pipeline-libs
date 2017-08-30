@@ -28,7 +28,7 @@ def call(body) {
 
       stage('test') {
          when {
-           expression { return doDocker == true }
+           expression {  return doDocker  }
          }
         steps {
            echo "It's true!"
