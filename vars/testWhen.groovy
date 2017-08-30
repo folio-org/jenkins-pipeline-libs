@@ -19,6 +19,7 @@ def call(body) {
             env.DOCKER = config.buildDocker
           }
           echo "buildDocker is: $config.buildDocker"
+          echo "Branch is: $env.BRANCH"
           echo "DOCKER is: $env.DOCKER"
         
         }
@@ -32,6 +33,7 @@ def call(body) {
         steps {
            echo "DOCKER again is: $env.DOCKER"
            echo "It's true!"
+           echo "Branch is: $env.BRANCH_NAME"
         }
       }
     }
