@@ -17,7 +17,7 @@ def call(body) {
           branch 'master'
         }
         steps {
-          echo "Building branch 'master'..."  
+          echo "Message: $config.message"  
           echo "Branch is: $env.BRANCH_NAME"
         }
       }
