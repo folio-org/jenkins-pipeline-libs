@@ -26,7 +26,8 @@ def call(body) {
 
       stage('test') {
          when {
-           environment name: 'DOCKER', value: 'yes'  
+           // environment name: 'DOCKER', value: 'yes'  
+           branch 'master'
          }
         steps {
            echo "DOCKER again is: $env.DOCKER"
