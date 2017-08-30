@@ -18,7 +18,7 @@ def call(body) {
         steps {
           script {
             currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.JOB_BASE_NAME}"
-            if ( config.buildDocker ==~ /(?i)(Y|YES|T|TRUE|ON|RUN)/) {
+            if ( config.buildDocker == 'yes')  {
                def Boolean doDocker = true
                echo "doDocker equals $doDocker"
             }
@@ -30,7 +30,7 @@ def call(body) {
 
       stage('test') {
          when {
-           expression { return doDocker || false }
+           expression { return doDocker == true }
          }
         steps {
            echo "It's true!"
