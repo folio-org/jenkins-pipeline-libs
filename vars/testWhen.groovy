@@ -33,7 +33,6 @@ def call(body) {
            script {
               if (config.buildDocker ==~ /(yes|true)/) {
                  echo "buildDocker is: $config.buildDocker"
-                 echo "It's 
                  echo "Branch is: $env.BRANCH_NAME"
               }
               else {
