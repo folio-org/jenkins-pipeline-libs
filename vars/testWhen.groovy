@@ -26,14 +26,20 @@ def call(body) {
       }
 
       stage('test') {
-         when {
+         //when {
            // environment name: 'DOCKER', value: 'yes'  
-           branch 'master'
-         }
+         //}
         steps {
-           echo "DOCKER again is: $env.DOCKER"
-           echo "It's true!"
-           echo "Branch is: $env.BRANCH_NAME"
+           script {
+              if (config.buildDocker ==~ /(yes|true)/) {
+                 echo "buildDocker is: $config.buildDocker"
+                 echo "It's 
+                 echo "Branch is: $env.BRANCH_NAME"
+              }
+              else {
+                echo "False: buildDocker is: $config.buildDocker" 
+              }
+           } 
         }
       }
     }
