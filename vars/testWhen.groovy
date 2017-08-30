@@ -29,6 +29,7 @@ def call(body) {
            environment name: 'DOCKER', value: 'yes'  
          }
         steps {
+           echo "DOCKER again is: $env.DOCKER"
            echo "It's true!"
         }
       }
