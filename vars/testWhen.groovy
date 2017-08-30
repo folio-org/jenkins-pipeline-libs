@@ -11,8 +11,6 @@ def call(body) {
 
     agent any 
 
-    parameters { booleanParam(name: 'buildDocker', defaultValue: false, description: '') }
-
     stages {
       stage('Prep') {
         steps {
