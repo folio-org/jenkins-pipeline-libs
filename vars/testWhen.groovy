@@ -24,7 +24,7 @@ def call(body) {
 
       stage('test') {
          when {
-           expression { config.buildDocker == 'yes' }
+           expression { $config.buildDocker == 'yes' }
          }
         steps {
            echo "It's true!"
