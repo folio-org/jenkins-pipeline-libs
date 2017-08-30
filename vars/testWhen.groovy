@@ -24,7 +24,7 @@ def call(body) {
 
       stage('test') {
          when {
-           expression { return config.buildDocker ==~ /(?i)(Y|YES|T|TRUE)/ }
+           expression { return $config.buildDocker ==~ /(?i)(Y|YES|T|TRUE)/ }
          }
         steps {
            echo "It's true!"
