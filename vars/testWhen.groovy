@@ -11,11 +11,17 @@ def call(body) {
 
     agent any 
 
+    parameters { booleanParam(name: 'buildDocker', defaultValue: false, description: '') }
+
     stages {
       stage('Prep') {
         steps {
           script {
-            currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.JOB_BASE_NAME}"
+            currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.JOB_BASE_NAME}
+            if ( config.buildDocker ==~ /(?i)(Y|YES|T|TRUE|ON|RUN)/) {
+               def Boolean doDocker = true
+               echo "doDocker equals $doDocker"
+            }
           }
           echo "buildDocker is: $config.buildDocker"
         
@@ -24,7 +30,7 @@ def call(body) {
 
       stage('test') {
          when {
-           expression { $config.buildDocker == 'yes' }
+           expression { return doDocker || false }
          }
         steps {
            echo "It's true!"
