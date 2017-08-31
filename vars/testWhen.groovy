@@ -13,7 +13,7 @@ def call(body) {
       stage('One') {
         echo "Branch is: $env.BRANCH_NAME"
         echo "Perform Stage One"
-        sh '/bin/false'
+        sendNotifications 'STARTED'
       }
 
       stage('Two') {
@@ -46,9 +46,7 @@ def call(body) {
     } // end try
     catch (Exception err) {
       currentBuild.result = 'FAILED'
-      println(err.toString());
       println(err.getMessage());
-      println(err.getStackTrace());
       echo "Build Result: $currentBuild.result"
       throw err
     
