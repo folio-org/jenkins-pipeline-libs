@@ -21,8 +21,8 @@ EOF
   """
 
   echo "Fat Jar is: $fatJar"
-  sh "echo $dockerFile > ${env.WORKSPACE}/Dockerfile"
-  sh "echo $dockerEntrypoint > ${env.WORKSPACE}/dockerentrypoint.sh"
+  writeFile file: "${env.WORKSPACE}/Dockerfile}", text: "$dockerFile"
+  writeFile file: "${env.WORKSPACE}/dockerentrypoint.sh", text: "$dockerEntrypoint"
   
   sh "docker build --tag ${name}:${version} --build-arg='VERTICLE_FILE=${fatJar}' ."
   sh "docker tag ${name}:${version} ${name}:latest"  
