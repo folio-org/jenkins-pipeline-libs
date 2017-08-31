@@ -13,6 +13,7 @@ def call(body) {
       stage('One') {
         echo "Branch is: $env.BRANCH_NAME"
         echo "Perform Stage One"
+        sh '/bin/false'
       }
 
       stage('Two') {
