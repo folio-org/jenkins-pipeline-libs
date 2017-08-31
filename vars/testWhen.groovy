@@ -35,7 +35,8 @@ def call(body) {
         def mvn_version =  readMavenPom().getVersion()
         env.name = "$mvn_artifact"
 
-        if (mvn_version ==~ /-SNAPSHOT/) {
+        if (mvn_version ==~ /SNAPSHOT/) {
+          echo "This is a snapshot"
           env.version = "${mvn_version}.${env.BUILD_NUMBER}"
         }
         else {
