@@ -5,9 +5,9 @@
  * Send notifications based on build status string
  */
 
-def call(String name, String version, String artifact) {
+def call(String name, String version) {
 
-  def fatJar = "${artifact}-fat.jar"
+  def fatJar = "${name}-fat.jar"
   def dockerFile = libraryResource 'org.folio.Dockerfile.JavaModule'
   def dockerEntrypoint = libraryResource 'org.folio.docker-entrypoint.JavaModule'
 
