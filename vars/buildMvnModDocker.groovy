@@ -26,4 +26,5 @@ EOF
   
   sh "docker build --tag ${name}:${version} --build-arg='VERTICLE_FILE=${fatJar}' ."
   sh "docker tag ${name}:${version} ${name}:latest"  
+  
 }
