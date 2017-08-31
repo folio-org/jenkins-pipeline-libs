@@ -8,8 +8,8 @@
 def call(String name, String version) {
 
   def fatJar = "${name}-fat.jar"
-  def dockerFile = libraryResource 'org/folio/Dockerfile.JavaModule'
-  def dockerEntrypoint = libraryResource 'org/folio/docker-entrypoint.JavaModule'
+  def dockerFile = libraryResource 'org/folio/Dockerfile.javaModule'
+  def dockerEntrypoint = libraryResource 'org/folio/docker-entrypoint.javaModule'
 
   sh """
   cat > .dockerignore << EOF
