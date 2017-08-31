@@ -33,12 +33,13 @@ def call(body) {
       stage('Maven Build') {
         def mvn_artifact = readMavenPom().getArtifactId() 
         def mvn_version =  readMavenPom().getVersion()
+        def version = ''
 
         if (mvn_version ==~ /-SNAPSHOT/) {
-          def version = "${mvn_version}.${env.BUILD_NUMBER}"
+          version = "${mvn_version}.${env.BUILD_NUMBER}"
         }
         else {
-          def version = "$mvn_version"
+          version = "$mvn_version"
         }
 
         echo "Building Maven artifact: ${mvn_artifact} Version: ${version}"
@@ -61,7 +62,7 @@ def call(body) {
         if ( config.doDocker ==~ /(?i)(Y|YES|T|TRUE)/ ) {
           stage('Docker') {
             echo "Building Docker" 
-            buildModDockerImage($mvn_artifact,$version) 
+            buildModDockerImage("$mvn_artifact","$version") 
           }
           stage('Docker Publish') {
             echo "Publishing Docker"
