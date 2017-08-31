@@ -33,16 +33,16 @@ def call(body) {
       stage('Maven Build') {
         def mvn_artifact = readMavenPom().getArtifactId() 
         def mvn_version =  readMavenPom().getVersion()
-        def version = ''
+        env.name = "$mvn_artifact"
 
         if (mvn_version ==~ /-SNAPSHOT/) {
-          version = "${mvn_version}.${env.BUILD_NUMBER}"
+          env.version = "${mvn_version}.${env.BUILD_NUMBER}"
         }
         else {
-          version = "$mvn_version"
+          env.version = "$mvn_version"
         }
 
-        echo "Building Maven artifact: ${mvn_artifact} Version: ${version}"
+        echo "Building Maven artifact: ${env.name} Version: ${env.version}"
             
         withMaven(jdk: 'OpenJDK 8 on Ubuntu Docker Slave Node',
                     maven: 'Maven on Ubuntu Docker Slave Node',
@@ -50,19 +50,19 @@ def call(body) {
                     ignoreAttachments: false),
                     artifactsPublisher(disabled: false)]) {
 
-          sh 'mvn integration-test'
+          //sh 'mvn integration-test'
+          sh 'mvn -DskipTests integration-test'
 
         }
       }
 
       //if ( env.BRANCH_NAME == 'master' ) {    
       if ( env.BRANCH_NAME == 'malc-test' ) {    
-        echo "config.doDocker is: $config.doDocker" 
 
         if ( config.doDocker ==~ /(?i)(Y|YES|T|TRUE)/ ) {
           stage('Docker') {
-            echo "Building Docker" 
-            buildModDockerImage("$mvn_artifact","$version") 
+            echo "Building Docker image $env.name:$env.version" 
+            buildModDockerImage("$env.name","$env.version") 
           }
           stage('Docker Publish') {
             echo "Publishing Docker"
