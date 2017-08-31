@@ -19,7 +19,8 @@ def call(body) {
         echo "Perform Stage Two"
       }
    
-      if ( env.BRANCH_NAME == 'master' ) {    
+      //if ( env.BRANCH_NAME == 'master' ) {    
+      if ( env.BRANCH_NAME == 'malc-test' ) {    
         echo "config.doDocker is: $config.doDocker" 
 
         if ( config.doDocker ==~ /(?i)(Y|YES|T|TRUE)/ ) {
