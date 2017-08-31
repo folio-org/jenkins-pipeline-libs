@@ -7,7 +7,7 @@ def call(body) {
   body.delegate = config
   body()
 
-  node {
+  node('folio-jenkins-slave-docker') {
 
     try {
       stage('Checkout') {
@@ -38,7 +38,7 @@ def call(body) {
           def version = "${mvn_version}.${env.BUILD_NUMBER}"
         }
         else {
-          def version = $mvn_version
+          def version = "$mvn_version"
         }
 
         echo "Building Maven artifact: ${mvn_artifact} Version: ${version}"
