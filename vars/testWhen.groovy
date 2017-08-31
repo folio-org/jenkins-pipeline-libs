@@ -48,7 +48,7 @@ def call(body) {
       currentBuild.result = 'FAILED'
       println(err.toString());
       println(err.getMessage());
-      println(ex.getStackTrace());
+      println(err.getStackTrace());
       echo "Build Result: $currentBuild.result"
       throw err
     
