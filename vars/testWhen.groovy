@@ -51,7 +51,7 @@ def call(body) {
                     artifactsPublisher(disabled: false)]) {
 
           //sh 'mvn integration-test'
-          sh 'mvn -DskipTests integration-test'
+          sh 'mvn -DskipTests package'
 
         }
       }
@@ -60,7 +60,7 @@ def call(body) {
       if ( env.BRANCH_NAME == 'malc-test' ) {    
 
         if ( config.doDocker ==~ /(?i)(Y|YES|T|TRUE)/ ) {
-          stage('Docker') {
+          stage('Docker Build') {
             echo "Building Docker image $env.name:$env.version" 
             buildModDockerImage("$env.name","$env.version") 
           }
