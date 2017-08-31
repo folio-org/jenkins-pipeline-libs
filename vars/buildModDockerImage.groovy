@@ -15,7 +15,7 @@ def call(String name, String version) {
   cat > .dockerignore << EOF
 *
 !Dockerfile
-!docker
+!docker*
 !target/*.jar
 EOF
   """
