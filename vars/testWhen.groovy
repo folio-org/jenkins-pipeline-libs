@@ -10,16 +10,50 @@ def call(body) {
   node {
 
     try {
-      stage('One') {
-        echo "Branch is: $env.BRANCH_NAME"
-        echo "Perform Stage One"
-        sendNotifications 'STARTED'
+      stage('Checkout') {
+        deleteDir()
+        currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.JOB_BASE_NAME}"
+        //sendNotifications 'STARTED'
+
+         checkout([
+                 $class: 'GitSCM',
+                 branches: scm.branches,
+                 extensions: scm.extensions + [[$class: 'SubmoduleOption',
+                                                       disableSubmodules: false,
+                                                       parentCredentials: false,
+                                                       recursiveSubmodules: true,
+                                                       reference: '',
+                                                       trackingSubmodules: false]],
+                 userRemoteConfigs: scm.userRemoteConfigs
+         ])
+
+         echo "Checked out $env.BRANCH_NAME"
       }
 
-      stage('Two') {
-        echo "Perform Stage Two"
+      stage('Maven Build') {
+        def mvn_artifact = readMavenPom().getArtifactId() 
+        def mvn_version =  readMavenPom().getVersion()
+
+        if (mvn_version ==~ /-SNAPSHOT/) {
+          def version = "${mvn_version}.${env.BUILD_NUMBER}"
+        }
+        else {
+          def version = $mvn_version
+        }
+
+        echo "Building Maven artifact: ${mvn_artifact} Version: ${version}"
+            
+        withMaven(jdk: 'OpenJDK 8 on Ubuntu Docker Slave Node',
+                    maven: 'Maven on Ubuntu Docker Slave Node',
+                    options: [junitPublisher(disabled: false,
+                    ignoreAttachments: false),
+                    artifactsPublisher(disabled: false)]) {
+
+          sh 'mvn integration-test'
+
+        }
       }
-   
+
       //if ( env.BRANCH_NAME == 'master' ) {    
       if ( env.BRANCH_NAME == 'malc-test' ) {    
         echo "config.doDocker is: $config.doDocker" 
@@ -27,6 +61,7 @@ def call(body) {
         if ( config.doDocker ==~ /(?i)(Y|YES|T|TRUE)/ ) {
           stage('Docker') {
             echo "Building Docker" 
+            buildModDockerImage($mvn_artifact,$version) 
           }
           stage('Docker Publish') {
             echo "Publishing Docker"
@@ -54,6 +89,7 @@ def call(body) {
     finally {
       echo "Send some notifications"
       echo "Do some cleanup"
+      
     }
   } //end node
     
