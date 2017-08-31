@@ -8,7 +8,7 @@
 def call(String name, String version, String fatJar) {
 
   def dockerFile = libraryResource 'org.folio.Dockerfile.JavaModule'
-  def dockerEntrypoint = libraryResource 'org.folio.dockerentrypoint.JavaModule'
+  def dockerEntrypoint = libraryResource 'org.folio.docker-entrypoint.JavaModule'
 
   sh """
   cat > .dockerignore << EOF
