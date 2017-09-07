@@ -63,7 +63,7 @@ def call(body) {
         if ( config.doDocker ==~ /(?i)(Y|YES|T|TRUE)/ ) {
           stage('Docker Build') {
             echo "Building Docker image $env.name:$env.version" 
-            buildMvnModDocker("$env.name","$env.version") 
+            buildJavaModDocker("$env.name","$env.version") 
           }
           stage('Docker Publish') {
             echo "Publishing Docker"
