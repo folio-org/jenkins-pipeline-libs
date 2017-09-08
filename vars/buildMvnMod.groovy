@@ -72,7 +72,7 @@ def call(body) {
         if (config.publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) {
           stage('Publish Module Descriptor') {
             if (fileExists('target/ModuleDescriptor.json')) {
-              def modDescriptor = 'target/ModuleDescriptor'
+              def modDescriptor = 'target/ModuleDescriptor.json'
               echo "Publishing Module Descriptor to FOLIO registry"
               postModuleDescriptor("$modDescriptor","$env.version") 
             }
