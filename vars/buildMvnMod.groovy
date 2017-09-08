@@ -71,12 +71,21 @@ def call(body) {
         } 
         if (config.publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) {
           stage('Publish Module Descriptor') {
-            echo "Publishing Module Descriptor"
+            if (fileExists('target/ModuleDescriptor.json')) {
+              def modDescriptor = 'target/ModuleDescriptor'
+              echo "Publishing Module Descriptor to FOLIO registry"
+              postModuleDescriptor("$modDescriptor","$env.version") 
+            else {
+              // 
+              echo "ModuleDescriptor.json not found"  
+            }
           }
         }
         if (config.publishAPI ==~ /(?i)(Y|YES|T|TRUE)/) {
           stage('Publish API Docs') {
           echo "Publishing API docs"
+            sh "python3 /usr/local/bin/generate_api_docs.py -r $env.name -v -o folio-api-docs"
+            sh 'aws s3 sync folio-api-docs s3://foliodocs/api'
           }
         }
       } 
@@ -90,7 +99,9 @@ def call(body) {
     }
     finally {
       echo "Send some notifications"
-      echo "Do some cleanup"
+      echo "Clean up any docker artifacts"
+      sh "docker rmi ${env.name}:${env.version} || exit 0"
+      sh "docker rmi ${env.name}:latest || exit 0"
       
     }
   } //end node
