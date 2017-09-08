@@ -8,9 +8,12 @@
 def call(String name, String version) {
 
   def fatJar = "${name}-fat.jar"
-  def dockerFile = libraryResource 'org/folio/Dockerfile.javaModule'
-  def dockerEntrypoint = libraryResource 'org/folio/docker-entrypoint.javaModule'
+  def dockerFile
+  def dockerEntrypoint
+  def buildArg
 
+  echo "Fat Jar is: $fatJar"
+ 
   sh """
   cat > .dockerignore << EOF
 *
@@ -20,11 +23,34 @@ def call(String name, String version) {
 EOF
   """
 
-  echo "Fat Jar is: $fatJar"
-  writeFile file: 'Dockerfile', text: "$dockerFile"
-  writeFile file: 'docker-entrypoint.sh', text: "$dockerEntrypoint"
+  if (fileExists('Dockerfile')) {
+    echo "Found existing Dockerfile." 
+    buildArg = 'no'
+  }
+  else {
+    echo "Dockerfile not found.  Using Java template."
+    dockerFile = libraryResource 'org/folio/Dockerfile.javaModule'
+    writeFile file: 'Dockerfile', text: "$dockerFile"
+    buildArg = 'yes'
+    
+  }
+
+  if (fileExists('docker/docker-entrypoint.sh')) {
+    echo "Found existing docker-entrypoint.sh script." 
+  }
+  else {
+   echo "docker-entrypoint.sh not found. Using Java entrypoint template."
+   dockerEntrypoint = libraryResource 'org/folio/docker-entrypoint.javaModule'
+   writeFile file: 'docker-entrypoint.sh', text: "$dockerEntrypoint"
+  }
+
+  if (buildArg == 'yes') {
+    sh "docker build --tag ${name}:${version} --build-arg='VERTICLE_FILE=${fatJar}' . "
+  }
+  else {
+    sh "docker build --tag ${name}:${version} ."
+  }
   
-  sh "docker build --tag ${name}:${version} --build-arg='VERTICLE_FILE=${fatJar}' ."
   sh "docker tag ${name}:${version} ${name}:latest"  
   
 }
