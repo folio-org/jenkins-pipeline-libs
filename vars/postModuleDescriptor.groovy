@@ -14,7 +14,7 @@ def call(String modDescriptor,String version) {
   if (version ==~ /.*-SNAPSHOT.*/) { 
     sh "mv $modDescriptor ${modDescriptor}.tmp"
     sh """
-      jq '.id |= \"${version}\" ${modDescriptor}.tmp > $modDescriptor
+      jq '.id |= \"${version}\"' ${modDescriptor}.tmp > $modDescriptor
     """
   }
 
