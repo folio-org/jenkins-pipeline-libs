@@ -75,6 +75,7 @@ def call(body) {
               def modDescriptor = 'target/ModuleDescriptor'
               echo "Publishing Module Descriptor to FOLIO registry"
               postModuleDescriptor("$modDescriptor","$env.version") 
+            }
             else {
               // 
               echo "ModuleDescriptor.json not found"  
