@@ -5,7 +5,7 @@
  * Send notifications based on build status string
  */
 
-def call(String modDescriptor,String version) {
+def call(String modDescriptor,String name,String version) {
  
   //def folioRegistry = 'http://folio-registry.aws.indexdata.com:9130/_/proxy/modules'
   def folioRegistry = 'http://folio-registry-test.aws.indexdata.com:9130/_/proxy/modules'
@@ -14,7 +14,7 @@ def call(String modDescriptor,String version) {
   if (version ==~ /.*-SNAPSHOT.*/) { 
     sh "mv $modDescriptor ${modDescriptor}.tmp"
     sh """
-      jq '.id |= \"${version}\"' ${modDescriptor}.tmp > $modDescriptor
+      jq '.id |= \"${name}-${version}\"' ${modDescriptor}.tmp > $modDescriptor
     """
   }
 
