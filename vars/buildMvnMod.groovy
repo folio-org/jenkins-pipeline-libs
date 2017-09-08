@@ -74,7 +74,7 @@ def call(body) {
             if (fileExists('target/ModuleDescriptor.json')) {
               def modDescriptor = 'target/ModuleDescriptor.json'
               echo "Publishing Module Descriptor to FOLIO registry"
-              postModuleDescriptor("$modDescriptor","$env.version") 
+              postModuleDescriptor("$modDescriptor","$env.name","$env.version") 
             }
             else {
               // 
