@@ -51,8 +51,7 @@ def call(body) {
                     ignoreAttachments: false),
                     artifactsPublisher(disabled: false)]) {
 
-          //sh 'mvn integration-test'
-          sh 'mvn -DskipTests package'
+          sh 'mvn integration-test'
 
         }
       }
@@ -77,8 +76,8 @@ def call(body) {
               }
               sh "docker tag ${env.name}:${env.version} ${env.repository}/${env.name}:${env.version}"
               sh "docker tag ${env.repository}/${env.name}:${env.version} ${env.repository}/${env.name}:latest"
-              //sh "docker push ${env.repository}/${env.name}:${env.version}"
-              //sh "docker push ${env.repository}/${env.name}:latest"
+              sh "docker push ${env.repository}/${env.name}:${env.version}"
+              sh "docker push ${env.repository}/${env.name}:latest"
             } 
           }
           
