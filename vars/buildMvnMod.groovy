@@ -13,7 +13,7 @@ def call(body) {
       stage('Checkout') {
         deleteDir()
         currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.JOB_BASE_NAME}"
-        //sendNotifications 'STARTED'
+        sendNotifications 'STARTED'
 
          checkout([
                  $class: 'GitSCM',
@@ -57,8 +57,8 @@ def call(body) {
         }
       }
 
-      //if ( env.BRANCH_NAME == 'master' ) {    
-      if ( env.BRANCH_NAME == 'malc-test' ) {    
+      if (( env.BRANCH_NAME == 'master' ) ||     
+         ( env.BRANCH_NAME == 'jenkins-test' )) {
 
         if ( config.doDocker ==~ /(?i)(Y|YES|T|TRUE)/ ) {
           stage('Docker Build') {
@@ -107,13 +107,13 @@ def call(body) {
     
     }
     finally {
-      
-      sendNotifications currentBuild.result
       echo "Clean up any temporary docker artifacts"
       sh "docker rmi ${env.name}:${env.version} || exit 0"
       sh "docker rmi ${env.name}:latest || exit 0"
       sh "docker rmi ${env.repository}/${env.name}:${env.version} || exit 0"
       sh "docker rmi ${env.repository}/${env.name}:latest || exit 0"
+
+      sendNotifications currentBuild.result
       
     }
   } //end node
