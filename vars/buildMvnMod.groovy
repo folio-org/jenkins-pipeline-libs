@@ -67,19 +67,27 @@ def call(body) {
           }
           stage('Docker Publish') {
             echo "Publishing Docker"
+
+            docker.withRegistry('https://index.docker.io/v1/', 'DockerHubIDJenkins') {
+              if (version ==~ /.*-SNAPSHOT.*/) {
+                env.repository = 'folioci'
+              }
+              else {
+                env.repository = 'folioorg'
+              }
+              sh "docker tag ${env.name}:${env.version} ${env.repository}/${env.name}:${env.version}"
+              sh "docker tag ${env.repository}/${env.name}:${env.version} ${env.repository}/${env.name}:latest"
+              //sh "docker push ${env.repository}/${env.name}:${env.version}"
+              //sh "docker push ${env.repository}/${env.name}:latest"
+            } 
           }
+          
         } 
         if (config.publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) {
           stage('Publish Module Descriptor') {
-            if (fileExists('target/ModuleDescriptor.json')) {
-              def modDescriptor = 'target/ModuleDescriptor.json'
               echo "Publishing Module Descriptor to FOLIO registry"
+              def modDescriptor = 'target/ModuleDescriptor.json'
               postModuleDescriptor("$modDescriptor","$env.name","$env.version") 
-            }
-            else {
-              // 
-              echo "ModuleDescriptor.json not found"  
-            }
           }
         }
         if (config.publishAPI ==~ /(?i)(Y|YES|T|TRUE)/) {
@@ -99,10 +107,13 @@ def call(body) {
     
     }
     finally {
-      echo "Send some notifications"
-      echo "Clean up any docker artifacts"
+      
+      sendNotifications currentBuild.result
+      echo "Clean up any temporary docker artifacts"
       sh "docker rmi ${env.name}:${env.version} || exit 0"
       sh "docker rmi ${env.name}:latest || exit 0"
+      sh "docker rmi $env.repository}/${env.name}:${env.version} || exit 0"
+      sh "docker rmi $env.repository}/${env.name}:latest || exit 0"
       
     }
   } //end node
