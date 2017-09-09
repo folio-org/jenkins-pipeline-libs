@@ -112,8 +112,8 @@ def call(body) {
       echo "Clean up any temporary docker artifacts"
       sh "docker rmi ${env.name}:${env.version} || exit 0"
       sh "docker rmi ${env.name}:latest || exit 0"
-      sh "docker rmi $env.repository}/${env.name}:${env.version} || exit 0"
-      sh "docker rmi $env.repository}/${env.name}:latest || exit 0"
+      sh "docker rmi ${env.repository}/${env.name}:${env.version} || exit 0"
+      sh "docker rmi ${env.repository}/${env.name}:latest || exit 0"
       
     }
   } //end node
