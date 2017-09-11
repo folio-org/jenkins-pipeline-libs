@@ -58,7 +58,7 @@ def call(body) {
 
       stage('SonarQube analysis') {
         withSonarQubeEnv('SonarCloud') {
-         sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.3.0.603:sonar'
+         sh 'mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:3.3.0.603:sonar'
         }
       }
 
