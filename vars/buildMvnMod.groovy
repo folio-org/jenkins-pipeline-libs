@@ -56,6 +56,12 @@ def call(body) {
         }
       }
 
+      stage('SonarQube analysis') {
+        withSonarQubeEnv {
+         sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.3.0.603:sonar'
+        }
+      }
+
       if (( env.BRANCH_NAME == 'master' ) ||     
          ( env.BRANCH_NAME == 'jenkins-test' )) {
 
