@@ -43,7 +43,7 @@ def call(String buildStatus = 'STARTED') {
     // Build failed. Red
     colorCode = '#FF0000'
     emailext (
-      to: 'folio-jenkins',
+      to: 'folio-jenkins@indexdata.com',
       subject: subject,
       body: details,
       recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'UpstreamComitterRecipientProvider'], [$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']]
