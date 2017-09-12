@@ -14,14 +14,20 @@ def call(String name, String version) {
 
   echo "Fat Jar is: $fatJar"
  
-  sh """
-  cat > .dockerignore << EOF
+  if (fileExists('.dockerignore')) {
+      echo "Using existing .dockerignore"
+  }
+  else {
+      echo "Creating .dockerignore"
+      sh """
+      cat > .dockerignore << EOF
 *
 !Dockerfile
 !docker*
 !target/*.jar
 EOF
-  """
+      """
+  }
 
   if (fileExists('Dockerfile')) {
     echo "Found existing Dockerfile." 
