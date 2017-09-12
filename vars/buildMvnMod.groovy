@@ -66,13 +66,15 @@ def call(body) {
           }
         }
         if ( config.mvnDeploy ==~ /(?i)(Y|YES|T|TRUE)/ ) {
-          echo "Deploying artifacts to Maven repository"
-          withMaven(jdk: 'OpenJDK 8 on Ubuntu Docker Slave Node',
-                    maven: 'Maven on Ubuntu Docker Slave Node',
-                    options: [junitPublisher(disabled: true,
-                    ignoreAttachments: false),
-                    artifactsPublisher(disabled: true)]) {
-            sh 'mvn -DskipTests deploy'
+          stage('Maven Deploy') {
+            echo "Deploying artifacts to Maven repository"
+            withMaven(jdk: 'OpenJDK 8 on Ubuntu Docker Slave Node',
+                      maven: 'Maven on Ubuntu Docker Slave Node',
+                      options: [junitPublisher(disabled: true,
+                      ignoreAttachments: false),
+                      artifactsPublisher(disabled: true)]) {
+              sh 'mvn -DskipTests deploy'
+            }
           }
         }
         if ( config.doDocker ==~ /(?i)(Y|YES|T|TRUE)/ ) {
