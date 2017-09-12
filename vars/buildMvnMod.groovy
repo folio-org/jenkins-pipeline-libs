@@ -65,7 +65,7 @@ def call(body) {
             sh 'mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:3.3.0.603:sonar -Dsonar.organization=folio-org -Dsonar.verbose=true'
           }
         }
-        if ( config.mvnDeploy ==~ /(?i)(Y|YES|T|TRUE)/ } {
+        if ( config.mvnDeploy ==~ /(?i)(Y|YES|T|TRUE)/ ) {
           echo "Deploying artifacts to Maven repository"
           withMaven(jdk: 'OpenJDK 8 on Ubuntu Docker Slave Node',
                     maven: 'Maven on Ubuntu Docker Slave Node',
