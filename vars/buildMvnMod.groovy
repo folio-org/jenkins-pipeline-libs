@@ -51,7 +51,7 @@ def call(body) {
                     ignoreAttachments: false),
                     artifactsPublisher(disabled: false)]) {
 
-          sh 'mvn integration-test'
+          sh 'mvn -DskipTests integration-test'
 
         }
       }
