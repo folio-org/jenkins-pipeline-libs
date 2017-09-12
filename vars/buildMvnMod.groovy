@@ -56,14 +56,15 @@ def call(body) {
         }
       }
 
-      stage('SonarQube analysis') {
-        withSonarQubeEnv('SonarCloud') {
-          sh 'mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:3.3.0.603:sonar -Dsonar.organization=folio-org -Dsonar.verbose=true'
-        }
-      }
 
       if (( env.BRANCH_NAME == 'master' ) ||     
          ( env.BRANCH_NAME == 'jenkins-test' )) {
+
+        stage('SonarQube Scan') {
+          withSonarQubeEnv('SonarCloud') {
+            sh 'mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:3.3.0.603:sonar -Dsonar.organization=folio-org -Dsonar.verbose=true'
+          }
+        }
 
         if ( config.doDocker ==~ /(?i)(Y|YES|T|TRUE)/ ) {
           stage('Docker Build') {
