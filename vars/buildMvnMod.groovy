@@ -51,15 +51,14 @@ def call(body) {
                     ignoreAttachments: false),
                     artifactsPublisher(disabled: false)]) {
 
-          sh 'mvn -DskipTests integration-test'
+          sh 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install'
 
         }
       }
 
       stage('SonarQube analysis') {
         withSonarQubeEnv('SonarCloud') {
-         // sh 'mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:3.3.0.603:sonar'
-         sh 'mvn -B clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar'
+          sh 'mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:3.3.0.603:sonar -Dsonar.organization=folio-org -Dsonar.verbose=true'
         }
       }
 
