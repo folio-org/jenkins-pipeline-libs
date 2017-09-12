@@ -51,13 +51,20 @@ def call(body) {
                     ignoreAttachments: false),
                     artifactsPublisher(disabled: false)]) {
 
-          sh 'mvn integration-test'
+          sh 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install'
 
         }
       }
 
+
       if (( env.BRANCH_NAME == 'master' ) ||     
          ( env.BRANCH_NAME == 'jenkins-test' )) {
+
+        stage('SonarQube Scan') {
+          withSonarQubeEnv('SonarCloud') {
+            sh 'mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:3.3.0.603:sonar -Dsonar.organization=folio-org -Dsonar.verbose=true'
+          }
+        }
 
         if ( config.doDocker ==~ /(?i)(Y|YES|T|TRUE)/ ) {
           stage('Docker Build') {
