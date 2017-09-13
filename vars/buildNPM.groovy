@@ -42,7 +42,9 @@ def call(body) {
         }
 
         def json = readJSON(file: 'package.json')
-        env.name = json.name 
+        def name = json.name.replaceAll(~/\//, "_")  
+        name = name.replaceAll(~/@/, "")  
+        env.name = name
         env.version = json.version
         echo "Package Name: $env.name"
         echo "Package Version: $env.version"
@@ -83,7 +85,7 @@ def call(body) {
 
 
       if (( env.BRANCH_NAME == 'master' ) ||     
-         ( env.BRANCH_NAME == 'jenkins-test' )) {
+         ( env.BRANCH_NAME == 'node-js' )) {
 
         stage('NPM Deploy') {
           echo "Deploying NPM packages to Nexus repository"
@@ -93,8 +95,8 @@ def call(body) {
         if (config.publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) {
           stage('Publish Module Descriptor') {
               echo "Publishing Module Descriptor to FOLIO registry"
-                //def modDescriptor = 'ModuleDescriptor.json'
-              // postModuleDescriptor("$modDescriptor","$env.name","$env.version") 
+                def modDescriptor = 'ModuleDescriptor.json'
+                postModuleDescriptor(modDescriptor,env.name,env.version) 
           }
         }
       } 
