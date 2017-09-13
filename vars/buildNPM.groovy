@@ -47,9 +47,8 @@ def call(body) {
         echo "Package Name: $env.name"
         echo "Package Version: $env.version"
 
-        withNPM(npmrcConfig: 'npmrc-folioci') {
           // We should probably use the --production flag here for releases
-          sh 'npm install' 
+        sh 'npm install' 
         }
       }
 
