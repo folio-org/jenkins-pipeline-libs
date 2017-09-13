@@ -85,7 +85,7 @@ def call(body) {
 
 
       if (( env.BRANCH_NAME == 'master' ) ||     
-         ( env.BRANCH_NAME == 'node-js' )) {
+         ( env.BRANCH_NAME == 'pipeline-tests' )) {
 
         stage('NPM Deploy') {
           echo "Deploying NPM packages to Nexus repository"
@@ -94,9 +94,12 @@ def call(body) {
 
         if (config.publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) {
           stage('Publish Module Descriptor') {
-              echo "Publishing Module Descriptor to FOLIO registry"
-                def modDescriptor = 'ModuleDescriptor.json'
-                postModuleDescriptor(modDescriptor,env.name,env.version) 
+            echo "Publishing Module Descriptor to FOLIO registry"
+            git url: 'https://github.com/folio-org/stripes-core'
+            sh 'stripes-core/util/package2md.js package.json > ModuleDescriptor.json'
+            def modDescriptor = 'ModuleDescriptor.json'
+
+            postModuleDescriptor(modDescriptor,env.name,env.version) 
           }
         }
       } 
