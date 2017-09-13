@@ -56,24 +56,24 @@ def call(body) {
           def scannerHome = tool 'SonarQube Scanner'
           if (env.BRANCH_NAME == 'master') {
             sh """
-            ${scannerHome}/bin/sonar-scanner 
-                            -Dsonar.projectKey=folio-org:${env.name}
-                            -Dsonar.projectName=${env.name}
-                            -Dsonar.projectVersion=${env.version}
-                            -Dsonar.sources=.
-                            -Dsonar.organization=folio-org
+            ${scannerHome}/bin/sonar-scanner \
+                            -Dsonar.projectKey=folio-org:${env.name} \
+                            -Dsonar.projectName=${env.name} \
+                            -Dsonar.projectVersion=${env.version} \
+                            -Dsonar.sources=. \
+                            -Dsonar.organization=folio-org 
             """
           }
           else { 
             // need to add some github stuff here 
             sh """
-            ${scannerHome}/bin/sonar-scanner 
-                            -Dsonar.projectKey=folio-org:${env.name}
-                            -Dsonar.projectName=${env.name}
-                            -Dsonar.projectVersion=${env.version}
-                            -Dsonar.sources=.
-                            -Dsonar.organization=folio-org
-                            -Dsonar.analysis.mode=preview
+            ${scannerHome}/bin/sonar-scanner \
+                            -Dsonar.projectKey=folio-org:${env.name} \
+                            -Dsonar.projectName=${env.name} \
+                            -Dsonar.projectVersion=${env.version} \
+                            -Dsonar.sources=. \
+                            -Dsonar.organization=folio-org \
+                            -Dsonar.analysis.mode=preview \
             """
           }
         }
