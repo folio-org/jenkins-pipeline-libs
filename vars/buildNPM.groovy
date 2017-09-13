@@ -84,7 +84,7 @@ def call(body) {
       }
 
 
-      if (( env.BRANCH_NAME == 'master' ) {
+      if ( env.BRANCH_NAME == 'master' ) {
         stage('NPM Deploy') {
           echo "Deploying NPM packages to Nexus repository"
           sh 'npm publish'
