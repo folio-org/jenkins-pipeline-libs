@@ -13,7 +13,7 @@ def call(body) {
       stage('Checkout') {
         deleteDir()
         currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.JOB_BASE_NAME}"
-        // sendNotifications 'STARTED'
+        sendNotifications 'STARTED'
 
          checkout([
                  $class: 'GitSCM',
@@ -84,18 +84,16 @@ def call(body) {
       }
 
 
-      if (( env.BRANCH_NAME == 'master' ) ||     
-         ( env.BRANCH_NAME == 'pipeline-tests' )) {
-
+      if (( env.BRANCH_NAME == 'master' ) {
         stage('NPM Deploy') {
           echo "Deploying NPM packages to Nexus repository"
-          // sh 'npm publish'
+          sh 'npm publish'
         }
 
         if (config.publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) {
           stage('Publish Module Descriptor') {
             echo "Publishing Module Descriptor to FOLIO registry"
-            git url: 'https://github.com/folio-org/stripes-core'
+            sh 'git clone https://github.com/folio-org/stripes-core'
             sh 'stripes-core/util/package2md.js package.json > ModuleDescriptor.json'
             def modDescriptor = 'ModuleDescriptor.json'
 
@@ -112,7 +110,7 @@ def call(body) {
     
     }
     finally {
-      // sendNotifications currentBuild.result
+      sendNotifications currentBuild.result
       
     }
   } //end node
