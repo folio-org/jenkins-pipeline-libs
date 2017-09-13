@@ -51,7 +51,7 @@ def call(body) {
       stage('SonarQube Scan') {
         withSonarQubeEnv('SonarCloud') {
           echo "Performing SonarQube scan" 
-          def scannerHome = tool 'SonarQube ScannerSonar'
+          def scannerHome = tool 'SonarQube Scanner'
           if (env.BRANCH_NAME == 'master') {
             sh """
             ${scannerHome}/bin/sonar-scanner 
