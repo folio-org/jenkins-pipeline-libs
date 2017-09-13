@@ -30,7 +30,7 @@ def call(body) {
          echo "Checked out $env.BRANCH_NAME"
       }
 
-      stage('NPM Build') {
+      stage('Prep') {
         // right now, all builds are snapshots
         def Boolean snapshot = true
 
@@ -46,33 +46,54 @@ def call(body) {
         env.version = json.version
         echo "Package Name: $env.name"
         echo "Package Version: $env.version"
+      }
 
-          // We should probably use the --production flag here for releases
-        sh 'npm install' 
+      stage('SonarQube Scan') {
+        withSonarQubeEnv('SonarCloud') {
+          echo "Performing SonarQube scan" 
+          def scannerHome = tool 'SonarQube ScannerSonar'
+          if (env.BRANCH_NAME == 'master') {
+            sh """
+            ${scannerHome}/bin/sonar-scanner 
+                            -Dsonar.projectKey=folio-org:${env.name}
+                            -Dsonar.projectName=${env.name}
+                            -Dsonar.projectVersion=${env.version}
+                            -Dsonar.sources=.
+                            -Dsonar.organization=folio-org
+            """
+          }
+          else { 
+            // need to add some github stuff here 
+            sh """
+            ${scannerHome}/bin/sonar-scanner 
+                            -Dsonar.projectKey=folio-org:${env.name}
+                            -Dsonar.projectName=${env.name}
+                            -Dsonar.projectVersion=${env.version}
+                            -Dsonar.sources=.
+                            -Dsonar.organization=folio-org
+                            -Dsonar.analysis.mode=preview
+            """
+          }
         }
+      }
+      stage('NPM Build') {
+        // We should probably use the --production flag here for releases
+        sh 'npm install' 
       }
 
 
       if (( env.BRANCH_NAME == 'master' ) ||     
          ( env.BRANCH_NAME == 'jenkins-test' )) {
 
-        stage('SonarQube Scan') {
-          withSonarQubeEnv('SonarCloud') {
-            echo "Performing SonarQube scan" 
-          }
+        stage('NPM Deploy') {
+          echo "Deploying NPM packages to Nexus repository"
+          // sh 'npm publish'
         }
-        if ( config.npmDeploy ==~ /(?i)(Y|YES|T|TRUE)/ ) {
-          stage('NPM Deploy') {
-            echo "Deploying NPM packages to Nexus repository"
-            // withNPM(npmrcConfig: 'npmrc-folioci') {
-            //  sh 'npm publish'
-            //}
-          }
-        }
+
         if (config.publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) {
           stage('Publish Module Descriptor') {
               echo "Publishing Module Descriptor to FOLIO registry"
-              // def modDescriptor = 'target/ModuleDescriptor.json'
+                //def modDescriptor = 'ModuleDescriptor.json'
               // postModuleDescriptor("$modDescriptor","$env.name","$env.version") 
           }
         }
