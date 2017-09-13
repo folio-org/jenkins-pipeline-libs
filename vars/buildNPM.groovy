@@ -31,24 +31,24 @@ def call(body) {
       }
 
       stage('NPM Build') {
-        def package = readJSON file: 'package.json'
-        env.name = package.name 
-        env.version = package.version
-        echo "Package Name: $env.name"
-        echo "Package Version: $env.version"
+        // right now, all builds are snapshots
+        def Boolean snapshot = true
 
-
-        withNPM(npmrcConfig: 'npmrc-folioci') {
-          // Artificially inflate the version of the npm package to designate 
-          // it as a "snapshot"
-          // sh 'npm version `/usr/local/bin/folioci_npmver.sh`'
-          def folioci_npmver = libraryResource 'org/folio/folioci_npmver.sh'
+        if (snapshot == true) {
+          def folioci_npmver = libraryResource('org/folio/folioci_npmver.sh')
           writeFile file: 'folioci_npmver.sh', text: folioci_npmver
           sh 'chmod +x folioci_npmver.sh'
           sh 'npm version `./folioci_npmver.sh`'
-          
+        }
 
-          // We should probably use the --production flag here, but we WANT more tests!
+        def json = readJSON(file: 'package.json')
+        env.name = json.name 
+        env.version = json.version
+        echo "Package Name: $env.name"
+        echo "Package Version: $env.version"
+
+        withNPM(npmrcConfig: 'npmrc-folioci') {
+          // We should probably use the --production flag here for releases
           sh 'npm install' 
         }
       }
@@ -62,7 +62,7 @@ def call(body) {
             echo "Performing SonarQube scan" 
           }
         }
-        if ( config.mvnDeploy ==~ /(?i)(Y|YES|T|TRUE)/ ) {
+        if ( config.npmDeploy ==~ /(?i)(Y|YES|T|TRUE)/ ) {
           stage('NPM Deploy') {
             echo "Deploying NPM packages to Nexus repository"
             // withNPM(npmrcConfig: 'npmrc-folioci') {
