@@ -36,10 +36,10 @@ def call(body) {
          echo "Change URL: $env.CHANGE_URL"
          echo "SCM branches: $scm.branches"
          echo "SCM userRemote: $scm.userRemoteConfigs"
-         def scmUrl = scm.getUserRemoteConfigs[0].getUrl()
+         def scmUrl = scm.UserRemoteConfigs[0].getUrl()
          echo "SCM URL: $scmUrl"
-         // def scmName = scm.getUserRemoteConfigs.getName()
-         // echo "getName: $scmName"
+         def scmName = scm.UserRemoteConfigs[0].getName()
+         echo "getName: $scmName"
       }
 
     } // end try
