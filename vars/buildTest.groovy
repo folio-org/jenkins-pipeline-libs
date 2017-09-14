@@ -38,8 +38,8 @@ def call(body) {
          echo "SCM userRemote: $scm.userRemoteConfigs"
          def scmUrl = scm.getUserRemoteConfigs[0].getUrl()
          echo "SCM URL: $scmUrl"
-         def scmName = scm.getUserRemoteConfigs[0].getName()
-         echo "getName: $scmName"
+         // def scmName = scm.getUserRemoteConfigs.getName()
+         // echo "getName: $scmName"
       }
 
     } // end try
