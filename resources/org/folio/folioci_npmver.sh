@@ -30,8 +30,8 @@ fi
 
 new_cur_ver=${maj_ver}.${min_ver}.${patch_ver}
 
-# add 00+Jenkins BUILD_NUMBER to current patch version
+# add 000+Jenkins BUILD_NUMBER to current patch version
 
-new_snap_ver=${new_cur_ver}00${BUILD_NUMBER}
+new_snap_ver=${new_cur_ver}000${BUILD_NUMBER}
 echo "$new_snap_ver"
 
