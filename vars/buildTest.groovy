@@ -38,8 +38,8 @@ def call(body) {
          echo "SCM userRemote: $scm.userRemoteConfigs"
          def scmUrl = scm.userRemoteConfigs[0].getUrl()
          echo "SCM URL: $scmUrl"
-         def scmName = scm.userRemoteConfigs[0].getName()
-         echo "getName: $scmName"
+         def proj_name = sh(returnStdout: true, script 'git config remote.origin.url | awk -F \'/\' \'{print $5}\'').trim()
+         echo "$proj_name"
       }
 
     } // end try
