@@ -28,7 +28,12 @@ def call(body) {
          ])
 
          echo "Checked out $env.BRANCH_NAME"
-         echo "Git URL: $env.GIT_URL"
+         echo "Git URL: $env.GIT_REPO_URL"
+         echo "Git Commit: $env.GIT_COMMIT"
+         echo "Git Branch: $env.GIT_BRANCH"
+         echo "Git Revision: $env.GIT_REVISION"
+         echo "Change ID: $env.CHANGE_ID"
+         echo "Change URL: $env.CHANGE_URL"
          echo "SCM branches: $scm.branches"
       }
 
