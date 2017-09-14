@@ -35,6 +35,7 @@ def call(body) {
          echo "Change ID: $env.CHANGE_ID"
          echo "Change URL: $env.CHANGE_URL"
          echo "SCM branches: $scm.branches"
+         echo "SCMO userRemote: $scm.userRemoteConfigs"
       }
 
     } // end try
