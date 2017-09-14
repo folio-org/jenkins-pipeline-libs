@@ -52,7 +52,7 @@ def call(body) {
         // project name is different from mod name specified in package.json
         def proj_name = sh(returnStdout: true, script: 'git config remote.origin.url | awk -F \'/\' \'{print $5}\' | sed -e \'s/\\.git//\'').trim()
         env.project_name = proj_name
-        echo "$env.proj_name"
+        echo "$env.project_name"
       }
 
       stage('SonarQube Scan') {
@@ -62,8 +62,8 @@ def call(body) {
           if (env.BRANCH_NAME == 'master') {
             sh """
             ${scannerHome}/bin/sonar-scanner \
-                            -Dsonar.projectKey=folio-org:${env.proj_name} \
-                            -Dsonar.projectName=${env.proj_name} \
+                            -Dsonar.projectKey=folio-org:${env.project_name} \
+                            -Dsonar.projectName=${env.project_name} \
                             -Dsonar.projectVersion=${env.version} \
                             -Dsonar.sources=. \
                             -Dsonar.organization=folio-org 
@@ -73,8 +73,8 @@ def call(body) {
             // need to add some github stuff here 
             sh """
             ${scannerHome}/bin/sonar-scanner \
-                            -Dsonar.projectKey=folio-org:${env.proj_name} \
-                            -Dsonar.projectName=${env.proj_name} \
+                            -Dsonar.projectKey=folio-org:${env.project_name} \
+                            -Dsonar.projectName=${env.project_name} \
                             -Dsonar.projectVersion=${env.version} \
                             -Dsonar.sources=. \
                             -Dsonar.organization=folio-org \
