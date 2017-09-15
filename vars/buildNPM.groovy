@@ -98,7 +98,7 @@ def call(body) {
           stage('Publish Module Descriptor') {
             echo "Publishing Module Descriptor to FOLIO registry"
             sh 'git clone https://github.com/folio-org/stripes-core'
-            sh 'stripes-core/util/package2md.js package.json > ModuleDescriptor.json'
+            sh 'stripes-core/util/package2md.js --strict package.json > ModuleDescriptor.json'
             def modDescriptor = 'ModuleDescriptor.json'
 
             postModuleDescriptor(modDescriptor,env.name,env.version) 
