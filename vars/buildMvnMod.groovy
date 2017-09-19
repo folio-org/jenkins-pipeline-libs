@@ -119,7 +119,7 @@ def call(body) {
           echo "PR request: $env.CHANGE_ID"
           stage('SonarQube Scan') {
             withCredentials([[$class: 'StringBinding', 
-                              credentialsId: 'folio-jenkins-github-token', 
+                              credentialsId: '6b0ebf62-3a12-4e6b-b77e-c45817b5791b', 
                               variable: 'GITHUB_ACCESS_TOKEN']]) {
               withSonarQubeEnv('SonarCloud') {
                 sh "mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:3.3.0.603:sonar " +
