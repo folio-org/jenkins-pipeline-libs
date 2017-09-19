@@ -115,7 +115,7 @@ def call(body) {
         }
       } 
       else {
-        if ($env.CHANGE_ID) {
+        if (env.CHANGE_ID) {
           echo "PR request: $env.CHANGE_ID"
           stage('SonarQube Scan') {
             withCredentials([[$class: 'StringBinding', 
