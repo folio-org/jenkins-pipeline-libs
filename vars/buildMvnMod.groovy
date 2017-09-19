@@ -28,6 +28,12 @@ def call(body) {
          ])
 
          echo "Checked out $env.BRANCH_NAME"
+
+        // project name is different from mod name specified in package.json
+        def proj_name = sh(returnStdout: true, script: 'git config remote.origin.url | awk -F \'/\' \'{print $5}\' | sed -e \'s/\\.git//\'').trim()
+        env.project_name = proj_name
+        echo "$env.project_name"
+
       }
 
       stage('Maven Build') {
@@ -109,7 +115,7 @@ def call(body) {
         if (config.publishAPI ==~ /(?i)(Y|YES|T|TRUE)/) {
           stage('Publish API Docs') {
           echo "Publishing API docs"
-            sh "python3 /usr/local/bin/generate_api_docs.py -r $env.name -v -o folio-api-docs"
+            sh "python3 /usr/local/bin/generate_api_docs.py -r $env.project_name -v -o folio-api-docs"
             sh 'aws s3 sync folio-api-docs s3://foliodocs/api'
           }
         }
@@ -126,6 +132,7 @@ def call(body) {
                        "-Dsonar.organization=folio-org -Dsonar.verbose=true " +
                        "-Dsonar.analysis.mode=preview " +
                        "-Dsonar.github.pullRequest=${env.CHANGE_ID} " +
+                       "-Dsonar.github.sonar.github.repository=folio-org/${env.project_name} " +
                        "-Dsonar.github.oauth=${GITHUB_ACCESS_TOKEN}"
               }
             }
