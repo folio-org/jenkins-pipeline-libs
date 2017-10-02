@@ -69,18 +69,6 @@ def call(body) {
                             -Dsonar.organization=folio-org 
             """
           }
-          else { 
-            // need to add some github stuff here 
-            sh """
-            ${scannerHome}/bin/sonar-scanner \
-                            -Dsonar.projectKey=folio-org:${env.project_name} \
-                            -Dsonar.projectName=${env.project_name} \
-                            -Dsonar.projectVersion=${env.version} \
-                            -Dsonar.sources=. \
-                            -Dsonar.organization=folio-org \
-                            -Dsonar.analysis.mode=preview \
-            """
-          }
         }
       }
       stage('NPM Build') {
