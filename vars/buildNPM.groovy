@@ -80,7 +80,7 @@ def call(body) {
       if (config.runLint ==~ /(?i)(Y|YES|T|TRUE)/) {
         stage('Lint') {
           echo "Running eslint..."
-          sh 'npm run lint'
+          sh 'npm run lint 2>/dev/null'
         }
       }
 
