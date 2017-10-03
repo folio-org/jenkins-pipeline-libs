@@ -54,26 +54,41 @@ def call(body) {
         env.project_name = proj_name
         echo "$env.project_name"
       }
-
-      stage('SonarQube Scan') {
-        withSonarQubeEnv('SonarCloud') {
-          echo "Performing SonarQube scan" 
-          def scannerHome = tool 'SonarQube Scanner'
-          if (env.BRANCH_NAME == 'master') {
+ 
+      if (env.BRANCH_NAME == 'master') {
+        stage('SonarQube Scan') {
+          withSonarQubeEnv('SonarCloud') {
+            echo "Performing SonarQube scan" 
+            def scannerHome = tool 'SonarQube Scanner'
             sh """
             ${scannerHome}/bin/sonar-scanner \
-                            -Dsonar.projectKey=folio-org:${env.project_name} \
-                            -Dsonar.projectName=${env.project_name} \
-                            -Dsonar.projectVersion=${env.version} \
-                            -Dsonar.sources=. \
-                            -Dsonar.organization=folio-org 
+                          -Dsonar.projectKey=folio-org:${env.project_name} \
+                          -Dsonar.projectName=${env.project_name} \
+                          -Dsonar.projectVersion=${env.version} \
+                          -Dsonar.sources=. \
+                          -Dsonar.organization=folio-org 
             """
           }
         }
       }
+
       stage('NPM Build') {
-        // We should probably use the --production flag here for releases
+        // We should probably use the --production flag at some pointfor releases
         sh 'npm install' 
+      }
+
+      if (config.runLint ==~ /(?i)(Y|YES|T|TRUE)/) {
+        stage('Lint') {
+          echo "Running eslint..."
+          sh 'npm run lint'
+        }
+      }
+
+      if (config.runTest ==~ /(?i)(Y|YES|T|TRUE)/) {
+        stage('Unit Tests') {
+          echo "Running unit tests..."
+          sh 'npm run test'
+        }
       }
 
       if ( env.BRANCH_NAME == 'master' ) {
