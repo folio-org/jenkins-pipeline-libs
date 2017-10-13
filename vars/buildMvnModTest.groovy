@@ -65,10 +65,11 @@ def call(body) {
       if ( config.doDocker ==~ /(?i)(Y|YES|T|TRUE)/ ) {
         stage('Docker Build') {
           def dockerDir
-          if (config.subDirs) {
+          if (config.subDir) {
             dockerDir = config.subDir
           } 
           else 
+            // default
             dockerDir = env.WORKSPACE
           }
           echo "Building Docker image $env.name:$env.version" 
