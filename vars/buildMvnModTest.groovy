@@ -57,7 +57,7 @@ def call(body) {
                     ignoreAttachments: false),
                     artifactsPublisher(disabled: false)]) {
 
-          sh 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install'
+          sh 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent -DskipTests install'
 
         }
       }
@@ -73,7 +73,7 @@ def call(body) {
             dockerDir = env.WORKSPACE
           }
           echo "Building Docker image $env.name:$env.version" 
-          buildJavaModDocker(env.name,env.version,dockerDir) 
+          buildJavaModDocker(env.name,env.version,$dockerDir) 
       }
           
     } // end try
