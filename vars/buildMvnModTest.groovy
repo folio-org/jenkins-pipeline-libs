@@ -64,8 +64,7 @@ def call(body) {
 
       if ( config.doDocker ==~ /(?i)(Y|YES|T|TRUE)/ ) {
         stage('Docker Build') {
-          def dockerDir
-          if (config.dockerDir) {
+          if (config.dockerDir != null) {
             dockerDir = config.dockerDir
           } 
           else 
