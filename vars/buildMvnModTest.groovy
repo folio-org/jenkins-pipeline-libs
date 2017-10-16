@@ -90,7 +90,6 @@ def call(body) {
       sh "docker rmi ${env.repository}/${env.name}:${env.version} || exit 0"
       sh "docker rmi ${env.repository}/${env.name}:latest || exit 0"
 
-      sendNotifications currentBuild.result
     }
 
   } //end node
