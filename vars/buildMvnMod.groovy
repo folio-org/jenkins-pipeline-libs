@@ -84,8 +84,14 @@ def call(body) {
         }
         if ( config.doDocker ==~ /(?i)(Y|YES|T|TRUE)/ ) {
           stage('Docker Build') {
+            if (config.dockerDir != null) {
+              dockerDir = config.dockerDir
+            } 
+            else 
+              dockerDir = env.WORKSPACE
+            }
             echo "Building Docker image $env.name:$env.version" 
-            buildJavaModDocker("$env.name","$env.version") 
+            buildJavaModDocker(env.name,env.version,dockerDir) 
           }
           stage('Docker Publish') {
             echo "Publishing Docker"
