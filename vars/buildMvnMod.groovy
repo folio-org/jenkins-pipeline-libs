@@ -87,7 +87,7 @@ def call(body) {
             if (config.dockerDir != null) {
               dockerDir = config.dockerDir
             } 
-            else 
+            else {
               dockerDir = env.WORKSPACE
             }
             echo "Building Docker image $env.name:$env.version" 
