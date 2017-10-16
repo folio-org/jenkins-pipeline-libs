@@ -62,10 +62,8 @@ def call(body) {
         }
       }
 
-      // if (( env.BRANCH_NAME == 'master' ) ||     
-      //   ( env.BRANCH_NAME == 'jenkins-test' )) {
       if (( env.BRANCH_NAME == 'master' ) ||     
-         ( env.BRANCH_NAME == 'okapi-433-docker' )) {
+         ( env.BRANCH_NAME == 'jenkins-test' )) {
 
         stage('SonarQube Scan') {
           withSonarQubeEnv('SonarCloud') {
