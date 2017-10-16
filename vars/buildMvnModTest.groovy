@@ -65,15 +65,15 @@ def call(body) {
       if ( config.doDocker ==~ /(?i)(Y|YES|T|TRUE)/ ) {
         stage('Docker Build') {
           def dockerDir
-          if (config.subDir) {
-            dockerDir = config.subDir
+          if (config.dockerDir) {
+            dockerDir = config.dockerDir
           } 
           else 
-            // default
+            // default top-level directory
             dockerDir = env.WORKSPACE
           }
           echo "Building Docker image $env.name:$env.version" 
-          buildJavaModDocker(env.name,env.version,$dockerDir) 
+          buildJavaModDocker(env.name,env.version,dockerDir) 
       }
           
     } // end try
