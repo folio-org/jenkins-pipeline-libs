@@ -43,7 +43,7 @@ def call(body) {
         else {
           echo "Unable to locate Jar file for this project"
         }
-          
+      }    
       else {
         if (fileExists("$dockerfile")) {
           echo "Found existing Dockerfile." 
