@@ -32,7 +32,7 @@ def call(body) {
       if (override ==~ /(?i)(Y|YES|T|TRUE)/) {
         def fatJar = "${env.name}-fat.jar"
 
-        if (fileExists("target/$fatJar") {
+        if (fileExists("target/$fatJar")) {
           echo "Fat jar appears to be: $fatJar"
 
           // use dockerfile template
