@@ -13,7 +13,7 @@ def call(body) {
       stage('Checkout') {
         deleteDir()
         currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.JOB_BASE_NAME}"
-        sendNotifications 'STARTED'
+        // sendNotifications 'STARTED'
 
          checkout([
                  $class: 'GitSCM',
@@ -62,6 +62,13 @@ def call(body) {
         }
       }
 
+      if ( config.doDocker ==~ /(?i)(Y|YES|T|TRUE)/ ) {
+        stage('Docker Build') {
+          echo "Building Docker image for $env.name:$env.version" 
+          buildJavaDocker() 
+        }
+      } 
+
       if (( env.BRANCH_NAME == 'master' ) ||     
          ( env.BRANCH_NAME == 'jenkins-test' )) {
 
@@ -82,35 +89,6 @@ def call(body) {
             }
           }
         }
-        if ( config.doDocker ==~ /(?i)(Y|YES|T|TRUE)/ ) {
-          stage('Docker Build') {
-            if (config.dockerDir != null) {
-              dockerDir = config.dockerDir
-            } 
-            else {
-              dockerDir = env.WORKSPACE
-            }
-            echo "Building Docker image $env.name:$env.version" 
-            buildJavaModDocker(env.name,env.version,dockerDir) 
-          }
-          stage('Docker Publish') {
-            echo "Publishing Docker"
-
-            docker.withRegistry('https://index.docker.io/v1/', 'DockerHubIDJenkins') {
-              if (version ==~ /.*-SNAPSHOT.*/) {
-                env.repository = 'folioci'
-              }
-              else {
-                env.repository = 'folioorg'
-              }
-              sh "docker tag ${env.name}:${env.version} ${env.repository}/${env.name}:${env.version}"
-              sh "docker tag ${env.repository}/${env.name}:${env.version} ${env.repository}/${env.name}:latest"
-              sh "docker push ${env.repository}/${env.name}:${env.version}"
-              sh "docker push ${env.repository}/${env.name}:latest"
-            } 
-          }
-          
-        } 
         if (config.publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) {
           stage('Publish Module Descriptor') {
               echo "Publishing Module Descriptor to FOLIO registry"
@@ -155,14 +133,7 @@ def call(body) {
     
     }
     finally {
-      echo "Clean up any temporary docker artifacts"
-      sh "docker rmi ${env.name}:${env.version} || exit 0"
-      sh "docker rmi ${env.name}:latest || exit 0"
-      sh "docker rmi ${env.repository}/${env.name}:${env.version} || exit 0"
-      sh "docker rmi ${env.repository}/${env.name}:latest || exit 0"
-
-      sendNotifications currentBuild.result
-      
+      // sendNotifications currentBuild.result
     }
   } //end node
     
