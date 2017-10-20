@@ -12,6 +12,7 @@ def call(body) {
   body()
 
   def dockerRepo = 'folioci'
+  def dockerImage = "${dockerRepo}/${env.name}:${env.version}"
 
   // Defaults if not defined. 
   def dockerfile = config.dockerfile ?: 'Dockerfile'
@@ -73,13 +74,29 @@ EOF
       // build docker image
 
       if (buildArg == 'yes') {
-        sh "docker build --tag ${dockerRepo}/${env.name}:${env.version} --build-arg='VERTICLE_FILE=${fatJar}' . "
+        sh "docker build --tag ${dockerImage} --build-arg='VERTICLE_FILE=${fatJar}' . "
       }
       else {
-        sh "docker build --tag ${dockerRepo}/${env.name}:${env.version} ."
+        sh "docker build --tag ${dockerImage} ."
       }
 
-      // TODO: perhaps a test phase here before publish
+      // Test container using container healthcheck
+      if ((config.healthCheck ==~ /(?i)(Y|YES|T|TRUE)/) && (config.healthChkCmd =! null)) {
+        def runArgs = config.runArgs ?: ' ' 
+        def dockerImage = "${dockerRepo}/${env.name}:${env.version}"
+        def status  = containerHealthCheck(dockerImage,healthChkCmd,runArgs)
+          
+        if (status != 'healthly') {  
+          echo "Container healthcheck failed"
+          // throw error here 
+        }
+        else {
+          echo "Container healthcheck passed"
+        }
+      }
+      else {
+        echo "No healthcheck configured. Skipping container healthcheck."
+      }
 
       // publish image if master branch
 
@@ -98,9 +115,7 @@ EOF
   } // end try
 
   catch (Exception err) {
-    //currentBuild.result = 'FAILED'
     println(err.getMessage());
-    //echo "Build Result: $currentBuild.result"
     throw err
   } 
 
