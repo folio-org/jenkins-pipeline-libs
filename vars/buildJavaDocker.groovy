@@ -83,7 +83,6 @@ EOF
       // Test container using container healthcheck
       if ((config.healthCheck ==~ /(?i)(Y|YES|T|TRUE)/) && (config.healthChkCmd =! null)) {
         def runArgs = config.runArgs ?: ' ' 
-        def dockerImage = "${dockerRepo}/${env.name}:${env.version}"
         def status  = containerHealthCheck(dockerImage,healthChkCmd,runArgs)
           
         if (status != 'healthly') {  
