@@ -1,6 +1,6 @@
-#!/usr/bin/groovy
+#!/usr/bin/env groovy
 
-def containerHealthCheck(String dockerImage, String checkCmd, String runArgs = '') {  
+def call(String dockerImage, String checkCmd, String runArgs = '') {  
    
    def timeout = '2s'
    def retries = 2
