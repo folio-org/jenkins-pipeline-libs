@@ -42,7 +42,7 @@ def call(body) {
         }
         else {
           echo "Unable to locate Jar file for this project."
-          echo "Trying fallback to local Dockerfile. 
+          echo "Trying fallback to local Dockerfile." 
         }
       }    
       else {
