@@ -81,7 +81,7 @@ EOF
       }
 
       // Test container using container healthcheck
-      if ((config.healthCheck ==~ /(?i)(Y|YES|T|TRUE)/) && (config.healthChkCmd =! null)) {
+      if ((config.healthChk ==~ /(?i)(Y|YES|T|TRUE)/) && (config.healthChkCmd != null)) {
         def runArgs = config.runArgs ?: ' ' 
         def status  = containerHealthCheck(dockerImage,healthChkCmd,runArgs)
           
