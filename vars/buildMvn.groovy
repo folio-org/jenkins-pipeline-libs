@@ -29,7 +29,6 @@ def call(body) {
 
          echo "Checked out $env.BRANCH_NAME"
 
-        // project name is different from mod name specified in package.json
         def proj_name = sh(returnStdout: true, script: 'git config remote.origin.url | awk -F \'/\' \'{print $5}\' | sed -e \'s/\\.git//\'').trim()
         env.project_name = proj_name
         echo "$env.project_name"
