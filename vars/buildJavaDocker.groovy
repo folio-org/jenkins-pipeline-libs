@@ -17,7 +17,6 @@ def call(body) {
   // Defaults if not defined. 
   def dockerfile = config.dockerfile ?: 'Dockerfile'
   def buildContext = config.dockerDir ?: env.WORKSPACE
-  def baseImage = config.baseImage ?: 'folioci/openjdk8-jre'
   def overrideConfig = config.overrideConfig ?: 'no'
   def publishMaster = config.publishMaster ?: 'yes'
 
@@ -42,7 +41,8 @@ def call(body) {
           buildArg = 'yes'
         }
         else {
-          echo "Unable to locate Jar file for this project"
+          echo "Unable to locate Jar file for this project."
+          echo "Trying fallback to local Dockerfile. 
         }
       }    
       else {
