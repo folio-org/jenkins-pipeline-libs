@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-def call(String dockerImage, String checkCmd, String runArgs = '') {  
+def call(String dockerImage, String checkCmd, String runArgs) {  
    
    def timeout = '2s'
    def retries = 2
@@ -12,7 +12,7 @@ def call(String dockerImage, String checkCmd, String runArgs = '') {
      echo "Testing $dockerImage image. Starting container.."
      sh """
         docker run -d --health-timeout=${timeout} --health-retries=${retries} \
-         --health-cmd=${checkCmd} --cidfile $cidFile $dockerImage $runArgs"
+         --health-cmd=${checkCmd} --cidfile $cidFile $dockerImage $runArgs
         """
 
      while(startupWaitRange) {
