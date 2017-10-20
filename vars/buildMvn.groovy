@@ -62,12 +62,12 @@ def call(body) {
         }
       }
 
-      if (config.buildJavaDocker) {
+      if (config.doDocker) {
         stage('Docker Build') {
           echo "Building Docker image for $env.name:$env.version" 
-          config.buildJavaDocker.delegate = this
-          config.buildJavaDocker.resolveStrategy = Closure.DELEGATE_FIRST
-          config.buildJavaDocker.call()
+          config.doDocker.delegate = this
+          config.doDocker.resolveStrategy = Closure.DELEGATE_FIRST
+	  config.doDocker.call()
         }
       } 
 
