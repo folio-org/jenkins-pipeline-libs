@@ -62,10 +62,12 @@ def call(body) {
         }
       }
 
-      if ( config.doDocker ==~ /(?i)(Y|YES|T|TRUE)/ ) {
+      if (config.buildJavaDocker) {
         stage('Docker Build') {
           echo "Building Docker image for $env.name:$env.version" 
-          buildJavaDocker() 
+          config.buildJavaDocker.delegate = this
+          config.buildJavaDocker.resolveStrategy = Closure.DELEGATE_FIRST
+          config.buildJavaDocker.call()
         }
       } 
 

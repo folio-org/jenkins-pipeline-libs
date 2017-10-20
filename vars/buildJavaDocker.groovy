@@ -7,7 +7,7 @@
 
 def call(body) {
   def config = [:]
-  body.resolveStrategy = Closure.DELEGATE_FIRST
+  //body.resolveStrategy = Closure.DELEGATE_FIRST
   body.delegate = config
   body()
 
@@ -98,9 +98,9 @@ EOF
   } // end try
 
   catch (Exception err) {
-    currentBuild.result = 'FAILED'
+    //currentBuild.result = 'FAILED'
     println(err.getMessage());
-    echo "Build Result: $currentBuild.result"
+    //echo "Build Result: $currentBuild.result"
     throw err
   } 
 
