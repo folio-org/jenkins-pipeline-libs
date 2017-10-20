@@ -11,13 +11,13 @@ def call(String dockerImage, String checkCmd, String runArgs) {
    try {
      echo "Testing $dockerImage image. Starting container.."
      sh """
-        docker run -d --health-timeout=${timeout} --health-retries=${retries} \
-         --health-cmd=${checkCmd} --cidfile $cidFile $dockerImage $runArgs
-        """
+     docker run -d --health-timeout=${timeout} --health-retries=${retries} \
+       --health-cmd=${checkCmd} --cidfile $cidFile $dockerImage $runArgs
+     """
 
      while(startupWaitRange) {
        health = sh(returnStdout: true, script: 'docker inspect `cat "$cidFile"` | jq -r \".[].State.Health.Status\"').trim()
-       println "Current Status: $status"
+       echo "Current Status: $status"
        if (health == 'starting') {
          sleep 1
        }
@@ -31,8 +31,8 @@ def call(String dockerImage, String checkCmd, String runArgs) {
        throw err
    }
    finally {
-     sh "docker stop `cat $cidFile`" || exit 0
-     sh "docker rm  `cat $cidFile`" || exit 0
+     sh "docker stop `cat $cidFile` || exit 0"
+     sh "docker rm  `cat $cidFile` || exit 0"
      return health
    }
 } 
