@@ -16,9 +16,9 @@ def call(String dockerImage, String checkCmd, String runArgs = '') {
         """
 
      while(startupWaitRange) {
-       status = sh(returnStdout: true, script: 'docker inspect `cat "$cidFile"` | jq -r \".[].State.Health.Status\"').trim()
+       health = sh(returnStdout: true, script: 'docker inspect `cat "$cidFile"` | jq -r \".[].State.Health.Status\"').trim()
        println "Current Status: $status"
-       if (status == 'starting') {
+       if (health == 'starting') {
          sleep 1
        }
        else {
@@ -27,7 +27,7 @@ def call(String dockerImage, String checkCmd, String runArgs = '') {
      }
    }
    catch(Exception err) {
-       status = 'error'
+       health = 'error'
        throw err
    }
    finally {
