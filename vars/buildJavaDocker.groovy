@@ -24,7 +24,7 @@ def call(body) {
   def buildArg = 'no'
 
   try { 
-    dir("$dockerDir") {
+    dir("$buildContext") {
    
       // if 'override' is 'yes', create our own Dockerfile, otherwise
       // use project's Dockerfile
