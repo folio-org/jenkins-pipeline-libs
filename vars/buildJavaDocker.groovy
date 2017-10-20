@@ -17,7 +17,7 @@ def call(body) {
   def dockerfile = config.dockerfile ?: 'Dockerfile'
   def buildContext = config.dockerDir ?: env.WORKSPACE
   def baseImage = config.baseImage ?: 'folioci/openjdk8-jre'
-  def override = config.override ?: 'no'
+  def overrideConfig = config.overrideConfig ?: 'no'
   def publishMaster = config.publishMaster ?: 'yes'
 
   // default
@@ -29,7 +29,7 @@ def call(body) {
       // if 'override' is 'yes', create our own Dockerfile, otherwise
       // use project's Dockerfile
 
-      if (override ==~ /(?i)(Y|YES|T|TRUE)/) {
+      if (overrideConfig ==~ /(?i)(Y|YES|T|TRUE)/) {
         def fatJar = "${env.name}-fat.jar"
 
         if (fileExists("target/$fatJar")) {
