@@ -6,6 +6,7 @@ def call(String dockerImage, String checkCmd, String runArgs) {
    def retries = 2
    def cidFile = "/tmp/${dockerImage}-${env.BUILD_NUMBER}.cid"
    def startupWaitRange = 1..40 // seconds
+   def maxStartupWait = 40
    def health = ''
 
    try {
@@ -14,8 +15,7 @@ def call(String dockerImage, String checkCmd, String runArgs) {
      docker run -d --health-timeout=${timeout} --health-retries=${retries} \
        --health-cmd=${checkCmd} --cidfile $cidFile $dockerImage $runArgs
      """
-
-     while(startupWaitRange) {
+   for (i = 0; i <maxStartupWait; i++) {
        health = sh(returnStdout: true, script: 'docker inspect `cat "$cidFile"` | jq -r \".[].State.Health.Status\"').trim()
        echo "Current Status: $status"
        if (health == 'starting') {
