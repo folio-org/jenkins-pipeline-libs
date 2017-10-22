@@ -7,7 +7,7 @@ def call(body) {
   body.delegate = config
   body()
 
-  node('folio-jenkins-slave-docker') {
+  node('jenkins-slave-folio-testing') {
 
     try {
       stage('Checkout') {
