@@ -56,7 +56,7 @@ def call(body) {
         }
       }    
       else {
-        if (fileExists("$dockerfile")) {
+        if (fileExists(dockerfile)) {
           echo "Found existing Dockerfile." 
         }
         else {

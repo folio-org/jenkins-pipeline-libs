@@ -13,7 +13,7 @@ def call(body) {
       stage('Checkout') {
         deleteDir()
         currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.JOB_BASE_NAME}"
-        // sendNotifications 'STARTED'
+        sendNotifications 'STARTED'
 
          checkout([
                  $class: 'GitSCM',
@@ -38,14 +38,14 @@ def call(body) {
       stage('Maven Build') {
         def mvn_artifact = readMavenPom().getArtifactId() 
         def mvn_version =  readMavenPom().getVersion()
-        env.name = "$mvn_artifact"
+        env.name = mvn_artifact
 
         if (mvn_version ==~ /.*-SNAPSHOT$/) {
           echo "This is a snapshot"
           env.version = "${mvn_version}.${env.BUILD_NUMBER}"
         }
         else {
-          env.version = "$mvn_version"
+          env.version = mvn_version
         }
 
         echo "Building Maven artifact: ${env.name} Version: ${env.version}"
@@ -56,7 +56,7 @@ def call(body) {
                     ignoreAttachments: false),
                     artifactsPublisher(disabled: false)]) {
 
-          sh 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install -DskipTests'
+          sh 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install'
 
         }
       }
@@ -94,7 +94,7 @@ def call(body) {
           stage('Publish Module Descriptor') {
               echo "Publishing Module Descriptor to FOLIO registry"
               def modDescriptor = 'target/ModuleDescriptor.json'
-              postModuleDescriptor("$modDescriptor","$env.name","$env.version") 
+              postModuleDescriptor(modDescriptor,env.name,env.version) 
           }
         }
         if (config.publishAPI ==~ /(?i)(Y|YES|T|TRUE)/) {
@@ -134,7 +134,7 @@ def call(body) {
     
     }
     finally {
-      // sendNotifications currentBuild.result
+      sendNotifications currentBuild.result
     }
   } //end node
     
