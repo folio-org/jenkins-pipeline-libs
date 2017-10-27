@@ -12,13 +12,15 @@ def call(String dockerImage, String checkCmd, String runArgs) {
      echo "Testing $dockerImage image. Starting container.."
      echo "docker run -d --health-timeout=${timeout} --health-retries=${retries}  --health-cmd='${checkCmd}' --cidfile $cidFile $dockerImage $runArgs"
      //dockerRunStatus = sh(returnStatus: true, script: "docker run -d --health-timeout=${timeout} --health-retries=${retries} --health-cmd='${checkCmd}' --cidfile $cidFile $dockerImage $runArgs").trim()
-      sh """
+     sh """
       docker run -d --health-timeout=${timeout} --health-retries=${retries} \
              --health-cmd='${checkCmd}' --cidfile $cidFile $dockerImage $runArgs || exit 1
-      """
+     """
+      
+     def cid = readFile(cidFile)
 
      for (i = 0; i <maxStartupWait; i++) {
-       health = sh(returnStdout: true, script: 'docker inspect `cat "$cidFile"` | jq -r \".[].State.Health.Status\"').trim()
+       health = sh(returnStdout: true, script: "docker inspect $cid | jq -r \\".[].State.Health.Status\\"").trim()
        echo "Current Status: $health"
        if (health == 'starting') {
          sleep 1
