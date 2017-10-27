@@ -2,7 +2,18 @@
 
 
 /*
- * Send notifications based on build status string
+ *  Build, Test and Publish Java-based docker images.
+ *
+ *  Configurable parameters: 
+ *
+ *  dockerfile:     Name of dockerfile. Default: 'Dockerfile'
+ *  buildContext:   Relative path to docker build context. Default: Jenkins $WORKSPACE
+ *  overrideConfig: Override project Dockerfile and use template. Default: false
+ *  publishMaster:  Publish image to Docker repo (master branch only): Default: true
+ *  healthChk:      Perform container health check with 'healthChkCmd' Default: false
+ *  healthChkCmd:   Specify health check command.  Default:  none
+ *  runArgs:  	    Additional container runtime arguments.  Default: none
+ *     
  */
 
 def call(body) {
@@ -12,7 +23,6 @@ def call(body) {
   body()
 
   def dockerRepo = 'folioci'
-  def dockerImage = "${dockerRepo}/${env.name}:${env.version}"
 
   // Defaults if not defined. 
   def dockerfile = config.dockerfile ?: 'Dockerfile'
@@ -74,28 +84,29 @@ EOF
       // build docker image
 
       if (buildArg == 'yes') {
-        sh "docker build --tag ${dockerImage} --build-arg='VERTICLE_FILE=${fatJar}' . "
+        sh "docker build -t ${env.name}:${env.version} --build-arg='VERTICLE_FILE=${fatJar}' . "
       }
       else {
-        sh "docker build --tag ${dockerImage} ."
+        sh "docker build -t ${env.name}:${env.version} ."
       }
 
       // Test container using container healthcheck
-      if ((config.healthChk ==~ /(?i)(Y|YES|T|TRUE)/) && (config.healthChkCmd != null)) {
+      if ((config.healthChk ==~ /(?i)(Y|YES|T|TRUE)/) && (config.healthChkCmd) {
         def runArgs = config.runArgs ?: ' ' 
         def healthChkCmd = config.healthChkCmd
-        def status  = containerHealthCheck(dockerImage,healthChkCmd,runArgs)
+        def dockerImage = "${env.name}:${env.version}"
+        def health  = containerHealthCheck(dockerImage,healthChkCmd,runArgs)
           
-        if (status != 'healthly') {  
-          echo "Container healthcheck failed"
-          // throw error here 
+        if (health != 'healthly') {  
+          echo "Container health check failed."
+          sh 'exit 1' 
         }
         else {
-          echo "Container healthcheck passed"
+          echo "Container health check passed."
         }
       }
       else {
-        echo "No healthcheck configured. Skipping container healthcheck."
+        echo "No health check configured. Skipping container health check."
       }
 
       // publish image if master branch
@@ -104,10 +115,11 @@ EOF
         // publish images to ci docker repo
         echo "Publishing Docker images"
         docker.withRegistry('https://index.docker.io/v1/', 'DockerHubIDJenkins') {
-          sh "docker tag ${dockerRepo}/${env.name}:${env.version} ${dockerRepo}/${env.name}:latest"
+          sh "docker tag ${env.name}:${env.version} ${dockerRepo}/${env.name}:${env.version}"
+          sh "docker tag ${env.name}:${env.version} ${dockerRepo}/${env.name}:latest"
           sh "docker push ${dockerRepo}/${env.name}:${env.version}"
           sh "docker push ${dockerRepo}/${env.name}:latest"
-        }
+      }
       }
 
     } // end dir()

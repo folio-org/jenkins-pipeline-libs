@@ -4,19 +4,22 @@ def call(String dockerImage, String checkCmd, String runArgs) {
    
    def timeout = '2s'
    def retries = 2
-   def cidFile = "/tmp/${dockerImage}-${env.BUILD_NUMBER}.cid"
+   def cidFile = sh(returnStdout: true, script: 'date +%N').trim()
    def maxStartupWait = 40
    def health = ''
 
    try {
      echo "Testing $dockerImage image. Starting container.."
      echo "docker run -d --health-timeout=${timeout} --health-retries=${retries}  --health-cmd='${checkCmd}' --cidfile $cidFile $dockerImage $runArgs"
-     sh """
-     docker run -d --health-timeout=${timeout} --health-retries=${retries}  --health-cmd='${checkCmd}' --cidfile $cidFile $dockerImage $runArgs
-     """
-   for (i = 0; i <maxStartupWait; i++) {
+     //dockerRunStatus = sh(returnStatus: true, script: "docker run -d --health-timeout=${timeout} --health-retries=${retries} --health-cmd='${checkCmd}' --cidfile $cidFile $dockerImage $runArgs").trim()
+      sh """
+      docker run -d --health-timeout=${timeout} --health-retries=${retries} \
+             --health-cmd='${checkCmd}' --cidfile $cidFile $dockerImage $runArgs || exit 1
+      """
+
+     for (i = 0; i <maxStartupWait; i++) {
        health = sh(returnStdout: true, script: 'docker inspect `cat "$cidFile"` | jq -r \".[].State.Health.Status\"').trim()
-       echo "Current Status: $status"
+       echo "Current Status: $health"
        if (health == 'starting') {
          sleep 1
        }
