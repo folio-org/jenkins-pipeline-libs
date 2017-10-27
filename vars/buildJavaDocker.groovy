@@ -98,7 +98,7 @@ EOF
         def dockerImage = "${env.name}:${env.version}"
         def health = containerHealthCheck(dockerImage,healthChkCmd,runArgs)
           
-        if (health != 'healthly') {  
+        if (health != 'healthy') {  
           echo "Container health check failed: $health"
           sh 'exit 1' 
         }
