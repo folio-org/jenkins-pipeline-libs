@@ -91,14 +91,15 @@ EOF
       }
 
       // Test container using container healthcheck
-      if ((config.healthChk ==~ /(?i)(Y|YES|T|TRUE)/) && (config.healthChkCmd) {
+      if ((config.healthChk ==~ /(?i)(Y|YES|T|TRUE)/) && (config.healthChkCmd)) {
+
         def runArgs = config.runArgs ?: ' ' 
         def healthChkCmd = config.healthChkCmd
         def dockerImage = "${env.name}:${env.version}"
-        def health  = containerHealthCheck(dockerImage,healthChkCmd,runArgs)
+        def health = containerHealthCheck(dockerImage,healthChkCmd,runArgs)
           
         if (health != 'healthly') {  
-          echo "Container health check failed."
+          echo "Container health check failed: $health"
           sh 'exit 1' 
         }
         else {
