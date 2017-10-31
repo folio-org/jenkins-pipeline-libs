@@ -32,11 +32,12 @@ def call(String sqBranch = null) {
     }
   }
   else {  
-    if ( env.BRANCH_NAME == 'master' ) {
+    //if (env.BRANCH_NAME == 'master') {
+    if (env.BRANCH_NAME == 'folio-918-test') {
       stage('SonarQube Analysis') {
         withSonarQubeEnv('SonarCloud') {
           sh "mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:3.3.0.603:sonar" +
-               "-Dsonar.organization=folio-org -Dsonar.verbose=true"
+               "-Dsonar.organization=folio-org -Dsonar.verbose=true -Dsonar.branch=test"
         }
       }
     }
