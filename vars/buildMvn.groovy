@@ -7,13 +7,14 @@ def call(body) {
   body.delegate = config
   body()
 
-  node('folio-jenkins-slave-docker') {
+  //node('folio-jenkins-slave-docker') {
+  node('jenkins-slave-folio-testing') {
 
     try {
       stage('Checkout') {
         deleteDir()
         currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.JOB_BASE_NAME}"
-        sendNotifications 'STARTED'
+        // sendNotifications 'STARTED'
 
          checkout([
                  $class: 'GitSCM',
@@ -61,6 +62,8 @@ def call(body) {
         }
       }
 
+      
+      // Docker stuff
       if (config.doDocker) {
         stage('Docker Build') {
           echo "Building Docker image for $env.name:$env.version" 
@@ -70,14 +73,17 @@ def call(body) {
         }
       } 
 
+      // Run Sonarqube stage
+      if (config.sqBranch) {
+        sonarqubeMvn(config.sqBranch) 
+      }
+      else {
+        sonarqubeMvn() {
+      }
+
       if (( env.BRANCH_NAME == 'master' ) ||     
          ( env.BRANCH_NAME == 'jenkins-test' )) {
 
-        stage('SonarQube Scan') {
-          withSonarQubeEnv('SonarCloud') {
-            sh 'mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:3.3.0.603:sonar -Dsonar.organization=folio-org -Dsonar.verbose=true'
-          }
-        }
         if ( config.mvnDeploy ==~ /(?i)(Y|YES|T|TRUE)/ ) {
           stage('Maven Deploy') {
             echo "Deploying artifacts to Maven repository"
@@ -105,26 +111,6 @@ def call(body) {
           }
         }
       } 
-      else {
-        if (env.CHANGE_ID) {
-          echo "PR request: $env.CHANGE_ID"
-          stage('SonarQube Scan') {
-            withCredentials([[$class: 'StringBinding', 
-                              credentialsId: '6b0ebf62-3a12-4e6b-b77e-c45817b5791b', 
-                              variable: 'GITHUB_ACCESS_TOKEN']]) {
-              withSonarQubeEnv('SonarCloud') {
-                sh "mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:3.3.0.603:sonar " +
-                       "-Dsonar.organization=folio-org -Dsonar.verbose=true " +
-                       "-Dsonar.analysis.mode=preview " +
-                       "-Dsonar.github.pullRequest=${env.CHANGE_ID} " +
-                       "-Dsonar.github.repository=folio-org/${env.project_name} " +
-                       "-Dsonar.github.oauth=${GITHUB_ACCESS_TOKEN}"
-              }
-            }
-          }
-        }
-      } 
-          
     } // end try
     catch (Exception err) {
       currentBuild.result = 'FAILED'
@@ -134,7 +120,7 @@ def call(body) {
     
     }
     finally {
-      sendNotifications currentBuild.result
+      // sendNotifications currentBuild.result
     }
   } //end node
     
