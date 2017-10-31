@@ -5,14 +5,14 @@
  *
  * Configurable parameters:
  *
- * sqBranch: Name of branch we want to run SQ analysis (map option in BuildMvn.groovy).
+ * (List) sqBranch: Branch names  we want to run SQ analysis (map option in BuildMvn.groovy).
  *
  * By default, analysis is run on GitHub PRs and 'master' branch. 
  *
  */
 
 
-def call(String sqBranch = null) {
+def call(List sqBranch = []) {
 
   stage('SonarQube Scan') {
     if (env.CHANGE_ID) {
