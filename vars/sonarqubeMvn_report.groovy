@@ -49,13 +49,13 @@ def call() {
                "-Dsonar.analysis.mode=preview -Dsonar.issueReport.html.enable=true"
         }
         // publish report
-        publishHTML([allowMissing: true, alwaysLinkToLastBuild: false, 
+        publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, 
                      keepAll: true, reportDir: 'target/sonar/issues-report', 
                      reportFiles: 'issues-report.html', 
                      reportName: 'Sonarqube Issues Report (Full)', 
                      reportTitles: 'issues-report'])
 
-        publishHTML([allowMissing: true, alwaysLinkToLastBuild: false, 
+        publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, 
                      keepAll: true, reportDir: 'target/sonar/issues-report', 
                      reportFiles: 'issues-report-light.html', 
                      reportName: 'Sonarqube Issues Report (Light)', 
