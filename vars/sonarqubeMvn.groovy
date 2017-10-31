@@ -12,7 +12,7 @@
  */
 
 
-def call(List sqBranch = []) {
+def call(String sqBranch = null) {
 
   stage('SonarQube Scan') {
     if (env.CHANGE_ID) {
