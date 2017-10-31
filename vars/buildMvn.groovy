@@ -57,7 +57,8 @@ def call(body) {
                     ignoreAttachments: false),
                     artifactsPublisher(disabled: false)]) {
 
-          sh 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install'
+        //  sh 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install'
+          sh 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install -DskipTests'
 
         }
       }
