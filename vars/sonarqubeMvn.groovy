@@ -40,7 +40,7 @@ def call(String sqBranch = null) {
 
       if (sqBranch) { 
         withSonarQubeEnv('SonarCloud') {
-          sh "mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:3.3.0.603:sonar" +
+          sh "mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:3.3.0.603:sonar " +
                "-Dsonar.organization=folio-org -Dsonar.verbose=true -Dsonar.branch=$sqBranch"
         }
       } 
