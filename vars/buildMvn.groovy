@@ -78,7 +78,7 @@ def call(body) {
         sonarqubeMvn(config.sqBranch) 
       }
       else {
-        sonarqubeMvn() {
+        sonarqubeMvn() 
       }
 
       if (( env.BRANCH_NAME == 'master' ) ||     
