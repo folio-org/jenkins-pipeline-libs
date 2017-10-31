@@ -14,8 +14,8 @@
 
 def call(String sqBranch = null) {
 
-  stage('SonarQube Scan') {
-    if (env.CHANGE_ID) {
+  if (env.CHANGE_ID) {
+    stage('SonarQube Analysis') {
       echo "PR request: $env.CHANGE_ID"
       withCredentials([[$class: 'StringBinding', 
                         credentialsId: '6b0ebf62-3a12-4e6b-b77e-c45817b5791b', 
@@ -30,20 +30,24 @@ def call(String sqBranch = null) {
         }
       }  
     }
-    else {  
-      if ( env.BRANCH_NAME == 'master' ) {
+  }
+  else {  
+    if ( env.BRANCH_NAME == 'master' ) {
+      stage('SonarQube Analysis') {
         withSonarQubeEnv('SonarCloud') {
           sh "mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:3.3.0.603:sonar" +
                "-Dsonar.organization=folio-org -Dsonar.verbose=true"
         }
       }
+    }
 
-      if (sqBranch) { 
+    if (sqBranch) { 
+      stage('SonarQube Analysis') {
         withSonarQubeEnv('SonarCloud') {
           sh "mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:3.3.0.603:sonar " +
                "-Dsonar.organization=folio-org -Dsonar.verbose=true -Dsonar.branch=$sqBranch"
         }
-      } 
-    }
-  } // end stage
+      }
+    } 
+  } // end if
 }
