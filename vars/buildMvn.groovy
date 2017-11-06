@@ -75,7 +75,7 @@ def call(body) {
       } 
 
       // Run Sonarqube stage
-      /*  if (config.sqBranch) {
+      if (config.sqBranch) {
         for (branch in config.sqBranch) {
           if (branch == env.BRANCH_NAME) {
             sonarqubeMvn(branch) 
@@ -85,9 +85,7 @@ def call(body) {
       else {
         sonarqubeMvn() 
       }
-     */
-      sonarqubeMvn_report()
-
+     
       if (( env.BRANCH_NAME == 'master' ) ||     
          ( env.BRANCH_NAME == 'jenkins-test' )) {
 
