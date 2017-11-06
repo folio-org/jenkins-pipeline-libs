@@ -87,7 +87,7 @@ def call(body) {
       } 
 
       // Run Sonarqube stage
-      if (config.sqBranch[0]) {
+      if (config.sqBranch) {
         for (branch in config.sqBranch) {
           if (branch == env.BRANCH_NAME) {
             sonarqubeMvn(branch) 
