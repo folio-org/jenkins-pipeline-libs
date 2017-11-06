@@ -1,5 +1,18 @@
 #!/usr/bin/groovy
 
+/*
+ * Main build script for Maven-based FOLIO projects
+ *
+ * Configurable parameters: 
+ *
+ * sqBranch:  List of additional branches to perform SonarQube Analysis (Default: none)
+ * doDocker:  Build, test, and publish Docker image via 'buildJavaDocker' (Default: 'no')
+ * mvnDeploy: Deploy built artifacts to Maven repository (Default: 'no')
+ * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no')
+ * publishApi: Publish API/RAML documentation.  (Default: 'no')
+*/
+ 
+
 
 def call(body) {
   def config = [:]
@@ -13,7 +26,7 @@ def call(body) {
       stage('Checkout') {
         deleteDir()
         currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.JOB_BASE_NAME}"
-        sendNotifications 'STARTED'
+         sendNotifications 'STARTED'
 
          checkout([
                  $class: 'GitSCM',
@@ -50,17 +63,20 @@ def call(body) {
 
         echo "Building Maven artifact: ${env.name} Version: ${env.version}"
             
-        withMaven(jdk: 'OpenJDK 8 on Ubuntu Docker Slave Node',
+        timeout(30) {
+          withMaven(jdk: 'OpenJDK 8 on Ubuntu Docker Slave Node',
                     maven: 'Maven on Ubuntu Docker Slave Node',
                     options: [junitPublisher(disabled: false,
                     ignoreAttachments: false),
                     artifactsPublisher(disabled: false)]) {
 
-          sh 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install'
-
+            sh 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install'
+          }
         }
       }
 
+      
+      // Docker stuff
       if (config.doDocker) {
         stage('Docker Build') {
           echo "Building Docker image for $env.name:$env.version" 
@@ -70,14 +86,21 @@ def call(body) {
         }
       } 
 
+      // Run Sonarqube stage
+      if (config.sqBranch[0]) {
+        for (branch in config.sqBranch) {
+          if (branch == env.BRANCH_NAME) {
+            sonarqubeMvn(branch) 
+          }
+        }
+      }
+      else {
+        sonarqubeMvn() 
+      }
+     
       if (( env.BRANCH_NAME == 'master' ) ||     
          ( env.BRANCH_NAME == 'jenkins-test' )) {
 
-        stage('SonarQube Scan') {
-          withSonarQubeEnv('SonarCloud') {
-            sh 'mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:3.3.0.603:sonar -Dsonar.organization=folio-org -Dsonar.verbose=true'
-          }
-        }
         if ( config.mvnDeploy ==~ /(?i)(Y|YES|T|TRUE)/ ) {
           stage('Maven Deploy') {
             echo "Deploying artifacts to Maven repository"
@@ -105,26 +128,6 @@ def call(body) {
           }
         }
       } 
-      else {
-        if (env.CHANGE_ID) {
-          echo "PR request: $env.CHANGE_ID"
-          stage('SonarQube Scan') {
-            withCredentials([[$class: 'StringBinding', 
-                              credentialsId: '6b0ebf62-3a12-4e6b-b77e-c45817b5791b', 
-                              variable: 'GITHUB_ACCESS_TOKEN']]) {
-              withSonarQubeEnv('SonarCloud') {
-                sh "mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:3.3.0.603:sonar " +
-                       "-Dsonar.organization=folio-org -Dsonar.verbose=true " +
-                       "-Dsonar.analysis.mode=preview " +
-                       "-Dsonar.github.pullRequest=${env.CHANGE_ID} " +
-                       "-Dsonar.github.repository=folio-org/${env.project_name} " +
-                       "-Dsonar.github.oauth=${GITHUB_ACCESS_TOKEN}"
-              }
-            }
-          }
-        }
-      } 
-          
     } // end try
     catch (Exception err) {
       currentBuild.result = 'FAILED'
@@ -134,7 +137,7 @@ def call(body) {
     
     }
     finally {
-      sendNotifications currentBuild.result
+       sendNotifications currentBuild.result
     }
   } //end node
     
