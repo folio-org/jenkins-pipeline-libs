@@ -63,14 +63,15 @@ def call(body) {
 
         echo "Building Maven artifact: ${env.name} Version: ${env.version}"
             
-        withMaven(jdk: 'OpenJDK 8 on Ubuntu Docker Slave Node',
+        timeout(30) {
+          withMaven(jdk: 'OpenJDK 8 on Ubuntu Docker Slave Node',
                     maven: 'Maven on Ubuntu Docker Slave Node',
                     options: [junitPublisher(disabled: false,
                     ignoreAttachments: false),
                     artifactsPublisher(disabled: false)]) {
 
-          sh 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install'
-
+            sh 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install'
+          }
         }
       }
 
