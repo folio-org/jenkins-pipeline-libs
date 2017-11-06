@@ -1,5 +1,18 @@
 #!/usr/bin/groovy
 
+/*
+ * Main build script for Maven-based FOLIO projects
+ *
+ * Configurable parameters: 
+ *
+ * sqBranch:  List of additional branches to perform SonarQube Analysis (Default: none)
+ * doDocker:  Build, test, and publish Docker image via 'buildJavaDocker' (Default: 'no')
+ * mvnDeploy: Deploy built artifacts to Maven repository (Default: 'no')
+ * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no')
+ * publishApi: Publish API/RAML documentation.  (Default: 'no')
+*/
+ 
+
 
 def call(body) {
   def config = [:]
@@ -7,14 +20,13 @@ def call(body) {
   body.delegate = config
   body()
 
-  //node('folio-jenkins-slave-docker') {
-  node('jenkins-slave-folio-testing') {
+  node('folio-jenkins-slave-docker') {
 
     try {
       stage('Checkout') {
         deleteDir()
         currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.JOB_BASE_NAME}"
-        // sendNotifications 'STARTED'
+         sendNotifications 'STARTED'
 
          checkout([
                  $class: 'GitSCM',
@@ -57,8 +69,7 @@ def call(body) {
                     ignoreAttachments: false),
                     artifactsPublisher(disabled: false)]) {
 
-        //  sh 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install'
-          sh 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install -DskipTests'
+          sh 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install'
 
         }
       }
@@ -125,7 +136,7 @@ def call(body) {
     
     }
     finally {
-      // sendNotifications currentBuild.result
+       sendNotifications currentBuild.result
     }
   } //end node
     
