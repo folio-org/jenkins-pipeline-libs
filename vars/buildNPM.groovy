@@ -70,7 +70,14 @@ def call(body) {
           def lintStatus = sh(returnStatus:true, script: 'yarn lint 2>/dev/null > lint.output')
           if (lintStatus != 0) {
             def lintReport =  readFile('lint.output')
-            echo "$lintReport"
+
+            if (env.CHANGE_ID) {
+              // Requires https://github.com/jenkinsci/pipeline-github-plugin
+              def comment = pullRequest.comment(lintReport)
+            }
+            else {
+              echo "$lintReport"
+            }
           }
           else {
             echo "No lint errors found"
