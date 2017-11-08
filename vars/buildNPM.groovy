@@ -55,22 +55,11 @@ def call(body) {
         echo "$env.project_name"
       }
  
+      /* Disabled.  --malc 11/08/201
       if (env.BRANCH_NAME == 'master') {
-        stage('SonarQube Scan') {
-          withSonarQubeEnv('SonarCloud') {
-            echo "Performing SonarQube scan" 
-            def scannerHome = tool 'SonarQube Scanner'
-            sh """
-            ${scannerHome}/bin/sonar-scanner \
-                          -Dsonar.projectKey=folio-org:${env.project_name} \
-                          -Dsonar.projectName=${env.project_name} \
-                          -Dsonar.projectVersion=${env.version} \
-                          -Dsonar.sources=. \
-                          -Dsonar.organization=folio-org 
-            """
-          }
-        }
+        sonarqubeScan()
       }
+      */
 
       stage('NPM Build') {
         // We should probably use the --production flag at some pointfor releases
@@ -78,9 +67,23 @@ def call(body) {
       }
 
       if (config.runLint ==~ /(?i)(Y|YES|T|TRUE)/) {
-        stage('Lint') {
-          echo "Running eslint..."
-          sh 'npm run lint 2>/dev/null'
+        stage('ESLint') {
+          echo "Running ESLint..."
+          def lintStatus = sh(returnStatus:true, script: 'yarn lint 2>/dev/null > lint.output')
+          if (lintStatus != 0) {
+            def lintReport =  readFile('lint.output')
+
+            if (env.CHANGE_ID) {
+              // Requires https://github.com/jenkinsci/pipeline-github-plugin
+              def comment = pullRequest.comment(lintReport)
+            }
+            else {
+              echo "$lintReport"
+            }
+          }
+          else {
+            echo "No lint errors found"
+          }
         }
       }
 
