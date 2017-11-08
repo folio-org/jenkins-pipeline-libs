@@ -69,7 +69,7 @@ def call(body) {
           echo "Running eslint..."
           def lintStatus = sh(returnStatus:true, script: 'yarn lint 2>/dev/null > lint.output')
           if (lintStatus != 0) {
-            def lintReport =  readFile(lint.output)
+            def lintReport =  readFile('lint.output')
             echo "$lintReport"
           }
           else {
