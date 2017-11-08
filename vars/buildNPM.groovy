@@ -56,7 +56,7 @@ def call(body) {
       }
  
       if (env.BRANCH_NAME == 'master') {
-        sonarqubeScan()
+        // sonarqubeScan()
       }
 
       stage('NPM Build') {
@@ -67,7 +67,14 @@ def call(body) {
       if (config.runLint ==~ /(?i)(Y|YES|T|TRUE)/) {
         stage('Lint') {
           echo "Running eslint..."
-          sh 'npm run lint 2>/dev/null'
+          def lintStatus = sh(returnStatus:true, script: 'yarn lint 2>/dev/null > lint.output')
+          if (lintStatus != 0) {
+            def lintReport =  readFile(lint.output)
+            echo "$lintReport"
+          }
+          else {
+            echo "No lint errors found"
+          }
         }
       }
 
