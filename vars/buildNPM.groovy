@@ -55,9 +55,11 @@ def call(body) {
         echo "$env.project_name"
       }
  
+      /* Disabled.  --malc 11/08/201
       if (env.BRANCH_NAME == 'master') {
-        // sonarqubeScan()
+        sonarqubeScan()
       }
+      */
 
       stage('NPM Build') {
         // We should probably use the --production flag at some pointfor releases
@@ -65,8 +67,8 @@ def call(body) {
       }
 
       if (config.runLint ==~ /(?i)(Y|YES|T|TRUE)/) {
-        stage('Lint') {
-          echo "Running eslint..."
+        stage('ESLint') {
+          echo "Running ESLint..."
           def lintStatus = sh(returnStatus:true, script: 'yarn lint 2>/dev/null > lint.output')
           if (lintStatus != 0) {
             def lintReport =  readFile('lint.output')
@@ -95,7 +97,7 @@ def call(body) {
       if ( env.BRANCH_NAME == 'master' ) {
         stage('NPM Deploy') {
           echo "Deploying NPM packages to Nexus repository"
-          // sh 'npm publish'
+          sh 'npm publish'
         }
 
         if (config.publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) {
