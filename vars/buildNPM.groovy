@@ -70,12 +70,14 @@ def call(body) {
         stage('ESLint') {
           echo "Running ESLint..."
           def lintStatus = sh(returnStatus:true, script: 'yarn lint 2>/dev/null > lint.output')
+          echo "Lint Status: $lintStatus"
           if (lintStatus != 0) {
             def lintReport =  readFile('lint.output')
 
             if (env.CHANGE_ID) {
               // Requires https://github.com/jenkinsci/pipeline-github-plugin
               def comment = pullRequest.comment(lintReport)
+              echo "$comment"
             }
             else {
               echo "$lintReport"
