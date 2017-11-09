@@ -63,7 +63,9 @@ def call(body) {
 
       stage('NPM Build') {
         // We should probably use the --production flag at some pointfor releases
-        sh 'npm install' 
+        withNPM(npmrcConfig: 'npmrc-folioci') {
+          sh 'npm install' 
+        }
       }
 
       if (config.runLint ==~ /(?i)(Y|YES|T|TRUE)/) {
@@ -99,7 +101,9 @@ def call(body) {
       if ( env.BRANCH_NAME == 'master' ) {
         stage('NPM Deploy') {
           echo "Deploying NPM packages to Nexus repository"
-          sh 'npm publish'
+          withNPM(npmrcConfig: 'npmrc-folioci') {
+            sh 'npm publish'
+          }
         }
 
         if (config.publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) {
