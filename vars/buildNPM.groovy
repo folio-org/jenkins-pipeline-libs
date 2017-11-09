@@ -74,7 +74,12 @@ def call(body) {
       if (config.runLint ==~ /(?i)(Y|YES|T|TRUE)/) {
         stage('ESLint') {
           echo "Running ESLint..."
-          def lintStatus = sh(returnStatus:true, script: 'npm run lint 2>/dev/null > lint.output')
+          withCredentials([string(credentialsId: 'jenkins-npm-folioci', 
+                                  variable: 'NPM_TOKEN')]) {
+            withNPM(npmrcConfig: 'jenkins-npm-folioci') {
+              def lintStatus = sh(returnStatus:true, script: 'npm run lint 2>/dev/null > lint.output')
+            }
+          }
           echo "Lint Status: $lintStatus"
           if (lintStatus != 0) {
             def lintReport =  readFile('lint.output')
