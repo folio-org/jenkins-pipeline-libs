@@ -75,7 +75,7 @@ def call(body) {
           echo "Running ESLint..."
           //def lintStatus = sh(returnStatus:true, script: 'yarn lint 2>/dev/null 1> lint.output')
           //echo "Lint Status: $lintStatus"
-          sh 'yarn lint 2>/dev/null' 
+          sh "yarn lint 2>/dev/null"
           if (lintStatus != 0) {
             def lintReport =  readFile('lint.output')
 
