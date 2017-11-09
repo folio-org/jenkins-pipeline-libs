@@ -73,8 +73,9 @@ def call(body) {
       if (config.runLint ==~ /(?i)(Y|YES|T|TRUE)/) {
         stage('ESLint') {
           echo "Running ESLint..."
-          def lintStatus = sh(returnStatus:true, script: 'yarn lint 2>/dev/null 1> lint.output')
-          echo "Lint Status: $lintStatus"
+          //def lintStatus = sh(returnStatus:true, script: 'yarn lint 2>/dev/null 1> lint.output')
+          //echo "Lint Status: $lintStatus"
+          sh 'yarn lint 2>/dev/null' 
           if (lintStatus != 0) {
             def lintReport =  readFile('lint.output')
 
@@ -84,7 +85,7 @@ def call(body) {
               echo "$comment"
             }
             else {
-              echo "$lintReport"
+              //echo "$lintReport"
             }
           }
           else {
