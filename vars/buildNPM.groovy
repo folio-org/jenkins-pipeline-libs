@@ -64,8 +64,11 @@ def call(body) {
 
       stage('NPM Build') {
         // We should probably use the --production flag at some pointfor releases
-        withNPM(npmrcConfig: 'npmrc-folioci') {
-          sh 'npm install' 
+        withCredentials([string(credentialsId: 'jenkins-npm-folioci', 
+                                  variable: 'NPM_TOKEN')]) {
+          withNPM(npmrcConfig: 'jenkins-npm-folioci') {
+            sh 'npm install' 
+          }
         }
       }
 
@@ -102,8 +105,11 @@ def call(body) {
       if ( env.BRANCH_NAME == 'master' ) {
         stage('NPM Deploy') {
           echo "Deploying NPM packages to Nexus repository"
-          withNPM(npmrcConfig: 'npmrc-folioci') {
-            sh 'npm publish'
+          withCredentials([string(credentialsId: 'jenkins-npm-folioci', 
+                                  variable: 'NPM_TOKEN')]) {
+            withNPM(npmrcConfig: 'jenkins-npm-folioci') {
+              sh 'npm publish'
+            }
           }
         }
 
