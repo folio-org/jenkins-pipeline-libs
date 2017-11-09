@@ -63,15 +63,13 @@ def call(body) {
 
       stage('NPM Build') {
         // We should probably use the --production flag at some pointfor releases
-        withNPM(npmrcConfig: 'npmrc-folioci') {
-          sh 'npm install' 
-        }
+         sh 'npm install' 
       }
 
       if (config.runLint ==~ /(?i)(Y|YES|T|TRUE)/) {
         stage('ESLint') {
           echo "Running ESLint..."
-          def lintStatus = sh(returnStatus:true, script: 'yarn lint 2>/dev/null > lint.output')
+          def lintStatus = sh(returnStatus:true, script: 'yarn lint 2>/dev/null 1> lint.output')
           echo "Lint Status: $lintStatus"
           if (lintStatus != 0) {
             def lintReport =  readFile('lint.output')
@@ -101,9 +99,7 @@ def call(body) {
       if ( env.BRANCH_NAME == 'master' ) {
         stage('NPM Deploy') {
           echo "Deploying NPM packages to Nexus repository"
-          withNPM(npmrcConfig: 'npmrc-folioci') {
-            sh 'npm publish'
-          }
+          sh 'npm publish'
         }
 
         if (config.publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) {
