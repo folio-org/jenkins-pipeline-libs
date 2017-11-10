@@ -61,70 +61,74 @@ def call(body) {
       }
       */
 
-      stage('NPM Build') {
-        // We should probably use the --production flag at some pointfor releases
-         sh 'npm install' 
-      }
+      withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
+        withNPM(npmrcConfig: 'jenkins-npm-folioci') {
+          stage('NPM Build') {
+          // We should probably use the --production flag at some pointfor releases
+            sh 'npm install' 
+          }
 
-      if (config.runLint ==~ /(?i)(Y|YES|T|TRUE)/) {
-        stage('ESLint') {
-          echo "Running ESLint..."
-          def lintStatus = sh(returnStatus:true, script: 'yarn lint 2>/dev/null 1> lint.output')
-          echo "Lint Status: $lintStatus"
-          if (lintStatus != 0) {
-            def lintReport =  readFile('lint.output')
+          if (config.runLint ==~ /(?i)(Y|YES|T|TRUE)/) {
+            stage('ESLint') {
+              echo "Running ESLint..."
+              def lintStatus = sh(returnStatus:true, script: 'yarn lint 2>/dev/null 1> lint.output')
+              echo "Lint Status: $lintStatus"
+              if (lintStatus != 0) {
+                def lintReport =  readFile('lint.output')
 
-            if (env.CHANGE_ID) {
-              // Requires https://github.com/jenkinsci/pipeline-github-plugin
-              def comment = pullRequest.comment(lintReport)
-              echo "$comment"
+                if (env.CHANGE_ID) {
+                  // Requires https://github.com/jenkinsci/pipeline-github-plugin
+                  // comment is response to API request in case we ever need it.
+                  def comment = pullRequest.comment(lintReport)
+                  echo "$comment"
+                }
+                else {
+                  echo "$lintReport"
+                }
+              }
+              else {
+                echo "No lint errors found"
+              }
             }
-            else {
-              echo "$lintReport"
+          }
+
+          if (config.runTest ==~ /(?i)(Y|YES|T|TRUE)/) {
+            stage('Unit Tests') {
+              echo "Running unit tests..."
+              sh 'npm run test'
             }
           }
-          else {
-            echo "No lint errors found"
-          }
-        }
-      }
 
-      if (config.runTest ==~ /(?i)(Y|YES|T|TRUE)/) {
-        stage('Unit Tests') {
-          echo "Running unit tests..."
-          sh 'npm run test'
-        }
-      }
+          if ( env.BRANCH_NAME == 'master' ) {
+            stage('NPM Deploy') {
+              echo "Deploying NPM packages to Nexus repository"
+                sh 'npm publish'
+            }
 
-      if ( env.BRANCH_NAME == 'master' ) {
-        stage('NPM Deploy') {
-          echo "Deploying NPM packages to Nexus repository"
-          sh 'npm publish'
-        }
+            if (config.publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) {
+              stage('Publish Module Descriptor') {
+                echo "Publishing Module Descriptor to FOLIO registry"
+                sh 'git clone https://github.com/folio-org/stripes-core'
+                sh 'stripes-core/util/package2md.js --strict package.json > ModuleDescriptor.json'
+                def modDescriptor = 'ModuleDescriptor.json'
 
-        if (config.publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) {
-          stage('Publish Module Descriptor') {
-            echo "Publishing Module Descriptor to FOLIO registry"
-            sh 'git clone https://github.com/folio-org/stripes-core'
-            sh 'stripes-core/util/package2md.js --strict package.json > ModuleDescriptor.json'
-            def modDescriptor = 'ModuleDescriptor.json'
-
-            postModuleDescriptor(modDescriptor,env.name,env.version) 
-          }
-        }
-      } 
-    } // end try
+                postModuleDescriptor(modDescriptor,env.name,env.version) 
+              }
+            }
+          } 
+        }  // end withNPM
+      }  // end WithCred    
+    }  // end try
     catch (Exception err) {
       currentBuild.result = 'FAILED'
       println(err.getMessage());
       echo "Build Result: $currentBuild.result"
       throw err
-    
     }
     finally {
       sendNotifications currentBuild.result
-      
     }
+
   } //end node
     
 } 
