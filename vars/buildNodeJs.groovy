@@ -32,7 +32,7 @@ def call(body) {
       stage('Checkout') {
         deleteDir()
         currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.JOB_BASE_NAME}"
-        sendNotifications 'STARTED'
+        // sendNotifications 'STARTED'
 
          checkout([
                  $class: 'GitSCM',
@@ -166,7 +166,7 @@ def call(body) {
       throw err
     }
     finally {
-      sendNotifications currentBuild.result
+      // sendNotifications currentBuild.result
     }
 
   } // end node
