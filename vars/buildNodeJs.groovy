@@ -1,4 +1,17 @@
-#!/usr/bin/groovy
+#!/usr/bin/env groovy
+
+/*
+ * Main build script for Maven-based FOLIO projects
+ *
+ * Configurable parameters: 
+ *
+ * doDocker:  Build, test, and publish Docker image via 'buildDocker' (Default: 'no')
+ * runLint: Run ESLint via 'yarn lint' (Default: 'no')
+ * runTest: Run unit tests via 'yarn test' (Default: 'no')
+ * npmDeploy: Publish NPM artifacts to NPM repository (Default: 'yes')
+ * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no')
+ * publishApi: Publish API/RAML documentation.  (Default: 'no')
+*/
 
 
 def call(body) {
@@ -8,6 +21,9 @@ def call(body) {
   body()
 
   def foliociLib = new org.folio.foliociCommands()
+  
+  def npmDeploy = config.npmDeploy ?: 'yes'
+  
 
   node('jenkins-slave-all') {
 
@@ -92,10 +108,12 @@ def call(body) {
           }
 
           if ( env.BRANCH_NAME == 'master' ) {
-            stage('NPM Deploy') {
-              // npm is more flexible than yarn for this stage. 
-              echo "Deploying NPM packages to Nexus repository"
+            if (npmDeploy ==~ /(?i)(Y|YES|T|TRUE)/) {
+              stage('NPM Deploy') {
+                // npm is more flexible than yarn for this stage. 
+                echo "Deploying NPM packages to Nexus repository"
                 sh 'npm publish'
+              }
             }
           }
 
@@ -117,11 +135,24 @@ def call(body) {
           // We assume that MDs are included in package.json
           stage('Publish Module Descriptor') {
             echo "Publishing Module Descriptor to FOLIO registry"
-            sh 'git clone https://github.com/folio-org/stripes-core'
-            sh 'stripes-core/util/package2md.js --strict package.json > ModuleDescriptor.json'
-            def modDescriptor = 'ModuleDescriptor.json'
-
+            if (config.ModDescriptor) { 
+              def modDescriptor = config.ModDescriptor
+            }
+            else {
+              echo "Generating Module Descriptor from package.json"
+              sh 'git clone https://github.com/folio-org/stripes-core'
+              sh 'stripes-core/util/package2md.js --strict package.json > ModuleDescriptor.json'
+              def modDescriptor = 'ModuleDescriptor.json'
+            }
+            // TODO: refactor postModuleDescriptor.  Add npm snapshot version. 
             postModuleDescriptor(modDescriptor,env.simpleName,env.version) 
+          }
+        }
+        if (config.publishAPI ==~ /(?i)(Y|YES|T|TRUE)/) {
+          stage('Publish API Docs') {
+            echo "Publishing API docs"
+            sh "python3 /usr/local/bin/generate_api_docs.py -r $env.project_name -v -o folio-api-docs"
+            sh 'aws s3 sync folio-api-docs s3://foliodocs/api'
           }
         }
       } 
