@@ -54,10 +54,10 @@ def call(body) {
         def Boolean snapshot = true
 
         if (snapshot == true) {
-          npmSnapshotVersion()
+          foliociLib.npmSnapshotVersion()
         }
 
-        def Map simpleNameVerMap = npmSimpleNameVersion('package.json')          
+        def Map simpleNameVerMap = foliociLib.npmSimpleNameVersion('package.json')          
         simpleNameVerMap.each { key, value ->
           env.simpleName = key
           env.version = value
