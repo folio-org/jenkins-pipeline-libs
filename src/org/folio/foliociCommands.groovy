@@ -3,7 +3,7 @@
 package org.folio
 
 // Update npm package.json version to "snapshot" version for FOLIO CI
-npmSnapshotVersion() {
+def npmSnapshotVersion() {
 
   def folioci_npmver = libraryResource('org/folio/folioci_npmver.sh')
   writeFile file: 'folioci_npmver.sh', text: folioci_npmver
@@ -14,7 +14,7 @@ npmSnapshotVersion() {
 
 // get the unscoped module name and version from package.json. 
 // Return name:version map.
-npmSimpleNameVersion(String npmPackageFile = 'package.json') {
+def npmSimpleNameVersion(String npmPackageFile = 'package.json') {
   
   def simpleNameVersion = [:]
   def json = readJSON(file: 'npmPackageFile')
@@ -29,7 +29,7 @@ npmSimpleNameVersion(String npmPackageFile = 'package.json') {
 }
 
 // get base repo/project name
-getProjName() {
+def getProjName() {
 
   def proj_name = sh(returnStdout: true, 
       script: 'git config remote.origin.url | awk -F \'/\' \'{print $5}\' | sed -e \'s/\\.git//\'').trim()
