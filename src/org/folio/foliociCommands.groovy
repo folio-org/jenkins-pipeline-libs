@@ -2,6 +2,9 @@
 
 package org.folio
 
+import jenkins.model.Jenkins
+import com.cloudbees.groovy.cps.NonCPS
+
 // Update npm package.json version to "snapshot" version for FOLIO CI
 def npmSnapshotVersion() {
 
