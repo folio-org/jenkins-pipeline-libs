@@ -10,6 +10,7 @@
  * runTest: Run unit tests via 'yarn test' (Default: 'no')
  * npmDeploy: Publish NPM artifacts to NPM repository (Default: 'yes')
  * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no')
+ * modDescriptor: path to standalone Module Descriptor file (Optional)
  * publishApi: Publish API/RAML documentation.  (Default: 'no')
 */
 
