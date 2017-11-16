@@ -26,7 +26,7 @@ def npmSimpleNameVersion(String npmPackageFile = 'package.json') {
   name = n.replaceAll(~/@/, "")  
   version = json.version
   
-  simpleNameVersion = [name:version]
+  simpleNameVersion = [(name):version]
   
   return simpleNameVersion
 }
