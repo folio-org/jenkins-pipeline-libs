@@ -20,7 +20,7 @@ def npmSnapshotVersion() {
 def npmSimpleNameVersion(String npmPackageFile = 'package.json') {
   
   def simpleNameVersion = [:]
-  def json = readJSON(file: 'npmPackageFile')
+  def json = readJSON(file: npmPackageFile)
   def name = json.name.replaceAll(~/\//, "_")  
 
   name = name.replaceAll(~/@/, "")  
