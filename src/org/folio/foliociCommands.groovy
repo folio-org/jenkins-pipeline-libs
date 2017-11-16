@@ -21,7 +21,7 @@ def npmSimpleNameVersion(String npmPackageFile = 'package.json') {
   
   def simpleNameVersion = [:]
   def json = readJSON(file: npmPackageFile)
-  def n = json.replaceAll(~/\//, "_")  
+  def n = json.name.replaceAll(~/\//, "_")  
 
   name = n.replaceAll(~/@/, "")  
   version = json.version
