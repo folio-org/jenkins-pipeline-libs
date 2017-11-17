@@ -40,4 +40,14 @@ def getProjName() {
   return proj_name
 }
 
+// update the 'Id' field (for snapshot versions, etc)
+def updateModDescrioptorId(String modDescriptor) {
+
+  echo "Update Module Descriptor version to snapshot version"
+  sh "mv $modDescriptor ${modDescriptor}.tmp"
+  sh """
+  jq '.id |= \"${env.name}-${env.version}\"' ${modDescriptor}.tmp > $modDescriptor
+  """
+}
+
 
