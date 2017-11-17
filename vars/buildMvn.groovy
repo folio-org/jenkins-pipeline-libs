@@ -20,7 +20,11 @@ def call(body) {
   body.delegate = config
   body()
 
-  node('folio-jenkins-slave-docker') {
+  def foliociLib = new org.folio.foliociCommands()
+
+  def buildNode = config.buildNode ?: 'jenkins-slave-all'
+
+  node(buildNode) {
 
     try {
       stage('Checkout') {
@@ -42,34 +46,35 @@ def call(body) {
 
          echo "Checked out $env.BRANCH_NAME"
 
-        def proj_name = sh(returnStdout: true, script: 'git config remote.origin.url | awk -F \'/\' \'{print $5}\' | sed -e \'s/\\.git//\'').trim()
-        env.project_name = proj_name
-        echo "$env.project_name"
-
       }
 
-      stage('Maven Build') {
-        def mvn_artifact = readMavenPom().getArtifactId() 
+      stage('Prep') {
+        def mvn_artifact = readMavenPom().getArtifactId()
         def mvn_version =  readMavenPom().getVersion()
         env.name = mvn_artifact
 
         if (mvn_version ==~ /.*-SNAPSHOT$/) {
           echo "This is a snapshot"
           env.version = "${mvn_version}.${env.BUILD_NUMBER}"
+          env.snapshot = true
         }
         else {
           env.version = mvn_version
         }
 
         echo "Building Maven artifact: ${env.name} Version: ${env.version}"
-            
-        timeout(30) {
-          withMaven(jdk: 'OpenJDK 8 on Ubuntu Docker Slave Node',
-                    maven: 'Maven on Ubuntu Docker Slave Node',
-                    options: [junitPublisher(disabled: false,
-                    ignoreAttachments: false),
-                    artifactsPublisher(disabled: false)]) {
 
+        // project name is the GitHub repo name and is typically
+        // different from mod name specified in package.json
+        env.project_name = foliociLib.getProjName()
+        echo "Project Name: $env.project_name"
+      }
+
+      stage('Maven Build') {
+        timeout(30) {
+          withMaven(jdk: 'openjdk-8-jenkins-slave-all',  
+                    maven: 'maven3-jenkins-slave-all',  
+                    mavenSettingsConfig: 'folioci-maven-settings') {
             sh 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install'
           }
         }
@@ -104,27 +109,34 @@ def call(body) {
         if ( config.mvnDeploy ==~ /(?i)(Y|YES|T|TRUE)/ ) {
           stage('Maven Deploy') {
             echo "Deploying artifacts to Maven repository"
-            withMaven(jdk: 'OpenJDK 8 on Ubuntu Docker Slave Node',
-                      maven: 'Maven on Ubuntu Docker Slave Node',
-                      options: [junitPublisher(disabled: true,
-                      ignoreAttachments: false),
-                      artifactsPublisher(disabled: true)]) {
+            withMaven(jdk: 'openjdk-8-jenkins-slave-all', 
+                      maven: 'maven3-jenkins-slave-all', 
+                      mavenSettingsConfig: 'folioci-maven-settings') {
               sh 'mvn -DskipTests deploy'
             }
           }
         }
         if (config.publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) {
           stage('Publish Module Descriptor') {
-              echo "Publishing Module Descriptor to FOLIO registry"
-              def modDescriptor = 'target/ModuleDescriptor.json'
-              postModuleDescriptor(modDescriptor,env.name,env.version) 
+            echo "Publishing Module Descriptor to FOLIO registry"
+            def modDescriptor = 'target/ModuleDescriptor.json'
+            // Add build number to version if snapshot
+            if (env.snapshot) { 
+              foliociLib.updateModDescriptorId(modDescriptor)
+            }
+              postModuleDescriptor(modDescriptor) 
           }
         }
         if (config.publishAPI ==~ /(?i)(Y|YES|T|TRUE)/) {
           stage('Publish API Docs') {
-          echo "Publishing API docs"
+            echo "Publishing API docs"
             sh "python3 /usr/local/bin/generate_api_docs.py -r $env.project_name -v -o folio-api-docs"
-            sh 'aws s3 sync folio-api-docs s3://foliodocs/api'
+            withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', 
+                 accessKeyVariable: 'AWS_ACCESS_KEY_ID', 
+                 credentialsId: 'jenkins-aws', 
+                 secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+              sh 'aws s3 sync folio-api-docs s3://foliodocs/api'
+            }
           }
         }
       } 
