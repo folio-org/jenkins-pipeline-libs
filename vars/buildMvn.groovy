@@ -24,7 +24,7 @@ def call(body) {
 
   def buildNode = config.buildNode ?: 'jenkins-slave-all'
 
-  node(buildnode) {
+  node(buildNode) {
 
     try {
       stage('Checkout') {
