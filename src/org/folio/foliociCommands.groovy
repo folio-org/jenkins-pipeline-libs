@@ -49,4 +49,3 @@ def updateModDescriptorId(String modDescriptor) {
   """
 }
 
-
