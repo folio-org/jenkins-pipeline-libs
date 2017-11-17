@@ -41,7 +41,7 @@ def getProjName() {
 }
 
 // update the 'Id' field (for snapshot versions, etc)
-def updateModDescrioptorId(String modDescriptor) {
+def updateModDescriptorId(String modDescriptor) {
 
   sh "mv $modDescriptor ${modDescriptor}.tmp"
   sh """
