@@ -122,7 +122,7 @@ def call(body) {
                 jq '.id |= \"${name}-${version}\"' ${modDescriptor}.tmp > $modDescriptor
                 """
               }
-              postModuleDescriptor("$modDescriptor","$env.name","$env.version") 
+              postModuleDescriptor(modDescriptor) 
           }
         }
         if (config.publishAPI ==~ /(?i)(Y|YES|T|TRUE)/) {
