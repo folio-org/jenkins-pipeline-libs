@@ -131,7 +131,10 @@ def call(body) {
           stage('Publish API Docs') {
             echo "Publishing API docs"
             sh "python3 /usr/local/bin/generate_api_docs.py -r $env.project_name -v -o folio-api-docs"
-            withAWS(region: 'us-east-1', credentials: 'jenkins-aws') {
+            withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', 
+                 accessKeyVariable: 'AWS_ACCESS_KEY_ID', 
+                 credentialsId: 'jenkins-aws', 
+                 secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
               sh 'aws s3 sync folio-api-docs s3://foliodocs/api'
             }
           }
