@@ -3,21 +3,14 @@
 
 /*
  * Send notifications based on build status string
+ * TODO: Move to src/org/folio
  */
 
-def call(String modDescriptor,String name,String version) {
+def call(String modDescriptor) {
  
   def folioRegistry = 'http://folio-registry.aws.indexdata.com/_/proxy/modules'
 
-  // Add build number to version if snapshot
-  if (version ==~ /.*-SNAPSHOT.*/) { 
-    sh "mv $modDescriptor ${modDescriptor}.tmp"
-    sh """
-      jq '.id |= \"${name}-${version}\"' ${modDescriptor}.tmp > $modDescriptor
-    """
-  }
-
-  def request = readFile("$modDescriptor")
+  def request = readFile(modDescriptor)
   echo "Module Descriptor:"
   echo "$request"
 
