@@ -80,7 +80,6 @@ def call(body) {
       withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
         withNPM(npmrcConfig: 'jenkins-npm-folioci') {
           stage('NPM Build') {
-          // We should probably use the --production flag at some pointfor releases
             sh 'yarn install' 
           }
 
