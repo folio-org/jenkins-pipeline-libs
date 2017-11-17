@@ -24,13 +24,17 @@ def call(body) {
 
   def foliociLib = new org.folio.foliociCommands()
   
+  // default is to deploy to npm repo when branch is master
   def npmDeploy = config.npmDeploy ?: 'yes'
+
+  // use the smaller nodejs build node since most 
+  // Nodejs builds are Stripes.
   def buildNode = config.npmDeploy ?: 'jenkins-slave-nodejs'
 
   // right now, all builds are snapshots
   env.snapshot = true
   
-  node('jenkins-slave-all') {
+  node(buildNode) {
 
     try {
       stage('Checkout') {
@@ -176,7 +180,6 @@ def call(body) {
     finally {
       // sendNotifications currentBuild.result
     }
-
   } // end node
     
 } 
