@@ -115,6 +115,13 @@ def call(body) {
           stage('Publish Module Descriptor') {
               echo "Publishing Module Descriptor to FOLIO registry"
               def modDescriptor = 'target/ModuleDescriptor.json'
+              // Add build number to version if snapshot
+              if (version ==~ /.*-SNAPSHOT.*/) { 
+                sh "mv $modDescriptor ${modDescriptor}.tmp"
+                sh """
+                jq '.id |= \"${name}-${version}\"' ${modDescriptor}.tmp > $modDescriptor
+                """
+              }
               postModuleDescriptor("$modDescriptor","$env.name","$env.version") 
           }
         }
