@@ -144,8 +144,8 @@ def call(body) {
             def modDescriptor = ''
             if (config.modDescriptor) { 
               modDescriptor = config.modDescriptor
+              env.name = env.project_name
               if (env.snapshot) {
-                env.name = env.simpleName
                 // update the version to the snapshot version
                 echo "Update Module Descriptor version to snapshot version"
                 foliociLib.updateModDescriptorId(modDescriptor)
@@ -153,6 +153,7 @@ def call(body) {
             }
             else {
               echo "Generating Stripes Module Descriptor from package.json"
+              env.name = env.simpleName
               sh 'git clone https://github.com/folio-org/stripes-core'
               sh 'stripes-core/util/package2md.js --strict package.json > ModuleDescriptor.json'
               modDescriptor = 'ModuleDescriptor.json'
