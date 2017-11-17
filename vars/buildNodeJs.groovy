@@ -24,6 +24,9 @@ def call(body) {
   def foliociLib = new org.folio.foliociCommands()
   
   def npmDeploy = config.npmDeploy ?: 'yes'
+
+  // right now, all builds are snapshots
+  env.snapshot = true
   
 
   node('jenkins-slave-all') {
@@ -50,10 +53,8 @@ def call(body) {
       }
 
       stage('Prep') {
-        // right now, all builds are snapshots
-        def Boolean snapshot = true
 
-        if (snapshot == true) {
+        if (env.snapshot == true) {
           foliociLib.npmSnapshotVersion()
         }
 
@@ -122,8 +123,9 @@ def call(body) {
       }  // end WithCred    
 
       if (config.doDocker) {
-        env_name = env.project_name
         stage('Docker Build') {
+          // use env.project_name as name of docker artifact
+          env.name = env.project_name
           echo "Building Docker image for $env.name:$env.version" 
           config.doDocker.delegate = this
           config.doDocker.resolveStrategy = Closure.DELEGATE_FIRST
@@ -138,6 +140,11 @@ def call(body) {
             echo "Publishing Module Descriptor to FOLIO registry"
             if (config.ModDescriptor) { 
               def modDescriptor = config.ModDescriptor
+              // update the version to the snapshot version
+              sh "mv $modDescriptor ${modDescriptor}.tmp"
+              sh """
+              jq '.id |= \"${env.simpleName}-${env.version}\"' ${modDescriptor}.tmp > $modDescriptor
+              """
             }
             else {
               echo "Generating Module Descriptor from package.json"
@@ -145,8 +152,7 @@ def call(body) {
               sh 'stripes-core/util/package2md.js --strict package.json > ModuleDescriptor.json'
               def modDescriptor = 'ModuleDescriptor.json'
             }
-            // TODO: refactor postModuleDescriptor.  Add npm snapshot version. 
-            postModuleDescriptor(modDescriptor,env.simpleName,env.version) 
+            postModuleDescriptor(modDescriptor) 
           }
         }
         if (config.publishAPI ==~ /(?i)(Y|YES|T|TRUE)/) {
