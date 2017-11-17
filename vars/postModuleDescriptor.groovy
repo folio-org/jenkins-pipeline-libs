@@ -10,7 +10,7 @@ def call(String modDescriptor) {
  
   def folioRegistry = 'http://folio-registry.aws.indexdata.com/_/proxy/modules'
 
-  def request = readFile(modDescriptor)
+  def request = readFile("$modDescriptor")
   echo "Module Descriptor:"
   echo "$request"
 
