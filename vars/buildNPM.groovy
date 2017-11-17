@@ -141,19 +141,21 @@ def call(body) {
         if (config.publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) {
           // We assume that MDs are included in package.json
           stage('Publish Module Descriptor') {
-            if (config.ModDescriptor) { 
+            def modDescriptor = ''
+            if (config.modDescriptor) { 
+              modDescriptor = config.modDescriptor
               if (env.snapshot) {
                 env.name = env.simpleName
                 // update the version to the snapshot version
                 echo "Update Module Descriptor version to snapshot version"
-                foliociLib.updateModDescriptorId(config.modDescriptor)
+                foliociLib.updateModDescriptorId(modDescriptor)
               }
             }
             else {
               echo "Generating Stripes Module Descriptor from package.json"
               sh 'git clone https://github.com/folio-org/stripes-core'
               sh 'stripes-core/util/package2md.js --strict package.json > ModuleDescriptor.json'
-              def modDescriptor = 'ModuleDescriptor.json'
+              modDescriptor = 'ModuleDescriptor.json'
             }
             echo "Publishing Module Descriptor to FOLIO registry"
             postModuleDescriptor(modDescriptor) 
