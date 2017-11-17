@@ -12,6 +12,7 @@
  * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no')
  * modDescriptor: path to standalone Module Descriptor file (Optional)
  * publishApi: Publish API/RAML documentation.  (Default: 'no')
+ * buildNode: label of jenkin's slave build node to use
 */
 
 
@@ -24,11 +25,11 @@ def call(body) {
   def foliociLib = new org.folio.foliociCommands()
   
   def npmDeploy = config.npmDeploy ?: 'yes'
+  def buildNode = config.npmDeploy ?: 'jenkins-slave-nodejs'
 
   // right now, all builds are snapshots
   env.snapshot = true
   
-
   node('jenkins-slave-all') {
 
     try {
@@ -137,21 +138,22 @@ def call(body) {
         if (config.publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) {
           // We assume that MDs are included in package.json
           stage('Publish Module Descriptor') {
-            echo "Publishing Module Descriptor to FOLIO registry"
             if (config.ModDescriptor) { 
               def modDescriptor = config.ModDescriptor
-              // update the version to the snapshot version
-              sh "mv $modDescriptor ${modDescriptor}.tmp"
-              sh """
-              jq '.id |= \"${env.simpleName}-${env.version}\"' ${modDescriptor}.tmp > $modDescriptor
-              """
+              if (env.snapshot) {
+                env.name = env.simpleName
+                // update the version to the snapshot version
+                echo "Update Module Descriptor version to snapshot version"
+                foliociLib.updateModDesccriptorId(modDescriptor)
+              }
             }
             else {
-              echo "Generating Module Descriptor from package.json"
+              echo "Generating Stripes Module Descriptor from package.json"
               sh 'git clone https://github.com/folio-org/stripes-core'
               sh 'stripes-core/util/package2md.js --strict package.json > ModuleDescriptor.json'
               def modDescriptor = 'ModuleDescriptor.json'
             }
+            echo "Publishing Module Descriptor to FOLIO registry"
             postModuleDescriptor(modDescriptor) 
           }
         }
