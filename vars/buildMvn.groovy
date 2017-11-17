@@ -119,10 +119,7 @@ def call(body) {
             def modDescriptor = 'target/ModuleDescriptor.json'
             // Add build number to version if snapshot
             if (env.version ==~ /.*-SNAPSHOT.*/) { 
-              sh "mv $modDescriptor ${modDescriptor}.tmp"
-              sh """
-              jq '.id |= \"${env.name}-${env.version}\"' ${modDescriptor}.tmp > $modDescriptor
-              """
+              foliociLib.updateModDescriptorId(modDescriptor)
             }
               postModuleDescriptor(modDescriptor) 
           }
