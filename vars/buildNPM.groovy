@@ -142,12 +142,11 @@ def call(body) {
           // We assume that MDs are included in package.json
           stage('Publish Module Descriptor') {
             if (config.ModDescriptor) { 
-              def modDescriptor = config.ModDescriptor
               if (env.snapshot) {
                 env.name = env.simpleName
                 // update the version to the snapshot version
                 echo "Update Module Descriptor version to snapshot version"
-                foliociLib.updateModDescriptorId(modDescriptor)
+                foliociLib.updateModDescriptorId(config.modDescriptor)
               }
             }
             else {
