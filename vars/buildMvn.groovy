@@ -115,9 +115,16 @@ def call(body) {
         }
         if (config.publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) {
           stage('Publish Module Descriptor') {
-              echo "Publishing Module Descriptor to FOLIO registry"
-              def modDescriptor = 'target/ModuleDescriptor.json'
-              postModuleDescriptor(modDescriptor,env.name,env.version) 
+            echo "Publishing Module Descriptor to FOLIO registry"
+            def modDescriptor = 'target/ModuleDescriptor.json'
+            // Add build number to version if snapshot
+            if (env.version ==~ /.*-SNAPSHOT.*/) { 
+              sh "mv $modDescriptor ${modDescriptor}.tmp"
+              sh """
+              jq '.id |= \"${env.name}-${env.version}\"' ${modDescriptor}.tmp > $modDescriptor
+              """
+            }
+              postModuleDescriptor(modDescriptor) 
           }
         }
         if (config.publishAPI ==~ /(?i)(Y|YES|T|TRUE)/) {
