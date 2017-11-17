@@ -147,7 +147,7 @@ def call(body) {
                 env.name = env.simpleName
                 // update the version to the snapshot version
                 echo "Update Module Descriptor version to snapshot version"
-                foliociLib.updateModDesccriptorId(modDescriptor)
+                foliociLib.updateModDescriptorId(modDescriptor)
               }
             }
             else {
