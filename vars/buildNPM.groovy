@@ -1,4 +1,19 @@
-#!/usr/bin/groovy
+#!/usr/bin/env groovy
+
+/*
+ * Main build script for Maven-based FOLIO projects
+ *
+ * Configurable parameters: 
+ *
+ * doDocker:  Build, test, and publish Docker image via 'buildDocker' (Default: 'no')
+ * runLint: Run ESLint via 'yarn lint' (Default: 'no')
+ * runTest: Run unit tests via 'yarn test' (Default: 'no')
+ * npmDeploy: Publish NPM artifacts to NPM repository (Default: 'yes')
+ * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no')
+ * modDescriptor: path to standalone Module Descriptor file (Optional)
+ * publishApi: Publish API/RAML documentation.  (Default: 'no')
+ * buildNode: label of jenkin's slave build node to use
+*/
 
 
 def call(body) {
@@ -7,13 +22,25 @@ def call(body) {
   body.delegate = config
   body()
 
-  node('jenkins-slave-nodejs') {
+  def foliociLib = new org.folio.foliociCommands()
+  
+  // default is to deploy to npm repo when branch is master
+  def npmDeploy = config.npmDeploy ?: 'yes'
+
+  // use the smaller nodejs build node since most 
+  // Nodejs builds are Stripes.
+  def buildNode = config.npmDeploy ?: 'jenkins-slave-nodejs'
+
+  // right now, all builds are snapshots
+  env.snapshot = true
+  
+  node(buildNode) {
 
     try {
       stage('Checkout') {
         deleteDir()
         currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.JOB_BASE_NAME}"
-        sendNotifications 'STARTED'
+        // sendNotifications 'STARTED'
 
          checkout([
                  $class: 'GitSCM',
@@ -31,41 +58,30 @@ def call(body) {
       }
 
       stage('Prep') {
-        // right now, all builds are snapshots
-        def Boolean snapshot = true
 
-        if (snapshot == true) {
-          def folioci_npmver = libraryResource('org/folio/folioci_npmver.sh')
-          writeFile file: 'folioci_npmver.sh', text: folioci_npmver
-          sh 'chmod +x folioci_npmver.sh'
-          sh 'npm version `./folioci_npmver.sh`'
+        if (env.snapshot == true) {
+          foliociLib.npmSnapshotVersion()
         }
 
-        def json = readJSON(file: 'package.json')
-        def name = json.name.replaceAll(~/\//, "_")  
-        name = name.replaceAll(~/@/, "")  
-        env.name = name
-        env.version = json.version
-        echo "Package Name: $env.name"
+        def Map simpleNameVerMap = foliociLib.npmSimpleNameVersion('package.json')          
+        simpleNameVerMap.each { key, value ->
+          env.simpleName = key
+          env.version = value
+        }
+        echo "Package Simplfied Name: $env.simpleName"
         echo "Package Version: $env.version"
 
-        // project name is different from mod name specified in package.json
-        def proj_name = sh(returnStdout: true, script: 'git config remote.origin.url | awk -F \'/\' \'{print $5}\' | sed -e \'s/\\.git//\'').trim()
-        env.project_name = proj_name
-        echo "$env.project_name"
+        // project name is the GitHub repo name and is typically
+        // different from mod name specified in package.json
+        env.project_name = foliociLib.getProjName()
+        echo "Project Name: $env.project_name"
       }
  
-      /* Disabled.  --malc 11/08/201
-      if (env.BRANCH_NAME == 'master') {
-        sonarqubeScan()
-      }
-      */
-
       withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
         withNPM(npmrcConfig: 'jenkins-npm-folioci') {
           stage('NPM Build') {
           // We should probably use the --production flag at some pointfor releases
-            sh 'npm install' 
+            sh 'yarn install' 
           }
 
           if (config.runLint ==~ /(?i)(Y|YES|T|TRUE)/) {
@@ -75,7 +91,6 @@ def call(body) {
               echo "Lint Status: $lintStatus"
               if (lintStatus != 0) {
                 def lintReport =  readFile('lint.output')
-
                 if (env.CHANGE_ID) {
                   // Requires https://github.com/jenkinsci/pipeline-github-plugin
                   // comment is response to API request in case we ever need it.
@@ -95,29 +110,66 @@ def call(body) {
           if (config.runTest ==~ /(?i)(Y|YES|T|TRUE)/) {
             stage('Unit Tests') {
               echo "Running unit tests..."
-              sh 'npm run test'
+              sh 'yarn test'
             }
           }
 
           if ( env.BRANCH_NAME == 'master' ) {
-            stage('NPM Deploy') {
-              echo "Deploying NPM packages to Nexus repository"
+            if (npmDeploy ==~ /(?i)(Y|YES|T|TRUE)/) {
+              stage('NPM Deploy') {
+                // npm is more flexible than yarn for this stage. 
+                echo "Deploying NPM packages to Nexus repository"
                 sh 'npm publish'
-            }
-
-            if (config.publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) {
-              stage('Publish Module Descriptor') {
-                echo "Publishing Module Descriptor to FOLIO registry"
-                sh 'git clone https://github.com/folio-org/stripes-core'
-                sh 'stripes-core/util/package2md.js --strict package.json > ModuleDescriptor.json'
-                def modDescriptor = 'ModuleDescriptor.json'
-
-                postModuleDescriptor(modDescriptor,env.name,env.version) 
               }
             }
-          } 
+          }
+
         }  // end withNPM
       }  // end WithCred    
+
+      if (config.doDocker) {
+        stage('Docker Build') {
+          // use env.project_name as name of docker artifact
+          env.name = env.project_name
+          echo "Building Docker image for $env.name:$env.version" 
+          config.doDocker.delegate = this
+          config.doDocker.resolveStrategy = Closure.DELEGATE_FIRST
+          config.doDocker.call()
+        }
+      } 
+
+      if ( env.BRANCH_NAME == 'master' ) {
+        if (config.publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) {
+          // We assume that MDs are included in package.json
+          stage('Publish Module Descriptor') {
+            if (config.ModDescriptor) { 
+              def modDescriptor = config.ModDescriptor
+              if (env.snapshot) {
+                env.name = env.simpleName
+                // update the version to the snapshot version
+                echo "Update Module Descriptor version to snapshot version"
+                foliociLib.updateModDesccriptorId(modDescriptor)
+              }
+            }
+            else {
+              echo "Generating Stripes Module Descriptor from package.json"
+              sh 'git clone https://github.com/folio-org/stripes-core'
+              sh 'stripes-core/util/package2md.js --strict package.json > ModuleDescriptor.json'
+              def modDescriptor = 'ModuleDescriptor.json'
+            }
+            echo "Publishing Module Descriptor to FOLIO registry"
+            postModuleDescriptor(modDescriptor) 
+          }
+        }
+        if (config.publishAPI ==~ /(?i)(Y|YES|T|TRUE)/) {
+          stage('Publish API Docs') {
+            echo "Publishing API docs"
+            sh "python3 /usr/local/bin/generate_api_docs.py -r $env.project_name -v -o folio-api-docs"
+            sh 'aws s3 sync folio-api-docs s3://foliodocs/api'
+          }
+        }
+      } 
+
     }  // end try
     catch (Exception err) {
       currentBuild.result = 'FAILED'
@@ -126,10 +178,9 @@ def call(body) {
       throw err
     }
     finally {
-      sendNotifications currentBuild.result
+      // sendNotifications currentBuild.result
     }
-
-  } //end node
+  } // end node
     
 } 
 
