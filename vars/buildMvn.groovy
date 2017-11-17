@@ -20,7 +20,11 @@ def call(body) {
   body.delegate = config
   body()
 
-  node('folio-jenkins-slave-docker') {
+  def foliociLib = new org.folio.foliociCommands()
+
+  def buildNode = config.buildNode ?: 'jenkins-slave-all'
+
+  node(buildnode) {
 
     try {
       stage('Checkout') {
@@ -42,27 +46,31 @@ def call(body) {
 
          echo "Checked out $env.BRANCH_NAME"
 
-        def proj_name = sh(returnStdout: true, script: 'git config remote.origin.url | awk -F \'/\' \'{print $5}\' | sed -e \'s/\\.git//\'').trim()
-        env.project_name = proj_name
-        echo "$env.project_name"
-
       }
 
-      stage('Maven Build') {
-        def mvn_artifact = readMavenPom().getArtifactId() 
+      stage('Prep') {
+        def mvn_artifact = readMavenPom().getArtifactId()
         def mvn_version =  readMavenPom().getVersion()
         env.name = mvn_artifact
 
         if (mvn_version ==~ /.*-SNAPSHOT$/) {
           echo "This is a snapshot"
           env.version = "${mvn_version}.${env.BUILD_NUMBER}"
+          env.snapshot = true
         }
         else {
           env.version = mvn_version
         }
 
         echo "Building Maven artifact: ${env.name} Version: ${env.version}"
-            
+
+        // project name is the GitHub repo name and is typically
+        // different from mod name specified in package.json
+        env.project_name = foliociLib.getProjName()
+        echo "Project Name: $env.project_name"
+      }
+
+      stage('Maven Build') {
         timeout(30) {
           withMaven(jdk: 'OpenJDK 8 on Ubuntu Docker Slave Node',
                     maven: 'Maven on Ubuntu Docker Slave Node',
@@ -118,7 +126,7 @@ def call(body) {
             echo "Publishing Module Descriptor to FOLIO registry"
             def modDescriptor = 'target/ModuleDescriptor.json'
             // Add build number to version if snapshot
-            if (env.version ==~ /.*-SNAPSHOT.*/) { 
+            if (env.snapshot) { 
               foliociLib.updateModDescriptorId(modDescriptor)
             }
               postModuleDescriptor(modDescriptor) 
