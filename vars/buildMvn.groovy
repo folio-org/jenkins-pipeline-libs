@@ -72,12 +72,9 @@ def call(body) {
 
       stage('Maven Build') {
         timeout(30) {
-          withMaven(jdk: 'OpenJDK 8 on Ubuntu Docker Slave Node',
-                    maven: 'Maven on Ubuntu Docker Slave Node',
-                    options: [junitPublisher(disabled: false,
-                    ignoreAttachments: false),
-                    artifactsPublisher(disabled: false)]) {
-
+          withMaven(jdk: 'openjdk-8-jenkins-slave-all',  
+                    maven: 'maven3-jenkins-slave-all',  
+                    mavenSettingsConfig: 'folioci-maven-settings') {
             sh 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install'
           }
         }
@@ -112,11 +109,9 @@ def call(body) {
         if ( config.mvnDeploy ==~ /(?i)(Y|YES|T|TRUE)/ ) {
           stage('Maven Deploy') {
             echo "Deploying artifacts to Maven repository"
-            withMaven(jdk: 'OpenJDK 8 on Ubuntu Docker Slave Node',
-                      maven: 'Maven on Ubuntu Docker Slave Node',
-                      options: [junitPublisher(disabled: true,
-                      ignoreAttachments: false),
-                      artifactsPublisher(disabled: true)]) {
+            withMaven(jdk: 'openjdk-8-jenkins-slave-all', 
+                      maven: 'maven3-jenkins-slave-all', 
+                      mavenSettingsConfig: 'folioci-maven-settings') {
               sh 'mvn -DskipTests deploy'
             }
           }
@@ -134,9 +129,11 @@ def call(body) {
         }
         if (config.publishAPI ==~ /(?i)(Y|YES|T|TRUE)/) {
           stage('Publish API Docs') {
-          echo "Publishing API docs"
+            echo "Publishing API docs"
             sh "python3 /usr/local/bin/generate_api_docs.py -r $env.project_name -v -o folio-api-docs"
-            sh 'aws s3 sync folio-api-docs s3://foliodocs/api'
+            withAWS(region: 'us-east-1', credentials: 'jenkins-aws') {
+              sh 'aws s3 sync folio-api-docs s3://foliodocs/api'
+            }
           }
         }
       } 
