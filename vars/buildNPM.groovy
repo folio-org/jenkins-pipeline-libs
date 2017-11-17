@@ -59,7 +59,7 @@ def call(body) {
 
       stage('Prep') {
 
-        if (env.snapshot == true) {
+        if (env.snapshot) {
           foliociLib.npmSnapshotVersion()
         }
 
