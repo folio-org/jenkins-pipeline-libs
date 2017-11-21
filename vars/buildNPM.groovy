@@ -125,7 +125,7 @@ def call(body) {
 
         }  // end withNPM
         // remove .npmrc put in directory by withNPM
-        rm -f .npmrc 
+        sh 'rm -f .npmrc'
       }  // end WithCred    
 
       if (config.doDocker) {
