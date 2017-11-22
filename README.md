@@ -33,8 +33,8 @@ defined in package.json before enabling this option.
 defined in package.json.  'test' is typically used for unit tests.
 
 
-A typical maven-based Server-side FOLIO module Jenkinsfile configuration might look like 
-the following: 
+A typical Maven-based, server-side FOLIO module Jenkinsfile configuration might look like 
+the following.
 
 ```
 buildMvn {
@@ -54,10 +54,10 @@ buildMvn {
 
  * 'publishAPI' - Convert RAML-based API to HTML and publish to http://dev.folio.org/doc/api/ 
 
- * 'mvnDeploy' - Deploy maven artifacts to FOLIO maven repository.
+ * 'mvnDeploy' - Deploy Maven artifacts to FOLIO Maven repository.
 
 If we are creating and deploying a Docker image as part of the module's artifacts, specify
-'doDocker' with 'buildJavaDocker' and the following typical options:
+'doDocker' with 'buildJavaDocker' and the following options:
 
  * 'publishMaster' - Publish image to 'folioci' Docker repository on Docker Hub when building
 'master' branch.  This is the default. 
@@ -68,7 +68,7 @@ If we are creating and deploying a Docker image as part of the module's artifact
 command is run *inside* the container and typically tests a REST endpoint to determine the 
 health of the application running inside the container. 
 
-There are other options availble to buildNPM, buildMvn, and buildJavaDocker for certain 
+There are other options availble to 'buildNPM', 'buildMvn', and 'buildJavaDockeri' for certain 
 corner cases.  Check these scripts directly for additional information.
 
 
