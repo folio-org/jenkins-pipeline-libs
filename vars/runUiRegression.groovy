@@ -16,6 +16,9 @@ def call(String uitestVer, String folioUrl) {
   def testStatus = sh(script: "docker run -i --rm -e \"FOLIO_UI_URL=${folioUrl}\" $uitestImage >> rtest.html 2>&1", returnStatus:true)
 
   sh 'echo "</pre><body></html>" >> rtest.html'
+ 
+  def testReport =  readFile('rtest.html')
+  echo $testReport
 
   publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, 
                keepAll: true, reportDir: '.', 
