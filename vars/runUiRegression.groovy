@@ -18,7 +18,7 @@ def call(String uitestVer, String folioUrl) {
   sh 'echo "</pre><body></html>" >> rtest.html'
  
   def testReport =  readFile('rtest.html')
-  echo $testReport
+  echo "$testReport"
 
   publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, 
                keepAll: true, reportDir: '.', 
