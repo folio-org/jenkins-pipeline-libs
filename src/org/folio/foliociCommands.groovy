@@ -49,9 +49,3 @@ def updateModDescriptorId(String modDescriptor) {
   """
 }
 
-// date string for FOLIO builds
-def folioDateString() {
-  def date = sh(returnStdout: true, script: 'date +%Y%m%d').trim()
-  return date
-}
-
