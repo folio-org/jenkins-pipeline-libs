@@ -10,9 +10,9 @@ aws="/usr/bin/aws --region us-east-1"
 filter="Name=resource-type,Values=instance Name=key,Values=Build Name=value,Values=${base_build}_latest"
 current_latest=$($aws ec2 describe-tags --filters $filter --query Tags[*].ResourceId)
 
-# ...and retag those instances to Build:folio_BUILDNAME_old
+# And re-tag those instances to Build:folio_BUILDNAME_old
 if [ -n "$current_latest" ]; then 
-  echo "Retagging previous builds to '${base_build}_old'"
+  echo "Re-tagging previous builds to '${base_build}_old'"
   for i in $current_latest
   do
     $aws ec2 create-tags --resources $i --tags Key=Build,Value=${base_build}_old
@@ -26,7 +26,7 @@ filter="Name=resource-type,Values=instance Name=key,Values=Group Name=value,Valu
 new_latest=$($aws ec2 describe-tags --filters $filter --query Tags[*].ResourceId)
 
 
-# ...and add 'Build:folio_BUILDNAME_latest' tag.
+# And add 'Build:folio_BUILDNAME_latest' tag.
 if [ -n "$new_latest" ]; then 
   echo "Adding tag 'Build:${base_build}_latest' to current build Group:${group_tag}."
   for i in $new_latest
