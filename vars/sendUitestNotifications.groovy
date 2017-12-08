@@ -9,6 +9,7 @@ def call(String testStatus) {
 
   // Default values
   def mailrcpt = 'folio-jenkins@indexdata.com'
+  def slackChannel = '#coreteam'
   def color = 'RED'
   def colorCode = '#FF0000'
   def subject = "${testStatus}: 'UI Regression Tests failed for ${env.JOB_NAME} ${env.BUILD_DISPLAY_NAME}'"
@@ -35,6 +36,6 @@ def call(String testStatus) {
   }
 
   // Send Slack notification
-  slackSend (color: colorCode, message: summary)
+  slackSend (channel: slackChannel, color: colorCode, message: summary)
 
 }
