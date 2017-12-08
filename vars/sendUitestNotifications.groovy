@@ -8,7 +8,7 @@
 def call(String testStatus) {
 
   // Default values
-  def mailrcpt = 'malc@indexdata.com'
+  def mailrcpt = 'folio-jenkins@indexdata.com'
   def color = 'RED'
   def colorCode = '#FF0000'
   def subject = "${testStatus}: 'UI Regression Tests failed for ${env.JOB_NAME} ${env.BUILD_DISPLAY_NAME}'"
@@ -20,7 +20,7 @@ def call(String testStatus) {
     // Build failed. Red
     colorCode = '#FF0000'
     emailext (
-      to: 'folio-jenkins@indexdata.com',
+      to: mailrcpt,
       subject: subject,
       body: details,
     )
