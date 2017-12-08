@@ -14,7 +14,7 @@ private_zoneid="Z3JKLZ9JDZ7HCP"
 
 public_record=$(cat <<EOF
 {
-"Comment": "Update public zone record to reflect latest ${build_base}-${build}",
+"Comment": "Update public zone record to reflect latest ${base_build}-${build}",
   "Changes": [
     { 
       "Action": "UPSERT",
@@ -59,9 +59,9 @@ EOF
 echo "Posting CNAME record for ${base_build}-${build}.aws.indexdata.com to AWS route53:" 
 echo "$public_record"
 echo "$public_record" > public_record.out
-$aws route53 --hosted-zone-id $public_zoneid --change-batch file://public_record.out
+$aws route53 change-resource-record-sets --hosted-zone-id $public_zoneid --change-batch file://public_record.out
 
 echo "Posting CNAME record for ${base_build}-${build}.indexdata.internal to AWS route53:" 
 echo "$private_record"
 echo "$private_record" > private_record.out
-$aws route53 --hosted-zone-id $private_zoneid --change-batch file://private_record.out
+$aws route53 change-resource-record-sets --hosted-zone-id $private_zoneid --change-batch file://private_record.out
