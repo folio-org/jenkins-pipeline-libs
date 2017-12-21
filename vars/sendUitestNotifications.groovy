@@ -29,10 +29,12 @@ def call(String testStatus) {
   else if (testStatus == 'SUCCESS') {
     // Green
     colorCode = '#32CD32'
+    subject = "${testStatus}: 'UI Regression Tests passed for ${env.JOB_NAME} ${env.BUILD_DISPLAY_NAME}. W00t!'"
   }
   else { 
     // Grey
     colorCode = '#808080'
+    subject = "${testStatus}: 'UI Regression Tests status for ${env.JOB_NAME} ${env.BUILD_DISPLAY_NAME} undetermined.'"
   }
 
   // Send Slack notification
