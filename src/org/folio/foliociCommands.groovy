@@ -49,3 +49,15 @@ def updateModDescriptorId(String modDescriptor) {
   """
 }
 
+// get version from module descriptor id
+def getModuleDescriptorIdVer(String modDescriptor) {
+  def id = sh(returnStdout: true,
+      script: "jq -r '.id' $modDescriptor").trim()
+
+  def proj_name = getProjName() 
+
+  def version = sh(returnStdout: true, 
+      script: "echo $id | sed -e s/$proj_name-//").trim()
+
+  return version
+}
