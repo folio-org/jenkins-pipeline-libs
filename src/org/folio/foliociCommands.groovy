@@ -12,6 +12,7 @@ def npmSnapshotVersion() {
   writeFile file: 'folioci_npmver.sh', text: folioci_npmver
   sh 'chmod +x folioci_npmver.sh'
   sh 'npm version `./folioci_npmver.sh`'
+  sh 'rm -f folioci_npmver.sh'
 
 }
 
