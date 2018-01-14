@@ -118,7 +118,7 @@ def call(body) {
               stage('NPM Deploy') {
                 // npm is more flexible than yarn for this stage. 
                 echo "Deploying NPM packages to Nexus repository"
-                sh 'npm publish'
+                sh 'npm publish -f'
               }
             }
           }
