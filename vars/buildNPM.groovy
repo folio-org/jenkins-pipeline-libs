@@ -45,7 +45,9 @@ def call(body) {
         checkout([
                  $class: 'GitSCM',
                  branches: scm.branches,
-                 extensions: scm.extensions + [[$class: 'SubmoduleOption',
+                 extensions: scm.extensions + [[$class: 'RelativeTargetDirectory',
+                                                       relativeTargetDir: 'project'],
+                                              [$class: 'SubmoduleOption',
                                                        disableSubmodules: false,
                                                        parentCredentials: false,
                                                        recursiveSubmodules: true,
