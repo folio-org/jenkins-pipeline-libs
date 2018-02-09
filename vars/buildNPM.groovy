@@ -40,9 +40,9 @@ def call(body) {
       stage('Checkout') {
         deleteDir()
         currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.JOB_BASE_NAME}"
-        sendNotifications 'STARTED'
+        // sendNotifications 'STARTED'
 
-         checkout([
+        checkout([
                  $class: 'GitSCM',
                  branches: scm.branches,
                  extensions: scm.extensions + [[$class: 'SubmoduleOption',
@@ -55,6 +55,7 @@ def call(body) {
          ])
 
          echo "Checked out $env.BRANCH_NAME"
+         echo "Workspace: $env.WORKSPACE"
       }
 
       stage('Prep') {
@@ -186,7 +187,7 @@ def call(body) {
       throw err
     }
     finally {
-      sendNotifications currentBuild.result
+      //sendNotifications currentBuild.result
     }
   } // end node
     
