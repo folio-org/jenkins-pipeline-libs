@@ -16,6 +16,15 @@ def npmSnapshotVersion() {
 
 }
 
+// get the NPM package name and scope
+def npmName(String npmPackageFile = 'package.json') {
+  
+  def json = readJSON(file: npmPackageFile)
+  def name = json.name
+
+  return name
+}
+
 // get the unscoped module name and version from package.json. 
 // Return name:version map.
 def npmSimpleNameVersion(String npmPackageFile = 'package.json') {
@@ -31,6 +40,7 @@ def npmSimpleNameVersion(String npmPackageFile = 'package.json') {
   
   return simpleNameVersion
 }
+
 
 // get base repo/project name
 def getProjName() {
