@@ -29,7 +29,7 @@ def call(body) {
 
   // use the smaller nodejs build node since most 
   // Nodejs builds are Stripes.
-  def buildNode = config.buildNode ?: 'jenkins-slave-nodejs'
+  def buildNode = config.buildNode ?: 'jenkins-slave-ansible'
 
   // right now, all builds are snapshots
   env.snapshot = true
@@ -56,20 +56,21 @@ def call(body) {
                  userRemoteConfigs: scm.userRemoteConfigs
          ])
 
-         git 'https://github.com/folio-org/ui-testing'
-         git 'https://github.com/folio-org/folio-testing-platform'
-
          echo "Checked out $env.BRANCH_NAME"
          echo "Workspace: $env.WORKSPACE"
       }
 
-      dir('project') {
+      dir("${env.WORKSPACE/project") {
         stage('Prep') {
 
           if (env.snapshot) {
             foliociLib.npmSnapshotVersion()
           }
 
+          // the actual NPM package name as defined in package.json
+          env.npm_name = foliociLib.npmName('package.json')
+
+          // simpleName is similar to npm_name except make name okapi compliant
           def Map simpleNameVerMap = foliociLib.npmSimpleNameVersion('package.json')          
           simpleNameVerMap.each { key, value ->
             env.simpleName = key
@@ -171,6 +172,7 @@ def call(body) {
               postModuleDescriptor(modDescriptor) 
             }
           }
+
           if (config.publishAPI ==~ /(?i)(Y|YES|T|TRUE)/) {
             stage('Publish API Docs') {
               echo "Publishing API docs"
@@ -186,6 +188,54 @@ def call(body) {
         } 
       } // end dir
 
+      // if ( env.CHANGE_ID ) {
+      if ( env.BRANCH_NAME == 'folio-1043-test' ) {
+
+        //env.tenant = env.CHANGE_ID
+        env.tenant = env.BRANCH_NAME
+        env.okapi_url = 'http://folio-snapshot-test.aws.indexdata.com:9130'
+
+        stage('Test Stripes Platform') {
+          dir("${env.WORKSPACE}/project") {
+            sh "yarn link"
+          }
+
+          dir("$env.WORKSPACE") { 
+            sh 'git clone https://github.com/folio-org/ui-testing'
+            sh 'git clone https://github.com/folio-org/folio-testing-platform'
+          }
+
+          dir ("${env.WORKSPACE}/folio-testing-platform") {
+            # need function to get npm project name from package.json
+            sh "yarn link $env.npm_name"
+            sh 'yarn install'
+            sh 'yarn build bundle'
+            withEnv(['JENKINS_NODE_COOKIE=dontkill']) {
+              sh "stripes serve stripes.config.js --okapi $env.okapi_url --tenant $env.tenant &"
+            }
+          }
+
+          dir("${env.WORKSPACE}/folio-infrastructure") {
+            checkout([$class: 'GitSCM', branches: [[name: '*/folio-1043']], 
+                               doGenerateSubmoduleConfigurations: false, 
+                               extensions: [[$class: 'SubmoduleOption', 
+                                                      disableSubmodules: false, 
+                                                      parentCredentials: false, 
+                                                      recursiveSubmodules: true, 
+                                                      reference: '', trackingSubmodules: true]], 
+                               submoduleCfg: [], 
+                               userRemoteConfigs: [[credentialsId: 'folio-jenkins-github-token', 
+                                                    url: 'https://github.com/folio-org/folio-infrastructure']]])
+            sh 'pwd'
+            sh 'ls -l'
+            // Run Ansible roles here (folio-infrastructure probably)
+            // ansiblePlaybook credentialsId: '11657186-f4d4-4099-ab72-2a32e023cced', installation: 'Ansible', 
+            //               inventory: 'folio-infrastructure/CI/ansible/inventory', 
+            //               playbook: 'folio-infrastructure/CI/ansible/folio-pr.yml', 
+            //              sudoUser: null, vaultCredentialsId: 'ansible-vault-pass' 
+          }
+        } 
+      } // end PR Integration tests
     }  // end try
     catch (Exception err) {
       currentBuild.result = 'FAILED'
