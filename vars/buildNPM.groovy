@@ -206,7 +206,6 @@ def call(body) {
           }
 
           dir ("${env.WORKSPACE}/folio-testing-platform") {
-            # need function to get npm project name from package.json
             sh "yarn link $env.npm_name"
             sh 'yarn install'
             sh 'yarn build bundle'
