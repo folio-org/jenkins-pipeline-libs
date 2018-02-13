@@ -196,7 +196,7 @@ def call(body) {
 
         //env.tenant = env.CHANGE_ID
         env.tenant = env.BRANCH_NAME
-        env.okapi_url = 'http://folio-snapshot-test.aws.indexdata.com:9130'
+        env.okapi_url = 'http://folio-snapshot-test.aws.indexdata.com:9130/'
 
         stage('Test Stripes Platform') {
           dir("${env.WORKSPACE}/project") {
@@ -211,7 +211,8 @@ def call(body) {
           dir ("${env.WORKSPACE}/folio-testing-platform") {
             sh "yarn link $env.npm_name"
             sh 'yarn install'
-            sh 'yarn build bundle'
+            // seems redundant
+            // sh 'yarn build bundle'
             withEnv(['JENKINS_NODE_COOKIE=dontkill']) {
               sh "stripes serve stripes.config.js --okapi $env.okapi_url --tenant $env.tenant &"
             }
@@ -229,10 +230,13 @@ def call(body) {
                                userRemoteConfigs: [[credentialsId: 'folio-jenkins-github-token', 
                                                     url: 'https://github.com/folio-org/folio-infrastructure']]])
 
+            sh 'git submodule update'
+
             withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', 
                                        accessKeyVariable: 'AWS_ACCESS_KEY_ID', 
                                        credentialsId: 'jenkins-aws', 
                                        secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+
               ansiblePlaybook credentialsId: '11657186-f4d4-4099-ab72-2a32e023cced', 
                            installation: 'Ansible', 
                            inventory: 'CI/ansible/inventory', 
