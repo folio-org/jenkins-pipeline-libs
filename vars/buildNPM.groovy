@@ -83,6 +83,9 @@ def call(body) {
           // different from mod name specified in package.json
           env.project_name = foliociLib.getProjName()
           echo "Project Name: $env.project_name"
+
+          // Install stripes-cli globally
+          sh 'sudo yarn global add @folio/stripes-cli --prefix /usr/local'
         }
  
         withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
