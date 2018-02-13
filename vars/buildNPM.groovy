@@ -229,12 +229,17 @@ def call(body) {
                                userRemoteConfigs: [[credentialsId: 'folio-jenkins-github-token', 
                                                     url: 'https://github.com/folio-org/folio-infrastructure']]])
 
-            ansiblePlaybook credentialsId: '11657186-f4d4-4099-ab72-2a32e023cced', 
+            withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', 
+                                       accessKeyVariable: 'AWS_ACCESS_KEY_ID', 
+                                       credentialsId: 'jenkins-aws', 
+                                       secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+              ansiblePlaybook credentialsId: '11657186-f4d4-4099-ab72-2a32e023cced', 
                            installation: 'Ansible', 
                            inventory: 'CI/ansible/inventory', 
                            playbook: 'CI/ansible/folio-pr.yml', 
                            sudoUser: null, vaultCredentialsId: 'ansible-vault-pass',
                            extras: "-e tenant_id=${env.tenant} -e tenant_name=${env.tenant} -e okapi_url=${env.okapi_url}"
+            }
           }
         } 
       } // end PR Integration tests
