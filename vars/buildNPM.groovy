@@ -60,7 +60,7 @@ def call(body) {
          echo "Workspace: $env.WORKSPACE"
       }
 
-      dir("${env.WORKSPACE/project") {
+      dir("${env.WORKSPACE}/project") {
         stage('Prep') {
 
           if (env.snapshot) {
