@@ -193,7 +193,6 @@ def call(body) {
 
       // if ( env.CHANGE_ID ) {
       if ( env.BRANCH_NAME == 'folio-1043-test' ) {
-        sh 'sudo npm install -g http-server'
 
         //env.tenant = env.CHANGE_ID
         env.tenant = env.BRANCH_NAME
@@ -213,6 +212,7 @@ def call(body) {
             sh "yarn link $env.npm_name"
             sh 'yarn install'
             sh "stripes build --okapi $env.okapi_url --tenant $env.tenant stripes.config.js bundle"
+            sh 'sudo npm install -g http-server'
             withEnv(['JENKINS_NODE_COOKIE=dontkill']) {
               sh 'http-server -p 3000 ./bundle &'
             }
