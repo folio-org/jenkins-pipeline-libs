@@ -212,7 +212,7 @@ def call(body) {
           dir ("${env.WORKSPACE}/folio-testing-platform") {
             sh "yarn link $env.npm_name"
             sh 'yarn install'
-            sh 'stripes build --okapi $env.okapi_url --tenant $env.tenant stripes.config.js bundle'
+            sh "stripes build --okapi $env.okapi_url --tenant $env.tenant stripes.config.js bundle"
             withEnv(['JENKINS_NODE_COOKIE=dontkill']) {
               sh 'http-server -p 3000 ./bundle &'
             }
