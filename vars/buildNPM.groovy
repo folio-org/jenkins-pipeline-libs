@@ -193,6 +193,7 @@ def call(body) {
 
       // if ( env.CHANGE_ID ) {
       if ( env.BRANCH_NAME == 'folio-1043-test' ) {
+        sudo npm install -g http-server
 
         //env.tenant = env.CHANGE_ID
         env.tenant = env.BRANCH_NAME
@@ -211,10 +212,9 @@ def call(body) {
           dir ("${env.WORKSPACE}/folio-testing-platform") {
             sh "yarn link $env.npm_name"
             sh 'yarn install'
-            // seems redundant
-            // sh 'yarn build bundle'
+            sh 'stripes build --okapi $env.okapi_url --tenant $env.tenant stripes.config.js bundle'
             withEnv(['JENKINS_NODE_COOKIE=dontkill']) {
-              sh "stripes serve stripes.config.js --okapi $env.okapi_url --tenant $env.tenant &"
+              sh 'http-server -p 3000 ./bundle &'
             }
           }
 
