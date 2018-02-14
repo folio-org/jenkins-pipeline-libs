@@ -193,7 +193,7 @@ def call(body) {
 
       // if ( env.CHANGE_ID ) {
       if ( env.BRANCH_NAME == 'folio-1043-test' ) {
-        sudo npm install -g http-server
+        sh 'sudo npm install -g http-server'
 
         //env.tenant = env.CHANGE_ID
         env.tenant = env.BRANCH_NAME
