@@ -194,8 +194,9 @@ def call(body) {
       // if ( env.CHANGE_ID ) {
       if ( env.BRANCH_NAME == 'folio-1043-test' ) {
 
-        //env.tenant = env.CHANGE_ID
-        env.tenant = env.BRANCH_NAME
+        // ensure tenant id is unique
+        //env.tenant = "${env.CHANGE_ID}-${env.BUILD_NUMBER}"
+        env.tenant = "${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
         env.okapi_url = 'http://folio-snapshot-test.aws.indexdata.com:9130/'
 
         stage('Test Stripes Platform') {
@@ -211,7 +212,14 @@ def call(body) {
           dir ("${env.WORKSPACE}/folio-testing-platform") {
             sh "yarn link $env.npm_name"
             sh 'yarn install'
+
+            // generate mod descriptors with '--strict' flag for dependencies
+            sh 'yarn postinstall --strict'
+
+            // build webpack with stripes-cli 
             sh "stripes build --okapi $env.okapi_url --tenant $env.tenant stripes.config.js bundle"
+
+            // start simple webserver to serve webpack
             sh 'sudo npm install -g http-server'
             withEnv(['JENKINS_NODE_COOKIE=dontkill']) {
               sh 'http-server -p 3000 ./bundle &'
