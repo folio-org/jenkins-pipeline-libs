@@ -72,3 +72,9 @@ def getModuleDescriptorIdVer(String modDescriptor) {
 
   return version
 }
+
+// replace all instances of '-' in string with '_'
+def replaceHyphen(String string) {
+  def convertedString  = string.replaceAll(~/-/, "_")
+  return convertedString
+}
