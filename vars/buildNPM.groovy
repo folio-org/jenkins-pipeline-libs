@@ -195,8 +195,9 @@ def call(body) {
       if ( env.BRANCH_NAME == 'folio-1043-test' ) {
 
         // ensure tenant id is unique
-        //env.tenant = "${env.CHANGE_ID}-${env.BUILD_NUMBER}"
-        env.tenant = "${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
+        //def tenant = "${env.CHANGE_ID}_${env.BUILD_NUMBER}"
+        def tenant = "${env.BRANCH_NAME}_${env.BUILD_NUMBER}"
+        env.tenant = foliociLib.replaceHyphen(tenant)
         env.okapi_url = 'http://folio-snapshot-test.aws.indexdata.com:9130/'
 
         stage('Test Stripes Platform') {
