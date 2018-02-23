@@ -227,7 +227,7 @@ def call(body) {
               sh 'http-server -p 3000 ./bundle &'
             }
 
-            withEnv([PATH+DEPLOYMENTBIN=$WORKSPACE/folio-infrastructure/CI/scripts]) {
+            withEnv(['PATH+DEPLOYMENTBIN=$WORKSPACE/folio-infrastructure/CI/scripts']) {
               echo $PATH
               echo $env.PATH 
             }
