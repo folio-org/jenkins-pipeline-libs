@@ -198,7 +198,7 @@ def call(body) {
         //def tenant = "${env.CHANGE_ID}_${env.BUILD_NUMBER}"
         def tenant = "${env.BRANCH_NAME}_${env.BUILD_NUMBER}"
         env.tenant = foliociLib.replaceHyphen(tenant)
-        env.okapi_url = 'http://folio-snapshot-test.aws.indexdata.com:9130/'
+        env.okapiUrl = 'http://folio-snapshot-test.aws.indexdata.com:9130/'
 
         stage('Test Stripes Platform') {
           dir("${env.WORKSPACE}/project") {
@@ -208,6 +208,7 @@ def call(body) {
           dir("$env.WORKSPACE") { 
             sh 'git clone https://github.com/folio-org/ui-testing'
             sh 'git clone https://github.com/folio-org/folio-testing-platform'
+            sh 'git clone https://github.com/folio-org/folio-infrastructure'
           }
 
           dir ("${env.WORKSPACE}/folio-testing-platform") {
@@ -218,40 +219,17 @@ def call(body) {
             sh 'yarn postinstall --strict'
 
             // build webpack with stripes-cli 
-            sh "stripes build --okapi $env.okapi_url --tenant $env.tenant stripes.config.js bundle"
+            sh "stripes build --okapi $env.okapiUrl --tenant $env.tenant stripes.config.js bundle"
 
             // start simple webserver to serve webpack
             sh 'sudo npm install -g http-server'
             withEnv(['JENKINS_NODE_COOKIE=dontkill']) {
               sh 'http-server -p 3000 ./bundle &'
             }
-          }
 
-          dir("${env.WORKSPACE}/folio-infrastructure") {
-            checkout([$class: 'GitSCM', branches: [[name: '*/folio-1043']], 
-                               doGenerateSubmoduleConfigurations: false, 
-                               extensions: [[$class: 'SubmoduleOption', 
-                                                      disableSubmodules: false, 
-                                                      parentCredentials: false, 
-                                                      recursiveSubmodules: true, 
-                                                      reference: '', trackingSubmodules: true]], 
-                               submoduleCfg: [], 
-                               userRemoteConfigs: [[credentialsId: 'folio-jenkins-github-token', 
-                                                    url: 'https://github.com/folio-org/folio-infrastructure']]])
-
-            sh 'git submodule update'
-
-            withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', 
-                                       accessKeyVariable: 'AWS_ACCESS_KEY_ID', 
-                                       credentialsId: 'jenkins-aws', 
-                                       secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-
-              ansiblePlaybook credentialsId: '11657186-f4d4-4099-ab72-2a32e023cced', 
-                           installation: 'Ansible', 
-                           inventory: 'CI/ansible/inventory', 
-                           playbook: 'CI/ansible/folio-pr.yml', 
-                           sudoUser: null, vaultCredentialsId: 'ansible-vault-pass',
-                           extras: "-e tenant_id=${env.tenant} -e tenant_name=${env.tenant} -e okapi_url=${env.okapi_url}"
+            withEnv([PATH+DEPLOYMENTBIN=$WORKSPACE/folio-infrastructure/CI/scripts]) {
+              echo $PATH
+              echo $env.PATH 
             }
           }
         } 
