@@ -206,7 +206,7 @@ def call(body) {
           }
 
           dir("$env.WORKSPACE") { 
-            sh 'git clone https://github.com/folio-org/ui-testing'
+            // sh 'git clone https://github.com/folio-org/ui-testing'
             sh 'git clone https://github.com/folio-org/folio-testing-platform'
           }
           
@@ -223,17 +223,18 @@ def call(body) {
             sh 'yarn postinstall --strict'
 
             // build webpack with stripes-cli 
-            sh "stripes build --okapi $env.okapiUrl --tenant $env.tenant stripes.config.js bundle"
+            // sh "stripes build --okapi $env.okapiUrl --tenant $env.tenant stripes.config.js bundle"
 
             // start simple webserver to serve webpack
-            sh 'sudo npm install -g http-server'
-            withEnv(['JENKINS_NODE_COOKIE=dontkill']) {
-              sh 'http-server -p 3000 ./bundle &'
-            }
+            // sh 'sudo npm install -g http-server'
+            // withEnv(['JENKINS_NODE_COOKIE=dontkill']) {
+            //   sh 'http-server -p 3000 ./bundle &'
+            // }
 
             withEnv(['PATH+DEPLOYMENTBIN=$WORKSPACE/folio-infrastructure/CI/scripts']) {
-              echo $PATH
-              echo $env.PATH 
+              sh "createTenant.sh $env.tenant $env.okapiUrl"
+              sh "createTenantModuleList.sh $env.tenant $env.okapiUrl ModuleDescriptors"
+             
             }
           }
         } 
