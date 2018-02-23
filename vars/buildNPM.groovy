@@ -210,7 +210,7 @@ def call(body) {
             sh 'git clone https://github.com/folio-org/folio-testing-platform'
           }
           
-          dir("$env.WORKSPACE/folio-infrastructure") {
+          dir("${env.WORKSPACE}/folio-infrastructure") {
             git branch: 'folio-1043', credentialsId: 'folio-jenkins-github-token', 
                 url: 'https://github.com/folio-org/folio-infrastructure'
           }
@@ -232,7 +232,7 @@ def call(body) {
             // }
 
             withEnv(['PATH+DEPLOYMENTBIN=$WORKSPACE/folio-infrastructure/CI/scripts']) {
-              sh "createTenant.sh $env.tenant $env.okapiUrl"
+              sh "${env.WORKSPACE}/folio-infrastructure/CI/scripts/createTenant.sh $env.tenant $env.okapiUrl"
               sh "createTenantModuleList.sh $env.tenant $env.okapiUrl ModuleDescriptors"
              
             }
