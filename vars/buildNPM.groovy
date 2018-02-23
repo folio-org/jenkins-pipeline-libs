@@ -233,7 +233,7 @@ def call(body) {
             def scriptPath="${env.WORKSPACE}/folio-infrastructure/CI/scripts"
             sh "${scriptPath}/createTenant.sh $env.tenant $env.okapiUrl"
             sh "${scriptPath}/createTenantModuleList.sh $env.tenant $env.okapiUrl ModuleDescriptors " +
-               "| enableTenantModules.sh"
+               "| ${scriptPath}/enableTenantModules.sh $env.tenant $env.okapiUrl"
           }
         } 
       } // end PR Integration tests
