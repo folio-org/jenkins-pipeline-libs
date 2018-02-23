@@ -208,9 +208,13 @@ def call(body) {
           dir("$env.WORKSPACE") { 
             sh 'git clone https://github.com/folio-org/ui-testing'
             sh 'git clone https://github.com/folio-org/folio-testing-platform'
-            sh 'git clone https://github.com/folio-org/folio-infrastructure'
           }
-
+          
+          dir("$env.WORKSPACE/folio-infrastructure") {
+            git branch: 'folio-1043', credentialsId: 'folio-jenkins-github-token', 
+                url: 'https://github.com/folio-org/folio-infrastructure'
+          }
+            
           dir ("${env.WORKSPACE}/folio-testing-platform") {
             sh "yarn link $env.npm_name"
             sh 'yarn install'
