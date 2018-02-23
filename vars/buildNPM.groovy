@@ -198,7 +198,7 @@ def call(body) {
         //def tenant = "${env.CHANGE_ID}_${env.BUILD_NUMBER}"
         def tenant = "${env.BRANCH_NAME}_${env.BUILD_NUMBER}"
         env.tenant = foliociLib.replaceHyphen(tenant)
-        env.okapiUrl = 'http://folio-snapshot-test.aws.indexdata.com:9130/'
+        env.okapiUrl = 'http://folio-snapshot-test.aws.indexdata.com:9130'
 
         stage('Test Stripes Platform') {
           dir("${env.WORKSPACE}/project") {
@@ -230,12 +230,9 @@ def call(body) {
             // withEnv(['JENKINS_NODE_COOKIE=dontkill']) {
             //   sh 'http-server -p 3000 ./bundle &'
             // }
-
-            withEnv(['PATH+DEPLOYMENTBIN=$WORKSPACE/folio-infrastructure/CI/scripts']) {
-              sh "${env.WORKSPACE}/folio-infrastructure/CI/scripts/createTenant.sh $env.tenant $env.okapiUrl"
-              sh "createTenantModuleList.sh $env.tenant $env.okapiUrl ModuleDescriptors"
-             
-            }
+            def scriptPath="${env.WORKSPACE}/folio-infrastructure/CI/scripts"
+            sh "${scriptPath}/createTenant.sh $env.tenant $env.okapiUrl"
+            sh "${scriptPath}/createTenantModuleList.sh $env.tenant $env.okapiUrl ModuleDescriptors"
           }
         } 
       } // end PR Integration tests
