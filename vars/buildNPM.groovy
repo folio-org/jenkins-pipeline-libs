@@ -1,7 +1,7 @@
 #!/usr/bin/env groovy
 
 /*
- * Main build script for Maven-based FOLIO projects
+ * Main build script for NPM-based FOLIO projects
  *
  * Configurable parameters: 
  *
