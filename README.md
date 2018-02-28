@@ -4,10 +4,10 @@ This repository contains the Jenkins pipeline shared library used for FOLIO CI/C
 located at https://github.com/folio-org
 
 The library assumes a lot about the configuration of the Jenkins server and the FOLIO
-developement workflow, so it's probably of limited use outside the FOLIO Jenkins context.  
+development workflow, so it's probably of limited use outside the FOLIO Jenkins context.  
 
 To utilize this library for https://github.com/folio-org projects,  add a 'Jenkinsfile' to
-the top-level directory of the project repository.   The library primary supports two types
+the top-level directory of the project repository.   The library primarily supports two types
 of development environments at this time - Java-based Maven projects and Nodejs-based projects. 
 
 A typical Stripes or UI module Jenkinsfile configuration might look like the following.
@@ -68,7 +68,7 @@ If we are creating and deploying a Docker image as part of the module's artifact
 command is run *inside* the container and typically tests a REST endpoint to determine the 
 health of the application running inside the container. 
 
-There are other options availble to 'buildNPM', 'buildMvn', and 'buildJavaDockeri' for certain 
+There are other options available to 'buildNPM', 'buildMvn', and 'buildJavaDocker' for certain 
 corner cases.  Check these scripts directly for additional information.
 
 
