@@ -240,7 +240,7 @@ def call(body) {
                "| ${scriptPath}/enableTenantModules.sh $env.okapiUrl $env.tenant"
 
             withCredentials([string(credentialsId: 'folio_admin-pgpassword',variable: 'PGPASSWORD')]) {
-              sh "${scriptPath}/createTenantAdminUser.sh $env.okapiUrl $env.tenant"
+              sh "${scriptPath}/createTenantAdminUser.sh $env.tenant"
             }
 
             def authToken
