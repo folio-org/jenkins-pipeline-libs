@@ -208,6 +208,9 @@ def call(body) {
           dir("$env.WORKSPACE") { 
             // sh 'git clone https://github.com/folio-org/ui-testing'
             sh 'git clone https://github.com/folio-org/folio-testing-platform'
+            sh 'git clone https://github.com/folio-org/mod-inventory-storage'
+            sh 'git clone https://github.com/folio-org/mod-circulation-storage'
+            sh 'git clone https://github.com/folio-org/mod-users'
           }
           
           dir("${env.WORKSPACE}/folio-infrastructure") {
@@ -231,11 +234,24 @@ def call(body) {
             //   sh 'http-server -p 3000 ./bundle &'
             // }
             def scriptPath="${env.WORKSPACE}/folio-infrastructure/CI/scripts"
-            sh "${scriptPath}/createTenant.sh $env.tenant $env.okapiUrl"
-            sh "${scriptPath}/createTenantModuleList.sh $env.tenant $env.okapiUrl ModuleDescriptors " +
-               "| ${scriptPath}/enableTenantModules.sh $env.tenant $env.okapiUrl"
-          }
-        } 
+
+            sh "${scriptPath}/createTenant.sh $env.okapiUrl $env.tenant"
+            sh "${scriptPath}/createTenantModuleList.sh $env.okapiUrl $env.tenant ModuleDescriptors " +
+               "| ${scriptPath}/enableTenantModules.sh $env.okapiUrl $env.tenant"
+
+            withCredentials([string(credentialsId: 'folio_admin-pgpassword',variable: 'PGPASSWORD')]) {
+              sh "${scriptPath}/createTenantAdminUser.sh $env.okapiUrl $env.tenant"
+            }
+
+            def authToken
+
+            authToken= sh(returnStdout: true,
+               script:  "${scriptpath}/getOkapiToken.sh -o $env.OkapiUrl -t $env.tenant -u ${env.tenant}_admin -p admin").trim()
+
+            echo "$authToken"
+          } 
+
+        } // end stage
       } // end PR Integration tests
     }  // end try
     catch (Exception err) {
