@@ -252,12 +252,11 @@ def call(body) {
             authToken= sh(returnStdout: true,
                script:  "${scriptPath}/getOkapiToken.sh -o $env.OkapiUrl -t $env.tenant -u ${env.tenant}_admin -p admin").trim()
 
-            echo "$authToken"
-
             // load reference data
+            sh "${env.WORKSPACE}/mod-inventory-storage/reference-data/import.sh -o $env.OkapiUrl -t $env.tenant " +
+               "-a $authToken -d ${env.WORKSPACE}/mod-inventory-storage/reference-data"
 
             // run UI tests
-
             
           } 
 
