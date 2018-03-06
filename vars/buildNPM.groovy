@@ -272,15 +272,17 @@ def call(body) {
             withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
               withNPM(npmrcConfig: 'jenkins-npm-folioci') {
                 sh 'yarn install'
-              }
 
-            env.FOLIO_UI_USERNAME = "${env.tenant}_admin"
-            env.FOLIO_UI_PASSWORD = "admin"
-            env.FOLIO_UI_URL = 'http://localhost:3000'
-            // env.FOLIO_UI_WAIT_TIMEOUT=10000
+                env.FOLIO_UI_USERNAME = "${env.tenant}_admin"
+                env.FOLIO_UI_PASSWORD = "admin"
+                env.FOLIO_UI_URL = 'http://localhost:3000'
+                // env.FOLIO_UI_WAIT_TIMEOUT=10000
   
-            // run UI tests
-            sh 'yarn test'
+                // run UI tests
+                sh 'yarn test'
+              }
+            }
+            
           }
 
         } // end stage
