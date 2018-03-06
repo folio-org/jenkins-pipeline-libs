@@ -273,6 +273,8 @@ def call(body) {
           dir("${env.WORKSPACE}/ui-testing") {  
             withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
               withNPM(npmrcConfig: 'jenkins-npm-folioci') {
+                // I think we need to remove the yarn lock file?
+                sh 'rm -f yarn.lock'
                 sh 'yarn install'
 
                 env.FOLIO_UI_USERNAME = "${env.tenant}_admin"
