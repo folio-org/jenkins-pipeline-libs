@@ -269,7 +269,10 @@ def call(body) {
           } 
 
           dir("${env.WORKSPACE}/ui-testing") {  
-            sh 'yarn install' 
+            withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
+              withNPM(npmrcConfig: 'jenkins-npm-folioci') {
+                sh 'yarn install'
+              }
 
             env.FOLIO_UI_USERNAME = "${env.tenant}_admin"
             env.FOLIO_UI_PASSWORD = "admin"
