@@ -253,12 +253,27 @@ def call(body) {
                script:  "${scriptPath}/getOkapiToken.sh -o $env.OkapiUrl -t $env.tenant -u ${env.tenant}_admin -p admin").trim()
 
             // load reference data
-            sh "${env.WORKSPACE}/mod-inventory-storage/reference-data/import.sh -o $env.OkapiUrl -t $env.tenant " +
-               "-a $authToken -d ${env.WORKSPACE}/mod-inventory-storage/reference-data"
+            sh "${env.WORKSPACE}/mod-inventory-storage/reference-data/import.sh -o $env.OkapiUrl " +
+               "-t $env.tenant -a $authToken -d ${env.WORKSPACE}/mod-inventory-storage/reference-data"
 
-            // run UI tests
+            sh "${env.WORKSPACE}/mod-circulation-storage/reference-data/import.sh -o $env.OkapiUrl " +
+               "-t $env.tenant -a $authToken -d ${env.WORKSPACE}/mod-circulation-storage/reference-data"
+
+            sh "${env.WORKSPACE}/mod-users/reference-data/import.sh -o $env.OkapiUrl -t $env.tenant " +
+               "-a $authToken -d ${env.WORKSPACE}/mod-users/reference-data"
             
           } 
+          dir("${env.WORKSPACE}/ui-testing)" {  
+            sh 'yarn install' 
+
+            env.FOLIO_UI_USERNAME = "${env.tenant}_admin"
+            env.FOLIO_UI_PASSWORD = "admin"
+            env.FOLIO_UI_URL = 'http://localhost:3000'
+            // env.FOLIO_UI_WAIT_TIMEOUT=10000
+  
+            // run UI tests
+            sh 'yarn test'
+          }
 
         } // end stage
       } // end PR Integration tests
