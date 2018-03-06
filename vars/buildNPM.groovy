@@ -86,6 +86,8 @@ def call(body) {
 
           // Install stripes-cli globally
           sh 'sudo yarn global add @folio/stripes-cli --prefix /usr/local'
+          // fix some permissions as a result of above command
+          sh 'sudo chown -R jenkins /home/jenkins'
         }
  
         withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
