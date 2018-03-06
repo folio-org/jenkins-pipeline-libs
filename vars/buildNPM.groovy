@@ -226,16 +226,20 @@ def call(body) {
             sh 'yarn postinstall --strict'
 
             // build webpack with stripes-cli 
-            // sh "stripes build --okapi $env.okapiUrl --tenant $env.tenant stripes.config.js bundle"
+            sh "stripes build --okapi $env.okapiUrl --tenant $env.tenant stripes.config.js bundle"
 
             // start simple webserver to serve webpack
-            // sh 'sudo npm install -g http-server'
-            // withEnv(['JENKINS_NODE_COOKIE=dontkill']) {
-            //   sh 'http-server -p 3000 ./bundle &'
-            // }
+            sh 'sudo npm install -g http-server'
+              withEnv(['JENKINS_NODE_COOKIE=dontkill']) {
+                sh 'http-server -p 3000 ./bundle &'
+              }
+
             def scriptPath="${env.WORKSPACE}/folio-infrastructure/CI/scripts"
 
+            // create tenant
             sh "${scriptPath}/createTenant.sh $env.okapiUrl $env.tenant"
+
+            // post MDs and enable tenant modules
             sh "${scriptPath}/createTenantModuleList.sh $env.okapiUrl $env.tenant ModuleDescriptors " +
                "| ${scriptPath}/enableTenantModules.sh $env.okapiUrl $env.tenant"
 
