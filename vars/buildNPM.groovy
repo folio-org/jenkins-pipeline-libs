@@ -245,7 +245,7 @@ def call(body) {
             }
 
             // add admin perms
-            sh "${scriptPath}/addAdminPerms.sh -o $env.OkapiUrl -t $env.tenant -u u ${env.tenant}_admin -p admin"
+            sh "${scriptPath}/addAdminPerms.sh -o $env.OkapiUrl -t $env.tenant -u ${env.tenant}_admin -p admin"
 
             // get auth token so we can load data
             def authToken
