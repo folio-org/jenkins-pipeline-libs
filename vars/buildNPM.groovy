@@ -206,7 +206,7 @@ def call(body) {
           }
 
           dir("$env.WORKSPACE") { 
-            // sh 'git clone https://github.com/folio-org/ui-testing'
+            sh 'git clone https://github.com/folio-org/ui-testing'
             sh 'git clone https://github.com/folio-org/folio-testing-platform'
             sh 'git clone https://github.com/folio-org/mod-inventory-storage'
             sh 'git clone https://github.com/folio-org/mod-circulation-storage'
