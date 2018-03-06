@@ -263,7 +263,8 @@ def call(body) {
                "-a $authToken -d ${env.WORKSPACE}/mod-users/reference-data"
             
           } 
-          dir("${env.WORKSPACE}/ui-testing)" {  
+
+          dir("${env.WORKSPACE}/ui-testing") {  
             sh 'yarn install' 
 
             env.FOLIO_UI_USERNAME = "${env.tenant}_admin"
