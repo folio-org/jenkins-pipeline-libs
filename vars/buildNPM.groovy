@@ -283,7 +283,9 @@ def call(body) {
                 // env.FOLIO_UI_WAIT_TIMEOUT=10000
   
                 // run UI tests
-                sh 'yarn test'
+                sh '/usr/bin/Xvfb :2 &'
+                sh 'sleep 1'
+                sh 'DISPLAY=:2 yarn test'
               }
             }
             
