@@ -239,16 +239,26 @@ def call(body) {
             sh "${scriptPath}/createTenantModuleList.sh $env.okapiUrl $env.tenant ModuleDescriptors " +
                "| ${scriptPath}/enableTenantModules.sh $env.okapiUrl $env.tenant"
 
+            // create tenant admin user which defaults to TENANTNAME_admin with password of 'admin'
             withCredentials([string(credentialsId: 'folio_admin-pgpassword',variable: 'PGPASSWORD')]) {
               sh "${scriptPath}/createTenantAdminUser.sh $env.tenant"
             }
 
-            def authToken
+            // add admin perms
+            sh "${scriptPath}/addAdminPerms.sh -o $env.OkapiUrl -t $env.tenant -u u ${env.tenant}_admin -p admin"
 
+            // get auth token so we can load data
+            def authToken
             authToken= sh(returnStdout: true,
-               script:  "${scriptpath}/getOkapiToken.sh -o $env.OkapiUrl -t $env.tenant -u ${env.tenant}_admin -p admin").trim()
+               script:  "${scriptPath}/getOkapiToken.sh -o $env.OkapiUrl -t $env.tenant -u ${env.tenant}_admin -p admin").trim()
 
             echo "$authToken"
+
+            // load reference data
+
+            // run UI tests
+
+            
           } 
 
         } // end stage
