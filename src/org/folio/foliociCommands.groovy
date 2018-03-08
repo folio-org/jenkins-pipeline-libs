@@ -50,11 +50,11 @@ def updateModDescriptorId(String modDescriptor) {
   """
 }
 
-def updateModDescriptor(String ModDescriptor) { 
+def updateModDescriptor(String modDescriptor) { 
   sh "mv $modDescriptor ${modDescriptor}.orig"
   sh """
   jq  '. | .id |= \"${env.name}-${env.version}\" | if has(\"launchDescriptor\") then 
-      .launchDescriptor.dockerImage |= \"${env.name}:${env.version}\" |
+      .launchDescriptor.dockerImage |= \"${env.dockerRepo}/${env.name}:${env.version}\" |
       .launchDescriptor.dockerPull |= "\true\" else . end' \
     ${modDescriptor}.orig > $modDescriptor
   """

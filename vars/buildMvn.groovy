@@ -110,7 +110,7 @@ def call(body) {
           echo "Testing Mod Descriptor update"
           def modDescriptor = 'target/ModuleDescriptor.json'
           foliociLib.updateModDescriptor(modDescriptor)
-          echo "$modDescriptor"
+          sh "cat $modDescriptor"
         }
       }
      
