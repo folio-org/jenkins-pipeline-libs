@@ -57,9 +57,11 @@ def call(body) {
           echo "This is a snapshot"
           env.version = "${mvn_version}.${env.BUILD_NUMBER}"
           env.snapshot = true
+          env.dockerRepo = 'folioci'
         }
         else {
           env.version = mvn_version
+          env.dockerRepo = 'folioorg'
         }
 
         echo "Building Maven artifact: ${env.name} Version: ${env.version}"
