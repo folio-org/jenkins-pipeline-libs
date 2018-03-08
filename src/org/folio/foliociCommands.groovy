@@ -55,7 +55,7 @@ def updateModDescriptor(String modDescriptor) {
   sh """
   jq  '. | .id |= \"${env.name}-${env.version}\" | if has(\"launchDescriptor\") then 
       .launchDescriptor.dockerImage |= \"${env.dockerRepo}/${env.name}:${env.version}\" |
-      .launchDescriptor.dockerPull |= "\true\" else . end' \
+      .launchDescriptor.dockerPull |= \"true\" else . end' \
     ${modDescriptor}.orig > $modDescriptor
   """
 }
