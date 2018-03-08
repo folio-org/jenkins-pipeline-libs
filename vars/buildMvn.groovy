@@ -114,6 +114,10 @@ def call(body) {
         }
       }
      
+      if ( env.BRANCH_NAME ==~ /^v\d+\.\d+\.\d+$/ ) {
+        echo "this is a release tag"
+      }
+     
       if (( env.BRANCH_NAME == 'master' ) ||     
          ( env.BRANCH_NAME == 'jenkins-test' )) {
 
