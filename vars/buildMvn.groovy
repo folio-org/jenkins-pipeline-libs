@@ -102,6 +102,15 @@ def call(body) {
       else {
         sonarqubeMvn() 
       }
+      // For test only
+      if (config.publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) {
+        stage('Test Module Descriptor') {
+          echo "Testing Mod Descriptor update"
+          def modDescriptor = 'target/ModuleDescriptor.json'
+          foliociLib.updateModDescriptor(modDescriptor)
+          echo "$modDescriptor"
+        }
+      }
      
       if (( env.BRANCH_NAME == 'master' ) ||     
          ( env.BRANCH_NAME == 'jenkins-test' )) {
@@ -124,7 +133,7 @@ def call(body) {
             if (env.snapshot) { 
               foliociLib.updateModDescriptorId(modDescriptor)
             }
-              postModuleDescriptor(modDescriptor) 
+            postModuleDescriptor(modDescriptor) 
           }
         }
         if (config.publishAPI ==~ /(?i)(Y|YES|T|TRUE)/) {
