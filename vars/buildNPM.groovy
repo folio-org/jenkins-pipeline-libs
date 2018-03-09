@@ -33,6 +33,7 @@ def call(body) {
 
   // right now, all builds are snapshots
   env.snapshot = true
+  env.dockerRepo = 'folioci'
   
   node(buildNode) {
 
