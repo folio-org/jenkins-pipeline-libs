@@ -22,7 +22,6 @@ def call(body) {
   body.delegate = config
   body()
 
-  def dockerRepo = 'folioci'
 
   // Defaults if not defined. 
   def dockerfile = config.dockerfile ?: 'Dockerfile'
@@ -116,10 +115,10 @@ EOF
         // publish images to ci docker repo
         echo "Publishing Docker images"
         docker.withRegistry('https://index.docker.io/v1/', 'DockerHubIDJenkins') {
-          sh "docker tag ${env.name}:${env.version} ${dockerRepo}/${env.name}:${env.version}"
-          sh "docker tag ${env.name}:${env.version} ${dockerRepo}/${env.name}:latest"
-          sh "docker push ${dockerRepo}/${env.name}:${env.version}"
-          sh "docker push ${dockerRepo}/${env.name}:latest"
+          sh "docker tag ${env.name}:${env.version} ${env.dockerRepo}/${env.name}:${env.version}"
+          sh "docker tag ${env.name}:${env.version} ${env.dockerRepo}/${env.name}:latest"
+          sh "docker push ${env.dockerRepo}/${env.name}:${env.version}"
+          sh "docker push ${env.dockerRepo}/${env.name}:latest"
       }
       }
 
@@ -136,8 +135,8 @@ EOF
     echo "Clean up any temporary docker artifacts"
     sh "docker rmi ${env.name}:${env.version} || exit 0"
     sh "docker rmi ${env.name}:latest || exit 0"
-    sh "docker rmi ${dockerRepo}/${env.name}:${env.version} || exit 0"
-    sh "docker rmi ${dockerRepo}/${env.name}:latest || exit 0"
+    sh "docker rmi ${env.dockerRepo}/${env.name}:${env.version} || exit 0"
+    sh "docker rmi ${env.dockerRepo}/${env.name}:latest || exit 0"
   }
 
 }
