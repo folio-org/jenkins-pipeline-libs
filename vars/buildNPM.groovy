@@ -33,6 +33,7 @@ def call(body) {
 
   // right now, all builds are snapshots
   env.snapshot = true
+  env.dockerRepo = 'folioci'
   
   node(buildNode) {
 
@@ -54,7 +55,7 @@ def call(body) {
                  userRemoteConfigs: scm.userRemoteConfigs
          ])
 
-         echo "Checked out $env.BRANCH_NAME"
+         echo "Checked out branch:  $env.BRANCH_NAME"
       }
 
       stage('Prep') {
@@ -150,7 +151,8 @@ def call(body) {
               if (env.snapshot) {
                 // update the version to the snapshot version
                 echo "Update Module Descriptor version to snapshot version"
-                foliociLib.updateModDescriptorId(modDescriptor)
+                foliociLib.updateModDescriptor(modDescriptor)
+                sh "cat $modDescriptor"
               }
             }
             else {

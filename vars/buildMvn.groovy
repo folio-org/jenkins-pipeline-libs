@@ -44,7 +44,7 @@ def call(body) {
                  userRemoteConfigs: scm.userRemoteConfigs
          ])
 
-         echo "Checked out $env.BRANCH_NAME"
+         echo "Checked out branch: $env.BRANCH_NAME"
 
       }
 
@@ -54,12 +54,15 @@ def call(body) {
         env.name = mvn_artifact
 
         if (mvn_version ==~ /.*-SNAPSHOT$/) {
-          echo "This is a snapshot"
+          echo "This is a snapshot build"
           env.version = "${mvn_version}.${env.BUILD_NUMBER}"
           env.snapshot = true
+          env.dockerRepo = 'folioci'
         }
         else {
+          echo "This is a release build"
           env.version = mvn_version
+          env.dockerRepo = 'folioorg'
         }
 
         echo "Building Maven artifact: ${env.name} Version: ${env.version}"
@@ -102,9 +105,10 @@ def call(body) {
       else {
         sonarqubeMvn() 
       }
-     
+
+      // master branch or tagged releases
       if (( env.BRANCH_NAME == 'master' ) ||     
-         ( env.BRANCH_NAME == 'jenkins-test' )) {
+         ( env.BRANCH_NAME ==~ /^v\d+\.\d+\.\d+$/ )) {
 
         if ( config.mvnDeploy ==~ /(?i)(Y|YES|T|TRUE)/ ) {
           stage('Maven Deploy') {
@@ -120,11 +124,9 @@ def call(body) {
           stage('Publish Module Descriptor') {
             echo "Publishing Module Descriptor to FOLIO registry"
             def modDescriptor = 'target/ModuleDescriptor.json'
-            // Add build number to version if snapshot
-            if (env.snapshot) { 
-              foliociLib.updateModDescriptorId(modDescriptor)
-            }
-              postModuleDescriptor(modDescriptor) 
+            foliociLib.updateModDescriptor(modDescriptor)
+            sh "cat $modDescriptor"
+            postModuleDescriptor(modDescriptor) 
           }
         }
         if (config.publishAPI ==~ /(?i)(Y|YES|T|TRUE)/) {
