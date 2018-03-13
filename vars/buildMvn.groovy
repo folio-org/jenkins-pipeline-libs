@@ -125,7 +125,6 @@ def call(body) {
             echo "Publishing Module Descriptor to FOLIO registry"
             def modDescriptor = 'target/ModuleDescriptor.json'
             foliociLib.updateModDescriptor(modDescriptor)
-            sh "cat $modDescriptor"
             postModuleDescriptor(modDescriptor) 
           }
         }
