@@ -54,7 +54,9 @@ def call(body) {
 
       // publish image if master branch
 
-      if ((env.BRANCH_NAME == 'master') && (publishMaster ==~ /(?i)(Y|YES|T|TRUE)/)) {
+      if ((env.BRANCH_NAME == 'master') || 
+          (env.BRANCH_NAME ==~ /^v\d+\.\d+\.\d+$/) &&
+          (publishMaster ==~ /(?i)(Y|YES|T|TRUE)/)) {
         // publish images to ci docker repo
         echo "Publishing Docker images"
         docker.withRegistry('https://index.docker.io/v1/', 'DockerHubIDJenkins') {
