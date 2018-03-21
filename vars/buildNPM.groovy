@@ -210,14 +210,22 @@ def call(body) {
           dir("$env.WORKSPACE") { 
             sh 'git clone https://github.com/folio-org/ui-testing'
             sh 'git clone https://github.com/folio-org/folio-testing-platform'
-            sh 'git clone https://github.com/folio-org/mod-inventory-storage'
-            sh 'git clone https://github.com/folio-org/mod-circulation-storage'
-            sh 'git clone https://github.com/folio-org/mod-users'
           }
           
           dir("${env.WORKSPACE}/folio-infrastructure") {
-            git branch: 'folio-1043', credentialsId: 'folio-jenkins-github-token', 
-                url: 'https://github.com/folio-org/folio-infrastructure'
+            checkout([$class: 'GitSCM', branches: [[name: '*/folio-1043']], 
+                               doGenerateSubmoduleConfigurations: false, 
+                               extensions: [[$class: 'SubmoduleOption', 
+                                                      disableSubmodules: false, 
+                                                      parentCredentials: false, 
+                                                      recursiveSubmodules: true, 
+                                                      reference: '', trackingSubmodules: true]], 
+                               submoduleCfg: [], 
+                               userRemoteConfigs: [[credentialsId: 'folio-jenkins-github-token', 
+                                                    url: 'https://github.com/folio-org/folio-infrastructure']]])
+
+            sh 'git submodule update'
+
           }
             
           dir ("${env.WORKSPACE}/folio-testing-platform") {
@@ -249,26 +257,34 @@ def call(body) {
             withCredentials([string(credentialsId: 'folio_admin-pgpassword',variable: 'PGPASSWORD')]) {
               sh "${scriptPath}/createTenantAdminUser.sh $env.tenant"
             }
-
-            // add admin perms
-            sh "${scriptPath}/addAdminPerms.sh -o $env.OkapiUrl -t $env.tenant -u ${env.tenant}_admin -p admin"
-
-            // get auth token so we can load data
-            def authToken
-            authToken= sh(returnStdout: true,
-               script:  "${scriptPath}/getOkapiToken.sh -o $env.OkapiUrl -t $env.tenant -u ${env.tenant}_admin -p admin").trim()
-
-            // load reference data
-            sh "${env.WORKSPACE}/mod-inventory-storage/reference-data/import.sh -o $env.OkapiUrl " +
-               "-t $env.tenant -a $authToken -d ${env.WORKSPACE}/mod-inventory-storage/reference-data"
-
-            sh "${env.WORKSPACE}/mod-circulation-storage/reference-data/import.sh -o $env.OkapiUrl " +
-               "-t $env.tenant -a $authToken -d ${env.WORKSPACE}/mod-circulation-storage/reference-data"
-
-            sh "${env.WORKSPACE}/mod-users/reference-data/import.sh -o $env.OkapiUrl -t $env.tenant " +
-               "-a $authToken -d ${env.WORKSPACE}/mod-users/reference-data"
-            
           } 
+
+          // load sample data, reference data, etc using Ansible
+          dir("${env.WORKSPACE}/folio-infrastructure/CI/ansible") { 
+
+            // set vars in include file 
+            echo "---" > vars_pr.yml
+            echo "okapi_url: ${env.okapi_url}" >> vars_pr.yml
+            echo "tenant: ${env.tenant}" >> vars_pr.yml
+            echo "admin_user: { username: ${env.tenant}_admin, password: admin }" >> vars_pr.yml
+
+            // debug
+            sh 'cat vars_pr.yml'
+       
+
+            withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', 
+                                       accessKeyVariable: 'AWS_ACCESS_KEY_ID', 
+                                       credentialsId: 'jenkins-aws', 
+                                       secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+
+              ansiblePlaybook credentialsId: '11657186-f4d4-4099-ab72-2a32e023cced', 
+                           installation: 'Ansible', 
+                           inventory: 'inventory', 
+                           playbook: 'folioci-pr.yml', 
+                           sudoUser: null, vaultCredentialsId: 'ansible-vault-pass'
+            }
+          }
+          
 
           dir("${env.WORKSPACE}/ui-testing") {  
             withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
