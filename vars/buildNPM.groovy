@@ -251,7 +251,9 @@ def call(body) {
 
             // post MDs and enable tenant modules
             sh "${scriptPath}/createTenantModuleList.sh $env.okapiUrl $env.tenant ModuleDescriptors " +
-               "| ${scriptPath}/enableTenantModules.sh $env.okapiUrl $env.tenant"
+                > tenant_mod_list"
+            sh 'cat tenant_mod_list'
+            sh "${scriptPath}/enableTenantModules.sh $env.okapiUrl $env.tenant < tenant_mod_list"
 
             // create tenant admin user which defaults to TENANTNAME_admin with password of 'admin'
             withCredentials([string(credentialsId: 'folio_admin-pgpassword',variable: 'PGPASSWORD')]) {
