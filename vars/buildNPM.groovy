@@ -251,7 +251,7 @@ def call(body) {
 
             // post MDs and enable tenant modules
             sh "${scriptPath}/createTenantModuleList.sh $env.okapiUrl $env.tenant ModuleDescriptors " +
-                > tenant_mod_list"
+               "> tenant_mod_list"
             sh 'cat tenant_mod_list'
             sh "${scriptPath}/enableTenantModules.sh $env.okapiUrl $env.tenant < tenant_mod_list"
 
