@@ -29,7 +29,7 @@ def call(body) {
 
   // use the smaller nodejs build node since most 
   // Nodejs builds are Stripes.
-  def buildNode = config.buildNode ?: 'jenkins-slave-ansible'
+  def buildNode = config.buildNode ?: 'jenkins-slave-all'
 
   // right now, all builds are snapshots
   env.snapshot = true
