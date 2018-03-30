@@ -265,10 +265,10 @@ def call(body) {
           dir("${env.WORKSPACE}/folio-infrastructure/CI/ansible") { 
 
             // set vars in include file 
-            echo "---" > vars_pr.yml
-            echo "okapi_url: ${env.okapi_url}" >> vars_pr.yml
-            echo "tenant: ${env.tenant}" >> vars_pr.yml
-            echo "admin_user: { username: ${env.tenant}_admin, password: admin }" >> vars_pr.yml
+            sh "echo --- > vars_pr.yml"
+            sh "echo okapi_url: ${env.okapi_url} >> vars_pr.yml"
+            sh "echo tenant: ${env.tenant} >> vars_pr.yml"
+            sh "echo admin_user: { username: ${env.tenant}_admin, password: admin } >> vars_pr.yml"
 
             // debug
             sh 'cat vars_pr.yml'
