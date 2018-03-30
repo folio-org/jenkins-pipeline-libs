@@ -266,7 +266,7 @@ def call(body) {
 
             // set vars in include file 
             sh "echo --- > vars_pr.yml"
-            sh "echo okapi_url: ${env.okapi_url} >> vars_pr.yml"
+            sh "echo okapi_url: ${env.okapiUrl} >> vars_pr.yml"
             sh "echo tenant: ${env.tenant} >> vars_pr.yml"
             sh "echo admin_user: { username: ${env.tenant}_admin, password: admin } >> vars_pr.yml"
 
