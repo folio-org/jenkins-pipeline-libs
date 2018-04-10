@@ -213,7 +213,7 @@ def call(body) {
           }
           
           dir("${env.WORKSPACE}/folio-infrastructure") {
-            checkout([$class: 'GitSCM', branches: [[name: '*/folio-1043']], 
+            checkout([$class: 'GitSCM', branches: [[name: '*/master']], 
                                doGenerateSubmoduleConfigurations: false, 
                                extensions: [[$class: 'SubmoduleOption', 
                                                       disableSubmodules: false, 
@@ -289,24 +289,8 @@ def call(body) {
           
 
           dir("${env.WORKSPACE}/ui-testing") {  
-            withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
-              withNPM(npmrcConfig: 'jenkins-npm-folioci') {
-                // I think we need to remove the yarn lock file?
-                sh 'rm -f yarn.lock'
-                sh 'yarn install'
-
-                env.FOLIO_UI_USERNAME = "${env.tenant}_admin"
-                env.FOLIO_UI_PASSWORD = "admin"
-                env.FOLIO_UI_URL = 'http://localhost:3000'
-                // env.FOLIO_UI_WAIT_TIMEOUT=10000
-  
-                // run UI tests
-                sh '/usr/bin/Xvfb :2 &'
-                sh 'sleep 1'
-                sh 'DISPLAY=:2 yarn test'
-              }
-            }
-            
+            def testStatus = runUiRegressionPr("${env.tenant}_admin","admin","http://localhost:3000")
+            echo "Regression test status: $testStatus" 
           }
 
         } // end stage
