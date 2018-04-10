@@ -8,6 +8,7 @@
 def call(String folioUser, String folioPassword, String folioUrl) {
 
   def testStatus = ''
+  def status
 
   withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
     withNPM(npmrcConfig: 'jenkins-npm-folioci') {
@@ -25,7 +26,7 @@ def call(String folioUser, String folioPassword, String folioUrl) {
       sh 'echo "<body><pre>" >> rtest.html'
 
       echo "Running UI Regression test against $folioUrl"
-      def returnStatus = sh(script: "DISPLAY=:2 yarn test >> rtest.html 2>&1", returnStatus:true)
+      status = sh(script: "DISPLAY=:2 yarn test >> rtest.html 2>&1", returnStatus:true)
 
       sh 'echo "</pre><body></html>" >> rtest.html'
     }
@@ -43,7 +44,9 @@ def call(String folioUser, String folioPassword, String folioUrl) {
                reportTitles: 'UI Regression Test Report'])
 
   // An exit code on non-zero indicates something failed
-  if (returnStatus != 0) { 
+  echo "Test Result Status: $status"
+  
+  if (status != 0) { 
     testStatus = 'FAILED'
   }
   else {
