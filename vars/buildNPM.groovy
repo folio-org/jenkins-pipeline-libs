@@ -117,7 +117,7 @@ def call(body) {
                   echo "No lint errors found"
                 }
               }
-            }
+          
 
             if (config.runTest ==~ /(?i)(Y|YES|T|TRUE)/) {
               stage('Unit Tests') {
@@ -204,7 +204,11 @@ def call(body) {
 
         stage('Test Stripes Platform') {
           dir("${env.WORKSPACE}/project") {
-            sh "yarn link"
+            // remove node_modules directory
+            sh 'rm -rf node_modules yarn.lock'
+            sh 'yarn link'
+            sh 'yarn link @folio/users'
+            sh 'yarn install'
           }
 
           dir("$env.WORKSPACE") { 
@@ -289,6 +293,7 @@ def call(body) {
           
 
           dir("${env.WORKSPACE}/ui-testing") {  
+            sh 'yarn link @folio/users'
             def testStatus = runUiRegressionPr("${env.tenant}_admin","admin","http://localhost:3000")
             echo "Regression test status: $testStatus" 
           }
