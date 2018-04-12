@@ -117,7 +117,7 @@ def call(body) {
                   echo "No lint errors found"
                 }
               }
-          
+            } 
 
             if (config.runTest ==~ /(?i)(Y|YES|T|TRUE)/) {
               stage('Unit Tests') {
