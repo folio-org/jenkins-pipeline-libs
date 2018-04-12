@@ -224,7 +224,8 @@ def call(body) {
                                                       disableSubmodules: false, 
                                                       parentCredentials: false, 
                                                       recursiveSubmodules: true, 
-                                                      reference: '', trackingSubmodules: true]], 
+                                                      reference: '', 
+                                                      trackingSubmodules: true]], 
                                submoduleCfg: [], 
                                userRemoteConfigs: [[credentialsId: 'folio-jenkins-github-token', 
                                                     url: 'https://github.com/folio-org/folio-infrastructure']]])
