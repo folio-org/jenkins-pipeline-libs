@@ -204,10 +204,11 @@ def call(body) {
 
         stage('Test Stripes Platform') {
           dir("${env.WORKSPACE}/project") {
+
             // remove node_modules directory
             sh 'rm -rf node_modules yarn.lock'
             sh 'yarn link'
-            sh 'yarn link @folio/users'
+            sh "yarn link $env.npm_name"
             sh 'yarn install'
           }
 
@@ -293,11 +294,10 @@ def call(body) {
           
 
           dir("${env.WORKSPACE}/ui-testing") {  
-            sh 'yarn link @folio/users'
-            def testStatus = runUiRegressionPr("${env.tenant}_admin","admin","http://localhost:3000")
+            sh "yarn link $env.npm_name"
+            def testStatus = runUiRegressionPr("${env.tenant}_admin",'admin','http://localhost:3000')
             echo "Regression test status: $testStatus" 
           }
-
         } // end stage
       } // end PR Integration tests
     }  // end try
