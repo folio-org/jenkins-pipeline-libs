@@ -230,13 +230,24 @@ def call(body) {
                                userRemoteConfigs: [[credentialsId: 'folio-jenkins-github-token', 
                                                     url: 'https://github.com/folio-org/folio-infrastructure']]])
 
-            sh 'git submodule update'
-
           }
             
           dir ("${env.WORKSPACE}/folio-testing-platform") {
             sh "yarn link $env.npm_name"
             sh 'yarn install'
+
+            // publish generated yarn.lock 
+            sh 'echo "<html><head><title>folio-testing-platform-yarn-lock</title></head>"' +
+               '> ftp-yarnlock.html'
+            sh 'echo "<body><pre>" >> ftp-yarnlock.html'
+            sh 'cat yarn.lock >> ftp-yarnlock.html'
+            sh 'echo "<body><pre>" >> ftp-yarnlock.html' 
+            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, 
+               keepAll: true, reportDir: '.', 
+               reportFiles: 'ftp-yarnlock.html', 
+               reportName: 'folio-testing-platform yarn.lock', 
+               reportTitles: 'folio-testing-platform yarn.lock'])
+
 
             // generate mod descriptors with '--strict' flag for dependencies
             sh 'yarn postinstall --strict'
@@ -267,7 +278,7 @@ def call(body) {
             }
           } 
 
-          // load sample data, reference data, etc using Ansible
+          // load sample data, reference data, etc for tenant using Ansible
           dir("${env.WORKSPACE}/folio-infrastructure/CI/ansible") { 
 
             // set vars in include file 
@@ -298,6 +309,19 @@ def call(body) {
             sh "yarn link $env.npm_name"
             def testStatus = runUiRegressionPr("${env.tenant}_admin",'admin','http://localhost:3000')
             echo "Regression test status: $testStatus" 
+
+            // publish generated yarn.lock 
+            sh 'echo "<html><head><title>ui-testing-yarn-lock</title></head>"' +
+               '> uitest-yarnlock.html'
+            sh 'echo "<body><pre>" >> uitest-yarnlock.html'
+            sh 'cat yarn.lock >> uitest-yarnlock.html'
+            sh 'echo "<body><pre>" >> uitest-yarnlock.html'
+            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false,
+               keepAll: true, reportDir: '.',
+               reportFiles: 'uitest-yarnlock.html',
+               reportName: 'ui-testing yarn.lock',
+               reportTitles: 'ui-testing yarn.lock'])
+
           }
         } // end stage
       } // end PR Integration tests
