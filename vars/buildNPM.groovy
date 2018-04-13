@@ -8,6 +8,7 @@
  * doDocker:  Build, test, and publish Docker image via 'buildDocker' (Default: 'no')
  * runLint: Run ESLint via 'yarn lint' (Default: 'no')
  * runTest: Run unit tests via 'yarn test' (Default: 'no')
+ * runRegression: Run UI regression tests for PRs (Default: 'no') 
  * npmDeploy: Publish NPM artifacts to NPM repository (Default: 'yes')
  * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no')
  * modDescriptor: path to standalone Module Descriptor file (Optional)
@@ -26,6 +27,9 @@ def call(body) {
   
   // default is to deploy to npm repo when branch is master
   def npmDeploy = config.npmDeploy ?: 'yes'
+
+  // default is don't run regression tests for PRs
+  def runRegression = config.runRegression ?: 'no'
 
   // use the smaller nodejs build node since most 
   // Nodejs builds are Stripes.
@@ -193,8 +197,9 @@ def call(body) {
         } 
       } // end dir
 
-      // if ( env.CHANGE_ID ) {
-      if ( env.BRANCH_NAME == 'folio-1043-test' ) {
+      // if (( env.CHANGE_ID ) && 
+      if (( env.BRANCH_NAME == 'folio-1043-test' ) && 
+         ( runRegression ==~ /(?i)(Y|YES|T|TRUE)/)) {
 
         // ensure tenant id is unique
         //def tenant = "${env.CHANGE_ID}_${env.BUILD_NUMBER}"
