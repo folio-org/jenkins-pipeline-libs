@@ -89,9 +89,9 @@ def call(body) {
           echo "Project Name: $env.project_name"
 
           // Install stripes-cli globally
-          sh 'sudo yarn global add @folio/stripes-cli --prefix /usr/local'
+          // sh 'sudo yarn global add @folio/stripes-cli --prefix /usr/local'
           // fix some permissions as a result of above command
-          sh 'sudo chown -R jenkins /home/jenkins'
+          // sh 'sudo chown -R jenkins /home/jenkins'
         }
  
         withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
@@ -261,7 +261,7 @@ def call(body) {
             sh "stripes build --okapi $env.okapiUrl --tenant $env.tenant stripes.config.js bundle"
 
             // start simple webserver to serve webpack
-            sh 'sudo npm install -g http-server'
+            // sh 'sudo npm install -g http-server'
               withEnv(['JENKINS_NODE_COOKIE=dontkill']) {
                 sh 'http-server -p 3000 ./bundle &'
               }
@@ -295,7 +295,6 @@ def call(body) {
             // debug
             sh 'cat vars_pr.yml'
        
-
             withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', 
                                        accessKeyVariable: 'AWS_ACCESS_KEY_ID', 
                                        credentialsId: 'jenkins-aws', 
