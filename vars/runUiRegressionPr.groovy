@@ -26,7 +26,8 @@ def call(String folioUser, String folioPassword, String folioUrl) {
       sh 'echo "<body><pre>" >> rtest.html'
 
       echo "Running UI Regression test against $folioUrl"
-      status = sh(script: "DEBUG=* DISPLAY=:2 yarn test >> rtest.html 2>&1", returnStatus:true)
+      //status = sh(script: "DEBUG=* DISPLAY=:2 yarn test >> rtest.html 2>&1", returnStatus:true)
+      status = sh(script: "DISPLAY=:2 yarn test >> rtest.html 2>&1", returnStatus:true)
 
       sh 'echo "</pre><body></html>" >> rtest.html'
     }
