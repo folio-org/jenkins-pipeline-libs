@@ -21,25 +21,26 @@ def call(String folioUser, String folioPassword, String folioUrl) {
       env.FOLIO_UI_PASSWORD = folioPassword
       env.FOLIO_UI_URL = folioUrl
 
-      sh 'echo "<html><head><title>UI Regression Test Report</title></head>" > rtest.html'
-      sh 'echo "<body><pre>" >> rtest.html'
+      sh 'mkdir -p ci_reports'
+      sh 'echo "<html><head><title>UI Regression Test Report</title></head>" > ci_reports/rtest.html'
+      sh 'echo "<body><pre>" >> ci_reports/rtest.html'
 
       echo "Running UI Regression test against $folioUrl"
-      status = sh(script: "DEBUG=* DISPLAY=:2 yarn test >> rtest.html 2>&1", returnStatus:true)
+      status = sh(script: "DEBUG=* DISPLAY=:2 yarn test >> ci_reports/rtest.html 2>&1", returnStatus:true)
      
-      // status = sh(script: "DISPLAY=:2 yarn test >> rtest.html 2>&1", returnStatus:true)
+      // status = sh(script: "DISPLAY=:2 yarn test >> ci_reports/rtest.html 2>&1", returnStatus:true)
 
-      sh 'echo "</pre><body></html>" >> rtest.html'
+      sh 'echo "</pre><body></html>" >> ci_reports/rtest.html'
     }
   }
  
   // print test results to job console
-  def testReport =  readFile('rtest.html')
+  def testReport =  readFile('ci_reports/rtest.html')
   echo "$testReport"
 
   // publish results
   publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, 
-               keepAll: true, reportDir: '.', 
+               keepAll: true, reportDir: 'ci_reports', 
                reportFiles: 'rtest.html', 
                reportName: 'UI Regression Test Report', 
                reportTitles: 'UI Regression Test Report'])

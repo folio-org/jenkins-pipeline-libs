@@ -237,13 +237,14 @@ def call(body) {
             sh 'yarn install'
 
             // publish generated yarn.lock 
+            sh 'mkdir -p ci_reports'
             sh 'echo "<html><head><title>folio-testing-platform-yarn-lock</title></head>"' +
-               '> ftp-yarnlock.html'
-            sh 'echo "<body><pre>" >> ftp-yarnlock.html'
-            sh 'cat yarn.lock >> ftp-yarnlock.html'
-            sh 'echo "<body><pre>" >> ftp-yarnlock.html' 
+               '> ci_reports/ftp-yarnlock.html'
+            sh 'echo "<body><pre>" >> ci_reports/ftp-yarnlock.html'
+            sh 'cat yarn.lock >> ci_reports/ftp-yarnlock.html'
+            sh 'echo "<body><pre>" >> ci_reports/ftp-yarnlock.html' 
             publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, 
-               keepAll: true, reportDir: '.', 
+               keepAll: true, reportDir: 'ci_reports', 
                reportFiles: 'ftp-yarnlock.html', 
                reportName: 'folio-testing-platform yarn.lock', 
                reportTitles: 'folio-testing-platform yarn.lock'])
@@ -322,13 +323,14 @@ def call(body) {
 
 
             // publish generated yarn.lock 
+            sh 'mkdir -p ci_reports'
             sh 'echo "<html><head><title>ui-testing-yarn-lock</title></head>"' +
-               '> uitest-yarnlock.html'
-            sh 'echo "<body><pre>" >> uitest-yarnlock.html'
-            sh 'cat yarn.lock >> uitest-yarnlock.html'
-            sh 'echo "<body><pre>" >> uitest-yarnlock.html'
+               '> ci_reports/uitest-yarnlock.html'
+            sh 'echo "<body><pre>" >> ci_reports/uitest-yarnlock.html'
+            sh 'cat yarn.lock >> ci_reports/uitest-yarnlock.html'
+            sh 'echo "<body><pre>" >> ci_reports/uitest-yarnlock.html'
             publishHTML([allowMissing: false, alwaysLinkToLastBuild: false,
-               keepAll: true, reportDir: '.',
+               keepAll: true, reportDir: 'ci_reports',
                reportFiles: 'uitest-yarnlock.html',
                reportName: 'ui-testing yarn.lock',
                reportTitles: 'ui-testing yarn.lock'])
