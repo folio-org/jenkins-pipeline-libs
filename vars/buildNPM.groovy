@@ -33,7 +33,7 @@ def call(body) {
 
   // use the smaller nodejs build node since most 
   // Nodejs builds are Stripes.
-  def buildNode = config.buildNode ?: 'jenkins-slave-all'
+  def buildNode = config.buildNode ?: 'jenkins-slave-all-test'
 
   // right now, all builds are snapshots
   env.snapshot = true
@@ -87,11 +87,6 @@ def call(body) {
           // different from mod name specified in package.json
           env.project_name = foliociLib.getProjName()
           echo "Project Name: $env.project_name"
-
-          // Install stripes-cli globally
-          // sh 'sudo yarn global add @folio/stripes-cli --prefix /usr/local'
-          // fix some permissions as a result of above command
-          // sh 'sudo chown -R jenkins /home/jenkins'
         }
  
         withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
@@ -261,7 +256,6 @@ def call(body) {
             sh "stripes build --okapi $env.okapiUrl --tenant $env.tenant stripes.config.js bundle"
 
             // start simple webserver to serve webpack
-            // sh 'sudo npm install -g http-server'
               withEnv(['JENKINS_NODE_COOKIE=dontkill']) {
                 sh 'http-server -p 3000 ./bundle &'
               }
@@ -311,8 +305,20 @@ def call(body) {
 
           dir("${env.WORKSPACE}/ui-testing") {  
             sh "yarn link $env.npm_name"
-            def testStatus = runUiRegressionPr("${env.tenant}_admin",'admin','http://localhost:3000')
-            echo "Regression test status: $testStatus" 
+            def prTestStatus
+            def regressionReportUrl = "${env.BUILD_URL}UI_Regression_Test_Report/"
+            def prTestStatusCode = runUiRegressionPr("${env.tenant}_admin",'admin','http://localhost:3000')
+            if (prTestStatusCode != 0) {
+	      prTestStatus = "UI Regression Tests FAILURE(S): $regressionReportUrl"
+            else {
+              prTestStatus = "All UI Regression Tests PASSED: $regressionReportUrl"
+            }
+            echo "Regression test status: $prTestStatus" 
+
+            // disable lines below if this is not a GitHub PR
+            //def prComment = pullRequest.comment(prTestStatus)
+            //echo "$prComment" 
+
 
             // publish generated yarn.lock 
             sh 'echo "<html><head><title>ui-testing-yarn-lock</title></head>"' +
