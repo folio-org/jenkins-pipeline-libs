@@ -310,6 +310,7 @@ def call(body) {
             def prTestStatusCode = runUiRegressionPr("${env.tenant}_admin",'admin','http://localhost:3000')
             if (prTestStatusCode != 0) {
 	      prTestStatus = "UI Regression Tests FAILURE(S): $regressionReportUrl"
+            }
             else {
               prTestStatus = "All UI Regression Tests PASSED: $regressionReportUrl"
             }
