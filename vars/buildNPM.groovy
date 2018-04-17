@@ -33,7 +33,7 @@ def call(body) {
 
   // use the smaller nodejs build node since most 
   // Nodejs builds are Stripes.
-  def buildNode = config.buildNode ?: 'jenkins-slave-all-test'
+  def buildNode = config.buildNode ?: 'jenkins-slave-all'
 
   // right now, all builds are snapshots
   env.snapshot = true
@@ -44,7 +44,7 @@ def call(body) {
       stage('Checkout') {
         deleteDir()
         currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.JOB_BASE_NAME}"
-        // sendNotifications 'STARTED'
+        sendNotifications 'STARTED'
 
         checkout([
                  $class: 'GitSCM',
