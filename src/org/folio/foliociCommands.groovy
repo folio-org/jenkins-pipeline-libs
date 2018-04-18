@@ -54,9 +54,19 @@ def getProjName() {
 // update the 'Id' field (for snapshot versions, etc)
 def updateModDescriptorId(String modDescriptor) {
 
-  sh "mv $modDescriptor ${modDescriptor}.tmp"
+  sh "mv $modDescriptor ${modDescriptor}.orig"
   sh """
-  jq '.id |= \"${env.name}-${env.version}\"' ${modDescriptor}.tmp > $modDescriptor
+  jq '.id |= \"${env.name}-${env.version}\"' ${modDescriptor}.orig > $modDescriptor
+  """
+}
+
+def updateModDescriptor(String modDescriptor) { 
+  sh "mv $modDescriptor ${modDescriptor}.orig"
+  sh """
+  jq  '. | .id |= \"${env.name}-${env.version}\" | if has(\"launchDescriptor\") then 
+      .launchDescriptor.dockerImage |= \"${env.dockerRepo}/${env.name}:${env.version}\" |
+      .launchDescriptor.dockerPull |= \"true\" else . end' \
+    ${modDescriptor}.orig > $modDescriptor
   """
 }
 

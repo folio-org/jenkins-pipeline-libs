@@ -1,7 +1,7 @@
 #!/usr/bin/env groovy
 
 /*
- * Main build script for Maven-based FOLIO projects
+ * Main build script for NPM-based FOLIO projects
  *
  * Configurable parameters: 
  *
@@ -37,6 +37,7 @@ def call(body) {
 
   // right now, all builds are snapshots
   env.snapshot = true
+  env.dockerRepo = 'folioci'
   
   node(buildNode) {
 
@@ -60,8 +61,7 @@ def call(body) {
                  userRemoteConfigs: scm.userRemoteConfigs
          ])
 
-         echo "Checked out $env.BRANCH_NAME"
-         echo "Workspace: $env.WORKSPACE"
+         echo "Checked out branch:  $env.BRANCH_NAME"
       }
 
       dir("${env.WORKSPACE}/project") {
