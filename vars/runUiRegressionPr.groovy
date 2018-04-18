@@ -42,8 +42,8 @@ def call(String folioUser, String folioPassword, String folioUrl) {
   publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, 
                keepAll: true, reportDir: 'ci_reports', 
                reportFiles: 'rtest.html', 
-               reportName: 'UI Regression Test Report', 
-               reportTitles: 'UI Regression Test Report'])
+               reportName: 'UI_Regression_Test_Report', 
+               reportTitles: 'UI_Regression_Test_Report'])
 
   // An exit code on non-zero indicates something failed
   echo "Test Result Status: $status"
