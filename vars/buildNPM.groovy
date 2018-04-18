@@ -197,7 +197,7 @@ def call(body) {
 
         // ensure tenant id is unique
         // def tenant = "${env.BRANCH_NAME}_${env.BUILD_NUMBER}"
-        def tenant = "${env.CHANGE_ID}_${env.BUILD_NUMBER}"
+        def tenant = "pr_${env.CHANGE_ID}_${env.BUILD_NUMBER}"
         env.tenant = foliociLib.replaceHyphen(tenant)
         env.okapiUrl = 'http://folio-snapshot-stable.aws.indexdata.com:9130'
 
