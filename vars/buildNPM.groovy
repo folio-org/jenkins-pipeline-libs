@@ -245,8 +245,8 @@ def call(body) {
             publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, 
                keepAll: true, reportDir: 'ci_reports', 
                reportFiles: 'ftp-yarnlock.html', 
-               reportName: 'folio-testing-platform yarn.lock', 
-               reportTitles: 'folio-testing-platform yarn.lock'])
+               reportName: 'folio-testing-platform-yarn.lock', 
+               reportTitles: 'folio-testing-platform-yarn.lock'])
 
 
             // generate mod descriptors with '--strict' flag for dependencies
@@ -317,8 +317,8 @@ def call(body) {
             echo "Regression test status: $prTestStatus" 
 
             // disable lines below if this is not a GitHub PR
-            def prComment = pullRequest.comment(prTestStatus)
-            echo "$prComment" 
+            // def prComment = pullRequest.comment(prTestStatus)
+            //echo "$prComment" 
 
 
             // publish generated yarn.lock 
@@ -331,8 +331,8 @@ def call(body) {
             publishHTML([allowMissing: false, alwaysLinkToLastBuild: false,
                keepAll: true, reportDir: 'ci_reports',
                reportFiles: 'uitest-yarnlock.html',
-               reportName: 'ui-testing yarn.lock',
-               reportTitles: 'ui-testing yarn.lock'])
+               reportName: 'ui-testing-yarn.lock',
+               reportTitles: 'ui-testing-yarn.lock'])
 
           }
         } // end stage
