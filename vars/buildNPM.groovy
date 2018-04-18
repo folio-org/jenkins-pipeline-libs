@@ -192,7 +192,8 @@ def call(body) {
         } 
       } // end dir
 
-      if (( env.CHANGE_ID ) && 
+      // if (( env.CHANGE_ID ) && 
+       if (( env.BRANCH_NAME == 'folio-1043-test' ) && 
          ( runRegression ==~ /(?i)(Y|YES|T|TRUE)/)) {
 
         // ensure tenant id is unique
@@ -317,8 +318,8 @@ def call(body) {
             echo "Regression test status: $prTestStatus" 
 
             // disable lines below if this is not a GitHub PR
-            def prComment = pullRequest.comment(prTestStatus)
-            echo "$prComment" 
+            //def prComment = pullRequest.comment(prTestStatus)
+            //echo "$prComment" 
 
 
             // publish generated yarn.lock 
