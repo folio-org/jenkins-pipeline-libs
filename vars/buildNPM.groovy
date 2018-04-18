@@ -192,13 +192,12 @@ def call(body) {
         } 
       } // end dir
 
-      // if (( env.CHANGE_ID ) && 
-       if (( env.BRANCH_NAME == 'folio-1043-test' ) && 
+      if (( env.CHANGE_ID ) && 
          ( runRegression ==~ /(?i)(Y|YES|T|TRUE)/)) {
 
         // ensure tenant id is unique
-        def tenant = "${env.BRANCH_NAME}_${env.BUILD_NUMBER}"
-        //def tenant = "${env.CHANGE_ID}_${env.BUILD_NUMBER}"
+        // def tenant = "${env.BRANCH_NAME}_${env.BUILD_NUMBER}"
+        def tenant = "${env.CHANGE_ID}_${env.BUILD_NUMBER}"
         env.tenant = foliociLib.replaceHyphen(tenant)
         env.okapiUrl = 'http://folio-snapshot-stable.aws.indexdata.com:9130'
 
@@ -318,8 +317,8 @@ def call(body) {
             echo "Regression test status: $prTestStatus" 
 
             // disable lines below if this is not a GitHub PR
-            //def prComment = pullRequest.comment(prTestStatus)
-            //echo "$prComment" 
+            def prComment = pullRequest.comment(prTestStatus)
+            echo "$prComment" 
 
 
             // publish generated yarn.lock 
