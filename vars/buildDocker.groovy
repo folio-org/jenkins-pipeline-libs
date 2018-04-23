@@ -28,7 +28,7 @@ def call(body) {
   def publishMaster = config.publishMaster ?: 'yes'
 
   try { 
-    dir("${env.WORKSPACE}}/${buildContext}") {
+    dir("${env.WORKSPACE}/${buildContext}") {
       // build docker image
       sh "docker build -t ${env.name}:${env.version} ."
 
