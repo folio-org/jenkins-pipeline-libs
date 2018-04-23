@@ -24,11 +24,11 @@ def call(body) {
 
   // Defaults if not defined. 
   def dockerfile = config.dockerfile ?: 'Dockerfile'
-  def buildContext = config.dockerDir ?: env.WORKSPACE
+  def buildContext = config.dockerDir ?: '.'
   def publishMaster = config.publishMaster ?: 'yes'
 
   try { 
-    dir("$buildContext") {
+    dir("${env.WORKSPACE}}/${buildContext}") {
       // build docker image
       sh "docker build -t ${env.name}:${env.version} ."
 
