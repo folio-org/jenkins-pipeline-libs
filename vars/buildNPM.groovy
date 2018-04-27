@@ -1,7 +1,7 @@
 #!/usr/bin/env groovy
 
 /*
- * Main build script for Maven-based FOLIO projects
+ * Main build script for NPM-based FOLIO projects
  *
  * Configurable parameters: 
  *
@@ -37,6 +37,7 @@ def call(body) {
 
   // right now, all builds are snapshots
   env.snapshot = true
+  env.dockerRepo = 'folioci'
   
   node(buildNode) {
 
@@ -44,7 +45,7 @@ def call(body) {
       stage('Checkout') {
         deleteDir()
         currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.JOB_BASE_NAME}"
-        // sendNotifications 'STARTED'
+        sendNotifications 'STARTED'
 
         checkout([
                  $class: 'GitSCM',
@@ -60,8 +61,7 @@ def call(body) {
                  userRemoteConfigs: scm.userRemoteConfigs
          ])
 
-         echo "Checked out $env.BRANCH_NAME"
-         echo "Workspace: $env.WORKSPACE"
+         echo "Checked out branch:  $env.BRANCH_NAME"
       }
 
       dir("${env.WORKSPACE}/project") {
@@ -87,11 +87,6 @@ def call(body) {
           // different from mod name specified in package.json
           env.project_name = foliociLib.getProjName()
           echo "Project Name: $env.project_name"
-
-          // Install stripes-cli globally
-          sh 'sudo yarn global add @folio/stripes-cli --prefix /usr/local'
-          // fix some permissions as a result of above command
-          sh 'sudo chown -R jenkins /home/jenkins'
         }
  
         withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
@@ -178,15 +173,14 @@ def call(body) {
         } 
       } // end dir
 
-      // if (( env.CHANGE_ID ) && 
-      if (( env.BRANCH_NAME == 'folio-1043-test' ) && 
+      if (( env.CHANGE_ID ) && 
          ( runRegression ==~ /(?i)(Y|YES|T|TRUE)/)) {
 
         // ensure tenant id is unique
-        //def tenant = "${env.CHANGE_ID}_${env.BUILD_NUMBER}"
-        def tenant = "${env.BRANCH_NAME}_${env.BUILD_NUMBER}"
+        // def tenant = "${env.BRANCH_NAME}_${env.BUILD_NUMBER}"
+        def tenant = "pr_${env.CHANGE_ID}_${env.BUILD_NUMBER}"
         env.tenant = foliociLib.replaceHyphen(tenant)
-        env.okapiUrl = 'http://folio-snapshot-test.aws.indexdata.com:9130'
+        env.okapiUrl = 'http://folio-snapshot-stable.aws.indexdata.com:9130'
 
         stage('Test Stripes Platform') {
           dir("${env.WORKSPACE}/project") {
@@ -223,16 +217,17 @@ def call(body) {
             sh 'yarn install'
 
             // publish generated yarn.lock 
+            sh 'mkdir -p ci_reports'
             sh 'echo "<html><head><title>folio-testing-platform-yarn-lock</title></head>"' +
-               '> ftp-yarnlock.html'
-            sh 'echo "<body><pre>" >> ftp-yarnlock.html'
-            sh 'cat yarn.lock >> ftp-yarnlock.html'
-            sh 'echo "<body><pre>" >> ftp-yarnlock.html' 
+               '> ci_reports/ftp-yarnlock.html'
+            sh 'echo "<body><pre>" >> ci_reports/ftp-yarnlock.html'
+            sh 'cat yarn.lock >> ci_reports/ftp-yarnlock.html'
+            sh 'echo "<body><pre>" >> ci_reports/ftp-yarnlock.html' 
             publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, 
-               keepAll: true, reportDir: '.', 
+               keepAll: true, reportDir: 'ci_reports', 
                reportFiles: 'ftp-yarnlock.html', 
-               reportName: 'folio-testing-platform yarn.lock', 
-               reportTitles: 'folio-testing-platform yarn.lock'])
+               reportName: 'folio-testing-platform-yarn.lock', 
+               reportTitles: 'folio-testing-platform-yarn.lock'])
 
 
             // generate mod descriptors with '--strict' flag for dependencies
@@ -242,7 +237,6 @@ def call(body) {
             sh "stripes build --okapi $env.okapiUrl --tenant $env.tenant stripes.config.js bundle"
 
             // start simple webserver to serve webpack
-            sh 'sudo npm install -g http-server'
               withEnv(['JENKINS_NODE_COOKIE=dontkill']) {
                 sh 'http-server -p 3000 ./bundle &'
               }
@@ -276,7 +270,6 @@ def call(body) {
             // debug
             sh 'cat vars_pr.yml'
        
-
             withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', 
                                        accessKeyVariable: 'AWS_ACCESS_KEY_ID', 
                                        credentialsId: 'jenkins-aws', 
@@ -293,20 +286,34 @@ def call(body) {
 
           dir("${env.WORKSPACE}/ui-testing") {  
             sh "yarn link $env.npm_name"
-            def testStatus = runUiRegressionPr("${env.tenant}_admin",'admin','http://localhost:3000')
-            echo "Regression test status: $testStatus" 
+            def prTestStatus
+            def regressionReportUrl = "${env.BUILD_URL}UI_Regression_Test_Report/"
+            def prTestStatusCode = runUiRegressionPr("${env.tenant}_admin",'admin','http://localhost:3000')
+            if (prTestStatusCode != 0) {
+	      prTestStatus = "UI Regression Tests FAILURE(S): $regressionReportUrl"
+            }
+            else {
+              prTestStatus = "All UI Regression Tests PASSED: $regressionReportUrl"
+            }
+            echo "Regression test status: $prTestStatus" 
+
+            // disable lines below if this is not a GitHub PR
+            // def prComment = pullRequest.comment(prTestStatus)
+            //echo "$prComment" 
+
 
             // publish generated yarn.lock 
+            sh 'mkdir -p ci_reports'
             sh 'echo "<html><head><title>ui-testing-yarn-lock</title></head>"' +
-               '> uitest-yarnlock.html'
-            sh 'echo "<body><pre>" >> uitest-yarnlock.html'
-            sh 'cat yarn.lock >> uitest-yarnlock.html'
-            sh 'echo "<body><pre>" >> uitest-yarnlock.html'
+               '> ci_reports/uitest-yarnlock.html'
+            sh 'echo "<body><pre>" >> ci_reports/uitest-yarnlock.html'
+            sh 'cat yarn.lock >> ci_reports/uitest-yarnlock.html'
+            sh 'echo "<body><pre>" >> ci_reports/uitest-yarnlock.html'
             publishHTML([allowMissing: false, alwaysLinkToLastBuild: false,
-               keepAll: true, reportDir: '.',
+               keepAll: true, reportDir: 'ci_reports',
                reportFiles: 'uitest-yarnlock.html',
-               reportName: 'ui-testing yarn.lock',
-               reportTitles: 'ui-testing yarn.lock'])
+               reportName: 'ui-testing-yarn.lock',
+               reportTitles: 'ui-testing-yarn.lock'])
 
           }
         } // end stage
@@ -319,7 +326,7 @@ def call(body) {
       throw err
     }
     finally {
-      //sendNotifications currentBuild.result
+      sendNotifications currentBuild.result
     }
   } // end node
     
