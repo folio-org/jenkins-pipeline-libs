@@ -3,7 +3,7 @@ def call() {
   stage('Lint') { 
     echo "Running 'yarn lint...'"
     sh 'mkdir -p ci'
-    def lintStatus = sh(returnStatus:true, script: 'yarn lint 2>/dev/null 1> ci/lint.html'
+    def lintStatus = sh(returnStatus:true, script: 'yarn lint 2>/dev/null 1> ci/lint.html')
     def lintReport = readFile('lint.html')
     echo "$lintReport"
   
