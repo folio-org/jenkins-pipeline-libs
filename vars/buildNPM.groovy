@@ -101,26 +101,7 @@ def call(body) {
             }
 
             if (config.runLint ==~ /(?i)(Y|YES|T|TRUE)/) {
-              stage('ESLint') {
-                echo "Running ESLint..."
-                def lintStatus = sh(returnStatus:true, script: 'yarn lint 2>/dev/null 1> lint.output')
-                echo "Lint Status: $lintStatus"
-                if (lintStatus != 0) {
-                  def lintReport =  readFile('lint.output')
-                  if (env.CHANGE_ID) {
-                    // Requires https://github.com/jenkinsci/pipeline-github-plugin
-                    // comment is response to API request in case we ever need it.
-                    def comment = pullRequest.comment(lintReport)
-                    echo "$comment"
-                  }
-                  else {
-                    echo "$lintReport"
-                  }
-                }
-                else {
-                  echo "No lint errors found"
-                }
-              }
+              runLintNPM
             } 
 
             if (config.runTest ==~ /(?i)(Y|YES|T|TRUE)/) {
