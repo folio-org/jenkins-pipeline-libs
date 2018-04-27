@@ -101,7 +101,7 @@ def call(body) {
             }
 
             if (config.runLint ==~ /(?i)(Y|YES|T|TRUE)/) {
-              runLintNPM
+              runLintNPM()
             } 
 
             if (config.runTest ==~ /(?i)(Y|YES|T|TRUE)/) {
