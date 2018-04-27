@@ -4,7 +4,7 @@ def call() {
     echo "Running 'yarn lint...'"
     sh 'mkdir -p ci'
     def lintStatus = sh(returnStatus:true, script: 'yarn lint 2>/dev/null 1> ci/lint.html')
-    def lintReport = readFile('lint.html')
+    def lintReport = readFile('ci/lint.html')
     echo "$lintReport"
   
     publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, 
