@@ -63,7 +63,7 @@ def call(String folioUser, String folioPassword, String folioUrl) {
       if (status != 0) { 
         testMessage = "UI Regression Tests FAILURES. Details at:  $regressionReportUrl"
       }
-      else 
+      else {
         testMessage = "All UI Regression Tests PASSED. Details at:  $regressionReportUrl" 
       }
      
