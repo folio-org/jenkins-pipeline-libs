@@ -91,7 +91,7 @@ def call(body) {
  
         withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
           withNPM(npmrcConfig: 'jenkins-npm-folioci') {
-            stage('NPM Build') {
+            stage('NPM Install') {
               sh 'yarn install' 
             }
 
@@ -100,7 +100,7 @@ def call(body) {
             } 
 
             if (config.runTest ==~ /(?i)(Y|YES|T|TRUE)/) {
-              stage('Unit Tests') {
+              stage('NPM Unit Tests') {
                 echo "Running unit tests..."
                 sh 'yarn test'
               }
@@ -108,7 +108,7 @@ def call(body) {
 
             if ( env.BRANCH_NAME == 'master' ) {
               if (npmDeploy ==~ /(?i)(Y|YES|T|TRUE)/) {
-                stage('NPM Deploy') {
+                stage('NPM Publish') {
                   // npm is more flexible than yarn for this stage. 
                   echo "Deploying NPM packages to Nexus repository"
                   sh 'npm publish -f'
@@ -179,145 +179,30 @@ def call(body) {
         // ensure tenant id is unique
         // def tenant = "${env.BRANCH_NAME}_${env.BUILD_NUMBER}"
         def tenant = "pr_${env.CHANGE_ID}_${env.BUILD_NUMBER}"
-        env.tenant = foliociLib.replaceHyphen(tenant)
-        env.okapiUrl = 'http://folio-snapshot-stable.aws.indexdata.com:9130'
+        tenant = foliociLib.replaceHyphen(tenant)
+        def okapiUrl = 'http://folio-snapshot-stable.aws.indexdata.com:9130'
 
-        stage('Test Stripes Platform') {
-          dir("${env.WORKSPACE}/project") {
+        dir("${env.WORKSPACE}/project") {
+          // clean up previous 'yarn install'
+          sh 'rm -rf node_modules yarn.lock'
+          sh 'yarn link'
+          /* a bit of NPM voodoo. Link to project itself so as not to install
+          *  package from NPM repository. */
+          sh "yarn link $env.npm_name"
+          sh 'yarn install'
+        }
 
-            // remove node_modules directory
-            sh 'rm -rf node_modules yarn.lock'
-            sh 'yarn link'
-            sh "yarn link $env.npm_name"
-            sh 'yarn install'
-          }
+        // Build stripes, deploy tenant on backend, run ui regression
+        buildStripes("$okapiUrl","$tenant")
+        def tenantStatus = deployTenant("$okapiUrl","$tenant") 
+        if (tenantStatus != 0) {
+          echo "Problem deploying tenant. Skipping UI Regression testing."
+        }
+        else {
+          runUiRegressionPr("${tenant}_admin",'admin','http://localhost:3000')
+        }  
+      }
 
-          dir("$env.WORKSPACE") { 
-            sh 'git clone https://github.com/folio-org/ui-testing'
-            sh 'git clone https://github.com/folio-org/folio-testing-platform'
-          }
-          
-          dir("${env.WORKSPACE}/folio-infrastructure") {
-            checkout([$class: 'GitSCM', branches: [[name: '*/master']], 
-                               doGenerateSubmoduleConfigurations: false, 
-                               extensions: [[$class: 'SubmoduleOption', 
-                                                      disableSubmodules: false, 
-                                                      parentCredentials: false, 
-                                                      recursiveSubmodules: true, 
-                                                      reference: '', 
-                                                      trackingSubmodules: true]], 
-                               submoduleCfg: [], 
-                               userRemoteConfigs: [[credentialsId: 'folio-jenkins-github-token', 
-                                                    url: 'https://github.com/folio-org/folio-infrastructure']]])
-
-          }
-            
-          dir ("${env.WORKSPACE}/folio-testing-platform") {
-            sh "yarn link $env.npm_name"
-            sh 'yarn install'
-
-            // publish generated yarn.lock 
-            sh 'mkdir -p ci_reports'
-            sh 'echo "<html><head><title>folio-testing-platform-yarn-lock</title></head>"' +
-               '> ci_reports/ftp-yarnlock.html'
-            sh 'echo "<body><pre>" >> ci_reports/ftp-yarnlock.html'
-            sh 'cat yarn.lock >> ci_reports/ftp-yarnlock.html'
-            sh 'echo "<body><pre>" >> ci_reports/ftp-yarnlock.html' 
-            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, 
-               keepAll: true, reportDir: 'ci_reports', 
-               reportFiles: 'ftp-yarnlock.html', 
-               reportName: 'folio-testing-platform-yarn.lock', 
-               reportTitles: 'folio-testing-platform-yarn.lock'])
-
-
-            // generate mod descriptors with '--strict' flag for dependencies
-            sh 'yarn postinstall --strict'
-
-            // build webpack with stripes-cli 
-            sh "stripes build --okapi $env.okapiUrl --tenant $env.tenant stripes.config.js bundle"
-
-            // start simple webserver to serve webpack
-              withEnv(['JENKINS_NODE_COOKIE=dontkill']) {
-                sh 'http-server -p 3000 ./bundle &'
-              }
-
-            def scriptPath="${env.WORKSPACE}/folio-infrastructure/CI/scripts"
-
-            // create tenant
-            sh "${scriptPath}/createTenant.sh $env.okapiUrl $env.tenant"
-
-            // post MDs and enable tenant modules
-            sh "${scriptPath}/createTenantModuleList.sh $env.okapiUrl $env.tenant ModuleDescriptors " +
-               "> tenant_mod_list"
-            sh 'cat tenant_mod_list'
-            sh "${scriptPath}/enableTenantModules.sh $env.okapiUrl $env.tenant < tenant_mod_list"
-
-            // create tenant admin user which defaults to TENANTNAME_admin with password of 'admin'
-            withCredentials([string(credentialsId: 'folio_admin-pgpassword',variable: 'PGPASSWORD')]) {
-              sh "${scriptPath}/createTenantAdminUser.sh $env.tenant"
-            }
-          } 
-
-          // load sample data, reference data, etc for tenant using Ansible
-          dir("${env.WORKSPACE}/folio-infrastructure/CI/ansible") { 
-
-            // set vars in include file 
-            sh "echo --- > vars_pr.yml"
-            sh "echo okapi_url: ${env.okapiUrl} >> vars_pr.yml"
-            sh "echo tenant: ${env.tenant} >> vars_pr.yml"
-            sh "echo admin_user: { username: ${env.tenant}_admin, password: admin } >> vars_pr.yml"
-
-            // debug
-            sh 'cat vars_pr.yml'
-       
-            withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', 
-                                       accessKeyVariable: 'AWS_ACCESS_KEY_ID', 
-                                       credentialsId: 'jenkins-aws', 
-                                       secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-
-              ansiblePlaybook credentialsId: '11657186-f4d4-4099-ab72-2a32e023cced', 
-                           installation: 'Ansible', 
-                           inventory: 'inventory', 
-                           playbook: 'folioci-pr.yml', 
-                           sudoUser: null, vaultCredentialsId: 'ansible-vault-pass'
-            }
-          }
-          
-
-          dir("${env.WORKSPACE}/ui-testing") {  
-            sh "yarn link $env.npm_name"
-            def prTestStatus
-            def regressionReportUrl = "${env.BUILD_URL}UI_Regression_Test_Report/"
-            def prTestStatusCode = runUiRegressionPr("${env.tenant}_admin",'admin','http://localhost:3000')
-            if (prTestStatusCode != 0) {
-	      prTestStatus = "UI Regression Tests FAILURE(S): $regressionReportUrl"
-            }
-            else {
-              prTestStatus = "All UI Regression Tests PASSED: $regressionReportUrl"
-            }
-            echo "Regression test status: $prTestStatus" 
-
-            // disable lines below if this is not a GitHub PR
-            // def prComment = pullRequest.comment(prTestStatus)
-            //echo "$prComment" 
-
-
-            // publish generated yarn.lock 
-            sh 'mkdir -p ci_reports'
-            sh 'echo "<html><head><title>ui-testing-yarn-lock</title></head>"' +
-               '> ci_reports/uitest-yarnlock.html'
-            sh 'echo "<body><pre>" >> ci_reports/uitest-yarnlock.html'
-            sh 'cat yarn.lock >> ci_reports/uitest-yarnlock.html'
-            sh 'echo "<body><pre>" >> ci_reports/uitest-yarnlock.html'
-            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false,
-               keepAll: true, reportDir: 'ci_reports',
-               reportFiles: 'uitest-yarnlock.html',
-               reportName: 'ui-testing-yarn.lock',
-               reportTitles: 'ui-testing-yarn.lock'])
-
-          }
-        } // end stage
-      } // end PR Integration tests
     }  // end try
     catch (Exception err) {
       currentBuild.result = 'FAILED'
