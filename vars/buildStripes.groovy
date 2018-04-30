@@ -7,7 +7,7 @@ def call(String okapiUrl, String tenant) {
   stage('Build Stripes Platform') {
 
     dir("${env.WORKSPACE}") {
-      sh "git clone https://github.com/folio-org/folio-org/${stripesPlatform}"
+      sh "git clone https://github.com/folio-org/${stripesPlatform}"
     }
 
     dir("${env.WORKSPACE}/${stripesPlatform}") {
