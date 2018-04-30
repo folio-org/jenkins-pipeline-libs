@@ -70,7 +70,8 @@ def call(String folioUser, String folioPassword, String folioUrl) {
       echo "$testMessage"
 
       if (env.CHANGE_ID) { 
-        pullRequest.comment(testMessage)
+        @NonCPS
+        def comment = pullRequest.comment(testMessage)
       }
 
     } // end dir
