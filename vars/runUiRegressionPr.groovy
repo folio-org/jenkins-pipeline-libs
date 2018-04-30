@@ -26,7 +26,7 @@ def call(String folioUser, String folioPassword, String folioUrl) {
       withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
         withNPM(npmrcConfig: 'jenkins-npm-folioci') {
           sh 'yarn install' 
-          sh '/usr/bin/Xvfb :2 &'
+          sh 'sudo /usr/bin/Xvfb :2 &'
           sh 'sleep 1'
 
           env.FOLIO_UI_USERNAME = folioUser
