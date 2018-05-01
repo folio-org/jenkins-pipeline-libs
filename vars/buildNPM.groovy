@@ -81,14 +81,14 @@ def call(body) {
             env.version = value
           }
           // "short" name e.g. 'folio_users' -> 'users'
-          env.npmShortName = foliociLib.getNpmShortName(env.simplename)
+          env.npmShortName = foliociLib.getNpmShortName(env.simpleName)
 
           // project name is the GitHub repo name and is typically
           // different from mod name specified in package.json
           env.project_name = foliociLib.getProjName()
 
           echo "Package Simplfied Name: $env.simpleName"
-          echo "Package Short Name: $env.NpmShortName"
+          echo "Package Short Name: $env.npmShortName"
           echo "Package Version: $env.version"
           echo "Project Name: $env.project_name"
         }
