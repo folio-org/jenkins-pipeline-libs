@@ -39,7 +39,7 @@ def call(String runRegression, String folioUser, String folioPassword, String fo
 
           if (runRegression == 'partial') {
             echo "Running partial UI Regression test against $folioUrl"
-            status = sh(script: "DISPLAY=:2 yarn module-test -o --run=${env.npmShortName} " +
+            status = sh(script: "DISPLAY=:2 yarn test-module -o --run=${env.npmShortName} " +
                           ">> ci/rtest.html 2>&1", returnStatus:true)
           } 
           else {
