@@ -7,7 +7,8 @@
 
 def call(String runRegression, String folioUser, String folioPassword, String folioUrl) {
 
-  def status
+  // default to failed regression test
+  def status = 1
   def testMessage
   def regressionReportUrl = "${env.BUILD_URL}UIRegressionTestReport/"
  
