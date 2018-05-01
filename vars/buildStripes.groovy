@@ -1,5 +1,10 @@
 #!/usr/bin/env groovy
 
+/*
+ * Build stripes platform e.g. 'folio-testing-platform'
+ */
+
+
 def call(String okapiUrl, String tenant) {
 
   def stripesPlatform = 'folio-testing-platform'

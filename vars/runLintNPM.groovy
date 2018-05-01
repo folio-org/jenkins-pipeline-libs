@@ -1,3 +1,10 @@
+#!/usr/bin/env groovy
+
+
+/*
+ * Run 'yarn lint' on UI modules
+ */
+
 
 def call() { 
   stage('Lint') { 

@@ -1,5 +1,12 @@
 #!/usr/bin/env groovy
 
+
+/*
+ *  Deploy a tenant, enable modules, and load sample data on FOLIO backend 
+ */
+
+
+
 def call(String okapiUrl, String tenant) {
 
   stage('Enable Tenant') {
