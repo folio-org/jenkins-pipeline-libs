@@ -27,7 +27,8 @@ def call() {
       // PR
       if (env.CHANGE_ID) {
         // Requires https://github.com/jenkinsci/pipeline-github-plugin
-        pullRequest.comment(lintReport) 
+        @NonCPS
+        def comment = pullRequest.comment(lintReport) 
       }
     }
     else {
