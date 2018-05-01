@@ -17,6 +17,7 @@ buildNPM {
   publishModDescriptor = 'yes'
   runLint = 'yes'
   runTest = 'yes'
+  runRegression = 'partial'
 }
 ```
 
@@ -31,6 +32,10 @@ defined in package.json before enabling this option.
 
 * 'runTest' - Will execute 'yarn test' as part of the build.  Ensure a 'test' run script is
 defined in package.json.  'test' is typically used for unit tests.
+
+* 'runRegression' - Will execute the UI regression test suite from 'ui-testing' against a real 
+FOLIO backend.  'full' will execute the full test suite while 'partial' will execute only tests 
+specific to the UI module'.  'none' disable regression testing. 
 
 
 A typical Maven-based, server-side FOLIO module Jenkinsfile configuration might look like 
