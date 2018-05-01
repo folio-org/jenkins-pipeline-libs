@@ -41,6 +41,11 @@ def npmSimpleNameVersion(String npmPackageFile = 'package.json') {
   return simpleNameVersion
 }
 
+// get NPM module short name
+def getNpmShortName(String string) {
+  def npmShortName = string.replaceAll(~/folio_/, "")
+  return npmShortName
+}
 
 // get base repo/project name
 def getProjName() {
@@ -88,3 +93,4 @@ def replaceHyphen(String string) {
   def convertedString  = string.replaceAll(~/-/, "_")
   return convertedString
 }
+
