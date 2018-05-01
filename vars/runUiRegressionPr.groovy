@@ -45,20 +45,20 @@ def call(String folioUser, String folioPassword, String folioUrl) {
       }
  
       // print test results to job console
-      def testReport =  readFile('ci_reports/rtest.html')
+      def testReport =  readFile('ci/rtest.html')
       echo "$testReport"
 
       // publish results
       publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, 
-                   keepAll: true, reportDir: 'ci_reports', 
+                   keepAll: true, reportDir: 'ci', 
                    reportFiles: 'rtest.html', 
                    reportName: 'UIRegressionTestReport', 
                    reportTitles: 'UIRegressionTestReport'])
 
       // publish generated yarn.lock
-      sh 'cat yarn.lock >> ci_reports/uitest-yarnlock.html'
+      sh 'cat yarn.lock >> ci/uitest-yarnlock.html'
       publishHTML([allowMissing: false, alwaysLinkToLastBuild: false,
-                   keepAll: true, reportDir: 'ci_reports',
+                   keepAll: true, reportDir: 'ci',
                    reportFiles: 'uitest-yarnlock.html',
                    reportName: 'UITestingYarnLock',
                    reportTitles: 'UITestingYarnLock'])
