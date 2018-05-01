@@ -5,7 +5,7 @@
  * Run UI Regression tests on PRs
  */
 
-def call(String folioUser, String folioPassword, String folioUrl) {
+def call(String runRegression, String folioUser, String folioPassword, String folioUrl) {
 
   def status
   def testMessage
@@ -37,9 +37,17 @@ def call(String folioUser, String folioPassword, String folioUrl) {
           sh 'echo "<html><head><title>UI Regression Test Report</title></head>" > ci/rtest.html'
           sh 'echo "<body><pre>" >> ci/rtest.html'
 
-          echo "Running UI Regression test against $folioUrl"
-          //status = sh(script: "DEBUG=* DISPLAY=:2 yarn test >> ci/rtest.html 2>&1", returnStatus:true)
-          status = sh(script: "DISPLAY=:2 yarn test >> ci/rtest.html 2>&1", returnStatus:true)
+          if (runRegession == 'partial') {
+            echo "Running partial UI Regression test against $folioUrl"
+            status = sh(script: "DISPLAY=:2 yarn module-test -o --run=${env.NpmShortName} " +
+                          ">> ci/rtest.html 2>&1", returnStatus:true)
+          } 
+          else {
+            // run 'full'
+            echo "Running full UI Regression test against $folioUrl:="
+            //status = sh(script: "DEBUG=* DISPLAY=:2 yarn test >> ci/rtest.html 2>&1", returnStatus:true)
+            status = sh(script: "DISPLAY=:2 yarn test >> ci/rtest.html 2>&1", returnStatus:true)
+          {
           sh 'echo "</pre><body></html>" >> ci/rtest.html'
         }
       }

@@ -27,6 +27,7 @@ def npmName(String npmPackageFile = 'package.json') {
 
 // get the unscoped module name and version from package.json. 
 // Return name:version map.
+@NonCPS
 def npmSimpleNameVersion(String npmPackageFile = 'package.json') {
   
   def simpleNameVersion = [:]
@@ -84,7 +85,15 @@ def getModuleDescriptorIdVer(String modDescriptor) {
 }
 
 // replace all instances of '-' in string with '_'
+@NonCPS
 def replaceHyphen(String string) {
   def convertedString  = string.replaceAll(~/-/, "_")
   return convertedString
+}
+
+// get NPM module short name
+@NonCPS
+def getNpmShortName(String string) {
+  def NpmShortName = string.replaceAll(~/folio_/, "")
+  return NpmShortName
 }

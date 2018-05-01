@@ -8,7 +8,7 @@
  * doDocker:  Build, test, and publish Docker image via 'buildDocker' (Default: 'no')
  * runLint: Run ESLint via 'yarn lint' (Default: 'no')
  * runTest: Run unit tests via 'yarn test' (Default: 'no')
- * runRegression: Run UI regression tests for PRs (Default: 'no') 
+ * runRegression: Run UI regression tests for PRs - 'none','full' or 'partial' (Default: 'none') 
  * npmDeploy: Publish NPM artifacts to NPM repository (Default: 'yes')
  * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no')
  * modDescriptor: path to standalone Module Descriptor file (Optional)
@@ -29,7 +29,7 @@ def call(body) {
   def npmDeploy = config.npmDeploy ?: 'yes'
 
   // default is don't run regression tests for PRs
-  def runRegression = config.runRegression ?: 'no'
+  def runRegression = config.runRegression ?: 'none'
 
   // use the smaller nodejs build node since most 
   // Nodejs builds are Stripes.
@@ -80,12 +80,16 @@ def call(body) {
             env.simpleName = key
             env.version = value
           }
-          echo "Package Simplfied Name: $env.simpleName"
-          echo "Package Version: $env.version"
+          // "short" name e.g. 'folio_users' -> 'users'
+          env.NpmShortName = foliociLib.getNpmShortName(env.shortname)
 
           // project name is the GitHub repo name and is typically
           // different from mod name specified in package.json
           env.project_name = foliociLib.getProjName()
+
+          echo "Package Simplfied Name: $env.simpleName"
+          echo "Package Short Name: $env.NpmShortName"
+          echo "Package Version: $env.version"
           echo "Project Name: $env.project_name"
         }
  
@@ -174,7 +178,7 @@ def call(body) {
       } // end dir
 
       if (( env.CHANGE_ID ) && 
-         ( runRegression ==~ /(?i)(Y|YES|T|TRUE)/)) {
+         ( runRegression != 'none')) {
 
         // ensure tenant id is unique
         // def tenant = "${env.BRANCH_NAME}_${env.BUILD_NUMBER}"
@@ -199,7 +203,7 @@ def call(body) {
           echo "Problem deploying tenant. Skipping UI Regression testing."
         }
         else {
-          runUiRegressionPr("${tenant}_admin",'admin','http://localhost:3000')
+          runUiRegressionPr(runRegression,"${tenant}_admin",'admin','http://localhost:3000')
         }  
       }
 
