@@ -20,7 +20,7 @@ def call(String runTestOptions = '') {
     def testReportUrl = "${env.BUILD_URL}Yarn_20Test_20Report/"
 
     // start Xvfb for tests that require browsers/displays
-    sudo Xvfb :20 &
+    sh 'sudo Xvfb :20 &'
 
     withEnv([ 
       'DISPLAY=:20',
