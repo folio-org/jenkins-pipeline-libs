@@ -17,7 +17,7 @@ def call(String runTestOptions = '') {
 
   stage('Run Local Tests') {
 
-    def testReportUrl = "${env.BUILD_URL}YarnTestReport/"
+    def testReportUrl = "${env.BUILD_URL}Yarn_20Test_20Report/"
 
     // start Xvfb for tests that require browsers/displays
     sudo Xvfb :20 &
@@ -35,7 +35,7 @@ def call(String runTestOptions = '') {
       sh 'mkdir -p ci'
       sh 'echo "<html><body><pre>" > ci/test.html'
 
-      def testStatus = sh(returnStatus:true, script: "yarn run $runTestOptions >> ci/test.html")
+      def testStatus = sh(returnStatus:true, script: "yarn test $runTestOptions 2>&1>> ci/test.html")
 
       sh 'echo "</pre><body></html>" >> ci/test.html'
  
@@ -46,11 +46,9 @@ def call(String runTestOptions = '') {
                  keepAll: true, reportDir: 'ci',
                  reportFiles: 'test.html',
                  reportName: 'Yarn Test Report',
-                 reportTitles: 'YarnTestReport'])
+                 reportTitles: 'Yarn Test Report'])
 
       sh 'rm -rf ci'
-
-      echo "$testStatus"
 
       if (testStatus != 0) { 
         def message = "Test errors found. $testReportUrl"
