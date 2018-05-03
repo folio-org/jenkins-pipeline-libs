@@ -33,11 +33,11 @@ def call(String runTestOptions = '') {
 
 
       sh 'mkdir -p ci'
-      sh 'echo "<html><body><pre>" > ci/test.html'
+      // sh 'echo "<html><body><pre>" > ci/test.html'
 
       def testStatus = sh(returnStatus:true, script: "yarn test $runTestOptions 2>&1>> ci/test.html")
 
-      sh 'echo "</pre><body></html>" >> ci/test.html'
+      // sh 'echo "</pre><body></html>" >> ci/test.html'
  
       def testReport = readFile('ci/test.html').trim()
       echo "$testReport"
