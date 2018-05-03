@@ -25,13 +25,15 @@ def call(String runTestOptions = '') {
     withEnv([ 
       'DISPLAY=:20',
       'CHROME_BIN=/usr/bin/google-chrome-stable',
-      'FIREFOX_BIN=/usr/bin/google-chrome-stable'
+      'FIREFOX_BIN=/usr/bin/firefox'
     ]) { 
 
       echo "Local browsers available:"
       sh "$CHROME_BIN --version"
       sh "$FIREFOX_BIN --version"
 
+
+      sh 'mkdir -p ci'
       sh 'echo "<html><body><pre>" > ci/test.html'
 
       def testStatus = sh(returnStatus:true, script: "yarn run $runTestOptions 2>/dev/null 1>> ci/test.html")
