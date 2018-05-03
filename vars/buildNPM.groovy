@@ -31,6 +31,9 @@ def call(body) {
   // default is don't run regression tests for PRs
   def runRegression = config.runRegression ?: 'none'
 
+  // default runTestOptions
+  def runTestOptions = config.runTestOptions ?: ''
+
   // use the smaller nodejs build node since most 
   // Nodejs builds are Stripes.
   def buildNode = config.buildNode ?: 'jenkins-slave-all'
@@ -104,10 +107,7 @@ def call(body) {
             } 
 
             if (config.runTest ==~ /(?i)(Y|YES|T|TRUE)/) {
-              stage('NPM Unit Tests') {
-                echo "Running unit tests..."
-                sh 'yarn test'
-              }
+              runTestNPM(runTestOptions)
             }
 
             if ( env.BRANCH_NAME == 'master' ) {

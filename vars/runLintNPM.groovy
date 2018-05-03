@@ -10,8 +10,7 @@ def call() {
   stage('Lint') { 
     echo "Running 'yarn lint...'"
     sh 'mkdir -p ci'
-    sh 'echo "<html><head><title>Lint Report</title></head>" > ci/lint.html'
-    sh 'echo "<body><pre>" >> ci/lint.html'
+    sh 'echo "<html><body><pre>" > ci/lint.html'
 
     def lintStatus = sh(returnStatus:true, script: 'yarn lint 2>/dev/null 1>> ci/lint.html')
 
@@ -23,8 +22,8 @@ def call() {
     publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, 
                  keepAll: true, reportDir: 'ci',
                  reportFiles: 'lint.html',
-                 reportName: 'Lint',
-                 reportTitles: 'Lint'])
+                 reportName: 'Lint Report',
+                 reportTitles: 'Lint Report'])
 
     sh 'rm -rf ci'
 
