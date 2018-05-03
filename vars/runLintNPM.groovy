@@ -22,8 +22,8 @@ def call() {
     publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, 
                  keepAll: true, reportDir: 'ci',
                  reportFiles: 'lint.html',
-                 reportName: 'Lint',
-                 reportTitles: 'Lint'])
+                 reportName: 'Lint Report',
+                 reportTitles: 'Lint Report'])
 
     sh 'rm -rf ci'
 
