@@ -17,6 +17,7 @@ buildNPM {
   publishModDescriptor = 'yes'
   runLint = 'yes'
   runTest = 'yes'
+  runTestOptions = '--karma.singleRun --karma.browsers=ChromeDocker'  (for karma-based testing)
   runRegression = 'partial'
 }
 ```
@@ -32,6 +33,8 @@ defined in package.json before enabling this option.
 
 * 'runTest' - Will execute 'yarn test' as part of the build.  Ensure a 'test' run script is
 defined in package.json.  'test' is typically used for unit tests.
+
+* 'runTestOptions' - Provide 'yarn test' with additional options
 
 * 'runRegression' - Will execute the UI regression test suite from 'ui-testing' against a real 
 FOLIO backend.  'full' will execute the full test suite while 'partial' will execute only tests 
