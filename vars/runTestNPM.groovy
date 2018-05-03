@@ -32,15 +32,18 @@ def call(String runTestOptions = '') {
       sh "$FIREFOX_BIN --version"
 
 
+      def testStatus = sh(returnStatus:true, script: "yarn test $runTestOptions 2>&1> test.out")
+
+      // encode markup in output that will mess up rendering
+      sh "sed -i -e 's/</\&lt;/g' -e 's/>/\&gt;/g' test.out"
+
+      def testOut = readFile('test.out').trim()
+      echo "$testOut"
+
       sh 'mkdir -p ci'
-      // sh 'echo "<html><body><pre>" > ci/test.html'
-
-      def testStatus = sh(returnStatus:true, script: "yarn test $runTestOptions 2>&1>> ci/test.html")
-
-      // sh 'echo "</pre><body></html>" >> ci/test.html'
- 
-      def testReport = readFile('ci/test.html').trim()
-      echo "$testReport"
+      sh 'echo "<html><body><pre>" > ci/test.html'
+      echo "$testOut >> ci/test.html"
+      sh 'echo "</pre><body></html>" >> ci/test.html'
     
       publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, 
                  keepAll: true, reportDir: 'ci',
