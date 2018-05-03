@@ -28,7 +28,6 @@ def call(String runTestOptions = '') {
       'FIREFOX_BIN=/usr/bin/firefox'
     ]) { 
 
-      echo "Local browsers available:"
       sh "$CHROME_BIN --version"
       sh "$FIREFOX_BIN --version"
 
@@ -36,20 +35,22 @@ def call(String runTestOptions = '') {
       sh 'mkdir -p ci'
       sh 'echo "<html><body><pre>" > ci/test.html'
 
-      def testStatus = sh(returnStatus:true, script: "yarn run $runTestOptions 2>/dev/null 1>> ci/test.html")
+      def testStatus = sh(returnStatus:true, script: "yarn run $runTestOptions >> ci/test.html")
 
       sh 'echo "</pre><body></html>" >> ci/test.html'
  
-      def testReport = readFile('ci/test.html')
+      def testReport = readFile('ci/test.html').trim()
       echo "$testReport"
     
       publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, 
                  keepAll: true, reportDir: 'ci',
                  reportFiles: 'test.html',
-                 reportName: 'Test',
-                 reportTitles: 'Test'])
+                 reportName: 'Yarn Test Report',
+                 reportTitles: 'YarnTestReport'])
 
       sh 'rm -rf ci'
+
+      echo "$testStatus"
 
       if (testStatus != 0) { 
         def message = "Test errors found. $testReportUrl"
