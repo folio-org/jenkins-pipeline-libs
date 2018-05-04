@@ -12,7 +12,7 @@ def call() {
     sh 'mkdir -p ci'
     sh 'echo "<html><body><pre>" > ci/lint.html'
 
-    def lintStatus = sh(returnStatus:true, script: 'yarn lint 2>/dev/null 1>> ci/lint.html')
+    def lintStatus = sh(returnStatus:true, script: 'yarn lint 2>&1>  ci/lint.html')
 
     sh 'echo "</pre><body></html>" >> ci/lint.html'
  
