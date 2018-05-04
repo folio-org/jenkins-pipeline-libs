@@ -1,0 +1,33 @@
+module.exports = (config) => {
+  let configuration = {
+  
+    singleRun: true,
+    browsers: ['ChromeDocker'],
+    customLaunchers: {
+      ChromeDocker: {
+        base: 'ChromeHeadless',
+        flags: [
+           '--no-sandbox',
+           '--disable-web-security'
+        ]
+      }
+    },
+
+    reporters: ['mocha', 'junit'],
+  
+    junitReporter: {
+      outputDir: 'runTest',
+      useBrowserName: true,
+    },
+
+    plugins: [
+      'karma-chrome-launcher',
+      'karma-mocha',
+      'karma-webpack',
+      'karma-mocha-reporter',
+      'karma-junit-reporter'
+    ],
+  };
+  config.set(configuration);
+};
+
