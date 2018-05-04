@@ -28,9 +28,9 @@ def call(String runTestOptions = '') {
     ]) { 
 
       // get latest versions for browsers
-      sh 'apt-get -q update'
-      sh 'apt-get -y --no-install-recommends install google-chrome-stable'
-      sh 'apt-get -y --no-install-recommends install firefox'
+      sh 'sudo apt-get -q update'
+      sh 'sudo apt-get -y --no-install-recommends install google-chrome-stable'
+      sh 'sudo apt-get -y --no-install-recommends install firefox'
 
       // display available browsers/version
       sh "$CHROME_BIN --version"
