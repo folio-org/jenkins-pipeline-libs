@@ -1,16 +1,21 @@
 module.exports = (config) => {
   let configuration = {
-    browsers: ['ChromeDocker'],
   
+    browsers: ['ChromeDocker','FirefoxHeadless'],
     customLaunchers: {
       ChromeDocker: {
-        base: 'Chrome',
+        base: 'ChromeHeadless',
         flags: [
            '--no-sandbox',
            '--disable-web-security'
         ]
       }
-    }
+    },
+
+    reporters: ['dots', 'junit'],
+    junitReporter: {
+      outputFile: 'test-results.xml'
+    },
   };
   config.set(configuration);
 };
