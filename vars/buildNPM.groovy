@@ -177,8 +177,7 @@ def call(body) {
         } 
       } // end dir
 
-      if (( env.CHANGE_ID ) && 
-         ( runRegression != 'none')) {
+      if (env.CHANGE_ID) {
 
         // ensure tenant id is unique
         // def tenant = "${env.BRANCH_NAME}_${env.BUILD_NUMBER}"
@@ -198,15 +197,16 @@ def call(body) {
 
         // Build stripes, deploy tenant on backend, run ui regression
         buildStripes("$okapiUrl","$tenant")
-        def tenantStatus = deployTenant("$okapiUrl","$tenant") 
-        if (tenantStatus != 0) {
-          echo "Problem deploying tenant. Skipping UI Regression testing."
+        if (runRegression != 'none') { 
+          def tenantStatus = deployTenant("$okapiUrl","$tenant") 
+          if (tenantStatus != 0) {
+            echo "Problem deploying tenant. Skipping UI Regression testing."
+          }
+          else {
+            runUiRegressionPr(runRegression,"${tenant}_admin",'admin','http://localhost:3000')
+          }  
         }
-        else {
-          runUiRegressionPr(runRegression,"${tenant}_admin",'admin','http://localhost:3000')
-        }  
       }
-
     }  // end try
     catch (Exception err) {
       currentBuild.result = 'FAILED'
