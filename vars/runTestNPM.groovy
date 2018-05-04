@@ -36,6 +36,9 @@ def call(String runTestOptions = '') {
       sh "$CHROME_BIN --version"
       sh "$FIREFOX_BIN --version"
 
+      // install karma junit reporter
+      sh 'yarn add karma-junit-reporter'
+
       // inject karma config for karma testing
       def karmaConf = libraryResource('org/folio/karma.conf.js.ci')
       writeFile file: 'karma.conf.js', text: "$karmaConf"
