@@ -38,7 +38,7 @@ def call(String runTestOptions = '') {
 
       // inject karma config for karma testing
       def karmaConf = libraryResource('org/folio/karma.conf.js.ci')
-      writeFile file: 'karma.conf.js', text: $karmaConf
+      writeFile file: 'karma.conf.js', text: "$karmaConf"
 
       def testStatus = sh(returnStatus:true, script: "yarn test $runTestOptions")
 
