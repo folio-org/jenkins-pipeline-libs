@@ -40,4 +40,17 @@ def call(String testStatus) {
   def summary = "${subject} (<${env.BUILD_URL}UI_Regression_Test_Report/|Open>)"
   slackSend (channel: slackChannel, color: colorCode, message: summary)
 
+  // Send SNS notification to EBSCO SNS for folio-1235
+  withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
+                             accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                             credentialsId: 'ebsco-sns',
+                             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+
+    snsPublish(topicArn:'arn:aws:sns:us-east-1:579891902283:Folio-Environment',
+               subject:'FOLIO Regression Test Status',
+               message: summary,
+               messageAttributes: ['k1': 'v1', 'k2': 'v2']))
+  }
+
+
 }
