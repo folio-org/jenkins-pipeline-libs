@@ -95,6 +95,7 @@ def replaceHyphen(String string) {
   return convertedString
 }
 
+@NonCPS
 def currentDateTime() {
   def dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm")
   def date = new Date()
