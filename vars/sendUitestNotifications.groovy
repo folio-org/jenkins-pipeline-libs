@@ -49,7 +49,7 @@ def call(String testStatus) {
     snsPublish(topicArn:'arn:aws:sns:us-east-1:579891902283:Folio-Environment',
                subject:'FOLIO Regression Test Status',
                message: summary,
-               messageAttributes: ['k1': 'v1', 'k2': 'v2']))
+               messageAttributes: ['k1': 'v1', 'k2': 'v2'])
   }
 
 
