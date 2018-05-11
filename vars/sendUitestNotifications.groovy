@@ -9,7 +9,9 @@ def call(String testStatus) {
 
   // Default values
   def mailrcpt = 'folio-jenkins@indexdata.com'
-  def slackChannel = '#coreteam'
+  // for testing
+  //def slackChannel = '#coreteam'
+  def slackChannel = '#folio-ci'
   def color = 'RED'
   def colorCode = '#FF0000'
   def subject = "${testStatus}: 'UI Regression Tests failed for ${env.JOB_NAME} ${env.BUILD_DISPLAY_NAME}'"
