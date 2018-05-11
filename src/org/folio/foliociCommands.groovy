@@ -4,6 +4,7 @@ package org.folio
 
 import jenkins.model.Jenkins
 import com.cloudbees.groovy.cps.NonCPS
+import java.text.SimpleDateFormat
 
 // Update npm package.json version to "snapshot" version for FOLIO CI
 def npmSnapshotVersion() {
@@ -92,5 +93,13 @@ def getModuleDescriptorIdVer(String modDescriptor) {
 def replaceHyphen(String string) {
   def convertedString  = string.replaceAll(~/-/, "_")
   return convertedString
+}
+
+@NonCPS
+def currentDateTime() {
+  def dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm")
+  def date = new Date()
+
+  return dateFormat.format(date)
 }
 
