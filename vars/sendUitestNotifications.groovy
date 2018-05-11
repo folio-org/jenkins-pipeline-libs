@@ -9,13 +9,11 @@ def call(String testStatus) {
 
   // Default values
   def mailrcpt = 'folio-jenkins@indexdata.com'
-  // for testing
-  //def slackChannel = '#coreteam'
-  def slackChannel = '#folio-ci'
+  def slackChannel = '#coreteam'
   def color = 'RED'
   def colorCode = '#FF0000'
   def subject = "${testStatus}: 'UI Regression Tests failed for ${env.JOB_NAME} ${env.BUILD_DISPLAY_NAME}'"
-  def details = "Check output at ${env.BUILD_URL}UI_Regression_Test_Report/ to view the results."
+  def details = "Check output at ${env.BUILD_URL}UI_20Regression_20Test_20Report/ to view the results."
 
   // Override default values based on build status
   if (testStatus == 'FAILED')  {
@@ -53,6 +51,5 @@ def call(String testStatus) {
                message: summary,
                messageAttributes: ['k1': 'v1', 'k2': 'v2'])
   }
-
 
 }
