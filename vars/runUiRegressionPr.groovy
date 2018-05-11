@@ -10,7 +10,7 @@ def call(String runRegression, String folioUser, String folioPassword, String fo
   // default to failed regression test
   def status = 1
   def testMessage
-  def regressionReportUrl = "${env.BUILD_URL}UIRegressionTestReport/"
+  def regressionReportUrl = "${env.BUILD_URL}UI_20Regression_20Test_20Report/"
  
   stage('Run UI Regression Tests') {
 
@@ -61,8 +61,8 @@ def call(String runRegression, String folioUser, String folioPassword, String fo
       publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, 
                    keepAll: true, reportDir: 'ci', 
                    reportFiles: 'rtest.html', 
-                   reportName: 'UIRegressionTestReport', 
-                   reportTitles: 'UIRegressionTestReport'])
+                   reportName: 'UI Regression Test Report', 
+                   reportTitles: 'UI Regression Test Report'])
 
       // publish generated yarn.lock
       sh 'cat yarn.lock >> ci/uitest-yarnlock.html'
