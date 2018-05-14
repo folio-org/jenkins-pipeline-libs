@@ -37,9 +37,9 @@ def call(String testStatus, String host, String okapiUrl) {
   }
 
   // Send Slack notification
-  def summary = "${subject} (<${env.BUILD_URL}UI_Regression_Test_Report/|Open>)"
-  // disabled for testing
-  //slackSend (channel: slackChannel, color: colorCode, message: summary)
+  def summary = "${subject} (<${env.BUILD_URL}UI_20Regression_20Test_20Report/|Open>)"
+
+  slackSend (channel: slackChannel, color: colorCode, message: summary)
 
   // Send SNS notification to EBSCO SNS for folio-1235
   withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
