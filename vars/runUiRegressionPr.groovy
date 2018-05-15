@@ -79,11 +79,17 @@ def call(String runRegression, String folioUser, String folioPassword, String fo
         testMessage = "All UI Regression Tests PASSED. Details at:  $regressionReportUrl" 
       }
      
-      echo "$testMessage"
-
       if (env.CHANGE_ID) { 
         @NonCPS
         def comment = pullRequest.comment(testMessage)
+      }
+
+      if (status != 0) {
+        // fail the build
+        error(testMessage)
+      }
+      else {
+        echo "$testMessage"
       }
 
     } // end dir
