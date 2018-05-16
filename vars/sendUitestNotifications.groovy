@@ -5,7 +5,7 @@
  * Send notifications based on build status string
  */
 
-def call(String testStatus, String instance, String folioUrl) {
+def call(String testStatus, String instance, String okapiUrl) {
 
   // Default values
   def mailrcpt = 'folio-jenkins@indexdata.com'
@@ -50,7 +50,7 @@ def call(String testStatus, String instance, String folioUrl) {
 
     snsPublish(topicArn:'arn:aws:sns:us-east-1:579891902283:Folio-Environment',
                subject:'FOLIO Regression Test Status',
-               message: "{ \"name\": \"${instance}\", \"message\": \"$summary\", \"folioUrl\": \"$folioUrl\" }",
+               message: "{ \"name\": \"${instance}\", \"message\": \"$summary\", \"okapiUrl\": \"$okapiUrl\" }",
                messageAttributes: ['k1': 'v1', 'k2': 'v2'])
   }
 
