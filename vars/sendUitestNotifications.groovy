@@ -5,7 +5,7 @@
  * Send notifications based on build status string
  */
 
-def call(String testStatus, String instance, String okapiUrl) {
+def call(String testStatus, String instance, String okapiUrl = 'unknown') {
 
   // Default values
   def mailrcpt = 'folio-jenkins@indexdata.com'
