@@ -27,17 +27,19 @@ def call(String runTestOptions = '') {
       'DEBIAN_FRONTEND=noninteractive'
     ]) { 
 
+      // disabled since we build new build images every week. 
       // get latest versions for browsers
-      sh 'sudo apt-get -q update'
-      sh 'sudo apt-get -y --no-install-recommends install google-chrome-stable'
-      sh 'sudo apt-get -y --no-install-recommends install firefox'
+      // sh 'sudo apt-get -q update'
+      // sh 'sudo apt-get -y --no-install-recommends install google-chrome-stable'
+      // sh 'sudo apt-get -y --no-install-recommends install firefox'
 
       // display available browsers/version
       sh "$CHROME_BIN --version"
       sh "$FIREFOX_BIN --version"
 
+      // disabled since we install this globally in build image. 
       // install karma junit reporter
-      sh 'yarn add --dev karma-junit-reporter'
+      // sh 'yarn add --dev karma-junit-reporter'
 
       // inject karma config for karma testing
       def karmaConf = libraryResource('org/folio/karma.conf.js.ci')
@@ -51,7 +53,7 @@ def call(String runTestOptions = '') {
       // cleanup CI stuff
       sh 'rm -rf runTest'
       sh 'rm -f karma.conf.js'
-      sh 'yarn remove karma-junit-reporter'
+      // sh 'yarn remove karma-junit-reporter'
 
       if (testStatus != 0) { 
         def message = "Test errors found. See ${env.BUILD_URL}"
