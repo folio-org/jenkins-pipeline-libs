@@ -83,10 +83,10 @@ EOF
       // build docker image
 
       if (buildArg == 'yes') {
-        sh "docker build -t ${env.name}:${env.version} --build-arg='VERTICLE_FILE=${fatJar}' . "
+        sh "docker build --pull=true --no-cache=true -t ${env.name}:${env.version} --build-arg='VERTICLE_FILE=${fatJar}' . "
       }
       else {
-        sh "docker build -t ${env.name}:${env.version} ."
+        sh "docker build --pull=true --no-cache=true -t ${env.name}:${env.version} ."
       }
 
       // Test container using container healthcheck
