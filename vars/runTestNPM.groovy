@@ -37,9 +37,8 @@ def call(String runTestOptions = '') {
       sh "$CHROME_BIN --version"
       sh "$FIREFOX_BIN --version"
 
-      // disabled since we install this globally in build image. 
       // install karma junit reporter
-      // sh 'yarn add --dev karma-junit-reporter'
+      sh 'yarn add --dev karma-junit-reporter'
 
       // inject karma config for karma testing
       def karmaConf = libraryResource('org/folio/karma.conf.js.ci')
