@@ -38,11 +38,11 @@ def call(String runTestOptions = '') {
       sh "$FIREFOX_BIN --version"
 
       // install karma junit reporter
-      //sh 'yarn add --dev karma-junit-reporter'
+      sh 'yarn add --dev karma-junit-reporter'
 
       // inject karma config for karma testing
-      //def karmaConf = libraryResource('org/folio/karma.conf.js.ci')
-      // writeFile file: 'karma.conf.js', text: "$karmaConf"
+      def karmaConf = libraryResource('org/folio/karma.conf.js.ci')
+      writeFile file: 'karma.conf.js', text: "$karmaConf"
 
       def testStatus = sh(returnStatus:true, script: "yarn test $runTestOptions")
 
@@ -50,9 +50,9 @@ def call(String runTestOptions = '') {
       junit allowEmptyResults: true, testResults: 'artifacts/runTest/*.xml'
 
       // cleanup CI stuff
-      // sh 'rm -rf runTest'
-      // sh 'rm -f karma.conf.js'
-      // sh 'yarn remove karma-junit-reporter'
+      sh 'rm -rf runTest'
+      sh 'rm -f karma.conf.js'
+      sh 'yarn remove karma-junit-reporter'
 
       if (testStatus != 0) { 
         def message = "Test errors found. See ${env.BUILD_URL}"
