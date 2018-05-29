@@ -50,9 +50,9 @@ def call(String runTestOptions = '') {
       junit allowEmptyResults: true, testResults: 'artifacts/**/*.xml'
 
       // cleanup CI stuff
-      sh 'rm -rf runTest'
-      sh 'rm -f karma.conf.js'
-      sh 'yarn remove karma-junit-reporter'
+      // sh 'rm -rf runTest'
+      // sh 'rm -f karma.conf.js'
+      // sh 'yarn remove karma-junit-reporter'
 
       if (testStatus != 0) { 
         def message = "Test errors found. See ${env.BUILD_URL}"
