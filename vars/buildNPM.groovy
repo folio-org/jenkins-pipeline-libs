@@ -75,9 +75,9 @@ def call(body) {
           }
 
           // the actual NPM package name as defined in package.json
-          env.npm_name = foliociLib.npmName('package.json')
+          env.npmName = foliociLib.npmName('package.json')
 
-          // simpleName is similar to npm_name except make name okapi compliant
+          // simpleName is similar to npmName except make name okapi compliant
           def Map simpleNameVerMap = foliociLib.npmSimpleNameVersion('package.json')          
           simpleNameVerMap.each { key, value ->
             env.simpleName = key
@@ -88,16 +88,17 @@ def call(body) {
 
           // project name is the GitHub repo name and is typically
           // different from mod name specified in package.json
-          env.project_name = foliociLib.getProjName()
+          env.projectName = foliociLib.getProjName()
 
           //git commit sha1
           env.gitCommit = foliociLib.getCommitSha()
           env.projUrl = foliociLib.getProjUrl()
 
+          echo "Package Name: $env.npmName"
           echo "Package Simplfied Name: $env.simpleName"
           echo "Package Short Name: $env.npmShortName"
           echo "Package Version: $env.version"
-          echo "Project Name: $env.project_name"
+          echo "Project Name: $env.projectName"
           echo "Git SHA1: $env.gitCommit"
           echo "Project Url: $env.projUrl"
         }
@@ -133,8 +134,8 @@ def call(body) {
 
         if (config.doDocker) {
           stage('Docker Build') {
-            // use env.project_name as name of docker artifact
-            env.name = env.project_name
+            // use env.projectName as name of docker artifact
+            env.name = env.projectName
             echo "Building Docker image for $env.name:$env.version" 
             config.doDocker.delegate = this
             config.doDocker.resolveStrategy = Closure.DELEGATE_FIRST
@@ -149,7 +150,7 @@ def call(body) {
               def modDescriptor = ''
               if (config.modDescriptor) { 
                 modDescriptor = config.modDescriptor
-                env.name = env.project_name
+                env.name = env.projectName
                 if (env.snapshot) {
                   // update the version to the snapshot version
                   echo "Update Module Descriptor version to snapshot version"
@@ -171,7 +172,7 @@ def call(body) {
           if (config.publishAPI ==~ /(?i)(Y|YES|T|TRUE)/) {
             stage('Publish API Docs') {
               echo "Publishing API docs"
-              sh "python3 /usr/local/bin/generate_api_docs.py -r $env.project_name -v -o folio-api-docs"
+              sh "python3 /usr/local/bin/generate_api_docs.py -r $env.projectName -v -o folio-api-docs"
               withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                    credentialsId: 'jenkins-aws',
@@ -197,7 +198,7 @@ def call(body) {
           sh 'yarn link'
           /* a bit of NPM voodoo. Link to project itself so as not to install
           *  package from NPM repository. */
-          sh "yarn link $env.npm_name"
+          sh "yarn link $env.npmName"
           sh 'yarn install'
         }
 

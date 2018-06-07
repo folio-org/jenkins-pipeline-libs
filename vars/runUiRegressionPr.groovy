@@ -21,7 +21,7 @@ def call(String runRegression, String folioUser, String folioPassword, String fo
 
     dir ("${env.WORKSPACE}/ui-testing") { 
 
-      sh "yarn link $env.npm_name"
+      sh "yarn link $env.npmName"
       sh 'rm -f yarn.lock'
     
       withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
