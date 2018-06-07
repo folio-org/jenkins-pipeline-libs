@@ -13,8 +13,8 @@ def call() {
       def scannerHome = tool 'SonarQube Scanner'
       sh """
       ${scannerHome}/bin/sonar-scanner \
-            -Dsonar.projectKey=folio-org:${env.project_name} \
-            -Dsonar.projectName=${env.project_name} \
+            -Dsonar.projectKey=folio-org:${env.projectName} \
+            -Dsonar.projectName=${env.projectName} \
             -Dsonar.projectVersion=${env.version} \
             -Dsonar.sources=. \
             -Dsonar.organization=folio-org 

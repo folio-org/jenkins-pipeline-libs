@@ -69,8 +69,8 @@ def call(body) {
 
         // project name is the GitHub repo name and is typically
         // different from mod name specified in package.json
-        env.project_name = foliociLib.getProjName()
-        echo "Project Name: $env.project_name"
+        env.projectName = foliociLib.getProjName()
+        echo "Project Name: $env.projectName"
       }
 
       stage('Maven Build') {
@@ -131,7 +131,7 @@ def call(body) {
         if (config.publishAPI ==~ /(?i)(Y|YES|T|TRUE)/) {
           stage('Publish API Docs') {
             echo "Publishing API docs"
-            sh "python3 /usr/local/bin/generate_api_docs.py -r $env.project_name -v -o folio-api-docs"
+            sh "python3 /usr/local/bin/generate_api_docs.py -r $env.projectName -v -o folio-api-docs"
             withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', 
                  accessKeyVariable: 'AWS_ACCESS_KEY_ID', 
                  credentialsId: 'jenkins-aws', 
