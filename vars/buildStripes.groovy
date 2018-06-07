@@ -17,8 +17,6 @@ def call(String okapiUrl, String tenant) {
 
     dir("${env.WORKSPACE}/${stripesPlatform}") {
       if (env.CHANGE_ID) { 
-        sh "yarn link $env.npm_name"
-
         // remove yarn.lock if it exists 
         sh 'rm -f yarn.lock'
 
@@ -30,10 +28,15 @@ def call(String okapiUrl, String tenant) {
         if (isYarnLock != 0) { 
           error('unable to fetch yarn.lock for folio-snapshot-stable')
         }
+        
+        // substitute PR commit for package
+        sh "yarn add folio-org/${env.projName}/#${env.CHANGE_ID}/head"
+        sh "yarn upgrade $env.npmName"
 
       }
-
-      sh 'yarn install'
+      else {
+        sh 'yarn install'
+      }
    
       // generate mod descriptors with '--strict' flag for dependencies
       sh 'yarn postinstall --strict'
