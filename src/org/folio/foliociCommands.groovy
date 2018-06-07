@@ -56,10 +56,17 @@ def getNpmShortName(String string) {
 // get base repo/project name
 def getProjName() {
 
-  def proj_name = sh(returnStdout: true, 
+  def projName = sh(returnStdout: true, 
       script: 'git config remote.origin.url | awk -F \'/\' \'{print $5}\' | sed -e \'s/\\.git//\'').trim()
 
-  return proj_name
+  return projName
+}
+
+// get project URL
+def getProjUrl() {
+  def projUrl = sh(returnStdout: true, script: 'git config remote.origin.url').trim()
+
+  return projUrl
 }
 
 // update the 'Id' field (for snapshot versions, etc)
