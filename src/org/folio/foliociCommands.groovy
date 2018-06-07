@@ -6,6 +6,11 @@ import jenkins.model.Jenkins
 import com.cloudbees.groovy.cps.NonCPS
 import java.text.SimpleDateFormat
 
+// get git commit/sha1
+def getCommitSha(){
+    return sh(returnStdout: true, script: 'git rev-parse HEAD')
+}
+
 // Update npm package.json version to "snapshot" version for FOLIO CI
 def npmSnapshotVersion() {
 
