@@ -90,10 +90,20 @@ def call(body) {
           // different from mod name specified in package.json
           env.project_name = foliociLib.getProjName()
 
+          //git commit sha1
+          env.gitCommit = foliociLib.getCommitSha()
+          env.scmUrl = scm.getUserRemoteConfigs()[0].getUrl()
+
           echo "Package Simplfied Name: $env.simpleName"
           echo "Package Short Name: $env.npmShortName"
           echo "Package Version: $env.version"
           echo "Project Name: $env.project_name"
+          echo "Git SHA1: $env.gitCommit"
+          echo "scmUrl: $env.scm.Url"
+
+          // debug 
+          echo scm.getUserRemoteConfigs()
+
         }
  
         withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
