@@ -70,6 +70,8 @@ def call(body) {
       dir("${env.WORKSPACE}/project") {
         stage('Prep') {
 
+          env.NODE_OPTIONS="--max-old-space-size=2048"
+
           if (env.snapshot) {
             foliociLib.npmSnapshotVersion()
           }
