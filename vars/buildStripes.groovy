@@ -30,7 +30,7 @@ def call(String okapiUrl, String tenant) {
         }
         
         // substitute PR commit for package
-        sh "yarn add folio-org/${env.projName}/#${env.CHANGE_ID}/head"
+        sh "yarn add folio-org/${env.projectName}/#${env.CHANGE_ID}/head"
         sh "yarn upgrade $env.npmName"
 
         // we need to update the version of node_modules/PACKAGE module in package.json
