@@ -33,13 +33,25 @@ def call(String okapiUrl, String tenant) {
         sh "yarn add folio-org/${env.projName}/#${env.CHANGE_ID}/head"
         sh "yarn upgrade $env.npmName"
 
+        // we need to update the version of node_modules/PACKAGE module in package.json
+        // since we are getting it from git before we generate a mod descriptor.
+        // Format:  VERSION-pr.$env{CHANGE_ID}
+        dir("node_modules/${env.npmName}") {
+          def gitVersion = sh(returnStdout: true, script: "jq -r \".version\" package.json").trim()
+          sh "npm version ${gitVersion}-pr.${env.CHANGE_ID}"
+        }
       }
       else {
-        sh 'yarn install'
+        // substitute git commit sha1 for package
+        sh "yarn add folio-org/$env.projName}/#${env.gitCommit}"
+        sh "yarn upgrade $env.npmName"
       }
-   
+
       // generate mod descriptors with '--strict' flag for dependencies
-      sh 'yarn postinstall --strict'
+      // sh 'yarn postinstall --strict'
+      sh 'stripes mod descriptor --configFile stripes.config.js --full --strict ' +
+         '> StripesModDescriptors.json'
+ 
 
       // build webpack with stripes-cli 
       sh "stripes build --okapi $okapiUrl --tenant $tenant stripes.config.js bundle" 
