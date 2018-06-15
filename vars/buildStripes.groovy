@@ -48,10 +48,10 @@ def call(String okapiUrl, String tenant) {
       }
 
       // generate mod descriptors with '--strict' flag for dependencies
-      // sh 'yarn postinstall --strict'
-      sh 'stripes mod descriptor --configFile stripes.config.js --full --strict ' +
-         '> StripesModDescriptors.json'
+      // sh 'stripes mod descriptor --configFile stripes.config.js --full --strict ' +
+      //   '> StripesModDescriptors.json'
  
+      sh 'yarn postinstall --strict'
 
       // build webpack with stripes-cli 
       sh "stripes build --okapi $okapiUrl --tenant $tenant stripes.config.js bundle" 
