@@ -8,7 +8,9 @@
  * doDocker:  Build, test, and publish Docker image via 'buildDocker' (Default: 'no')
  * runLint: Run ESLint via 'yarn lint' (Default: 'no')
  * runTest: Run unit tests via 'yarn test' (Default: 'no')
+ * runTestOptions:  Extra opts to pass to 'yarn test'
  * runRegression: Run UI regression tests for PRs - 'none','full' or 'partial' (Default: 'none') 
+ * stripesPlatform:  Specifiy Stripes platform.  (Default: 'none' - build in 'app' context')
  * npmDeploy: Publish NPM artifacts to NPM repository (Default: 'yes')
  * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no')
  * modDescriptor: path to standalone Module Descriptor file (Optional)
@@ -33,6 +35,9 @@ def call(body) {
 
   // default runTestOptions
   def runTestOptions = config.runTestOptions ?: ''
+
+  // default Stripes platform.  '
+  def stripesPlatform = config.stripesPlatform ?: null
 
   // use the smaller nodejs build node since most 
   // Nodejs builds are Stripes.
@@ -205,7 +210,7 @@ def call(body) {
         }
 
         // Build stripes, deploy tenant on backend, run ui regression
-        buildStripes("$okapiUrl","$tenant")
+        buildStripes("$okapiUrl","$tenant",stripesPlatform)
         if (runRegression != 'none') { 
           def tenantStatus = deployTenant("$okapiUrl","$tenant") 
           if (tenantStatus != 0) {
