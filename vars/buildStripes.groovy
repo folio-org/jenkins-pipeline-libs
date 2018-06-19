@@ -55,6 +55,15 @@ def call(String okapiUrl, String tenant, String stripesPlatform = null) {
         // build webpack with stripes-cli. See STCLI-66 re: PREFIX env
         sh "PREFIX=/usr/local/share/.config/yarn " +
            "stripes build --okapi $okapiUrl --tenant $tenant stripes.config.js bundle" 
+
+        // publish generated yarn.lock for possible debugging
+        sh 'mkdir -p ci'
+        sh 'cp yarn.lock ci/yarnLock.html'
+        publishHTML([allowMissing: false, alwaysLinkToLastBuild: false,
+                    keepAll: true, reportDir: 'ci',
+                    reportFiles: 'yarnLock.html',
+                    reportName: "YarnLock",
+                    reportTitles: "YarnLock"])
       }
     }
     else { 
@@ -68,14 +77,5 @@ def call(String okapiUrl, String tenant, String stripesPlatform = null) {
       sh 'http-server -p 3000 ./bundle &'
     }
 
-    // publish generated yarn.lock for possible debugging
-    sh 'mkdir -p ci'
-    sh 'cp yarn.lock ci/yarnLock.html'
-    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false,
-                 keepAll: true, reportDir: 'ci',
-                 reportFiles: 'yarnLock.html',
-                 reportName: "YarnLock",  
-                 reportTitles: "YarnLock"])
-    
   } // end stage
 } 
