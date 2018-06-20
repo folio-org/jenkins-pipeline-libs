@@ -32,7 +32,7 @@ def call(String okapiUrl, String tenant) {
 
       // post MDs and enable tenant modules
       def mdStatus = sh(script: "${scriptPath}/createTenantModuleList.sh $okapiUrl " +
-                        "$tenant ${env.WORKSPACE}/folio-testing-platform/ModuleDescriptors " +
+                        "$tenant ${env.WORKSPACE}/${env.stripesPlatform}/ModuleDescriptors " +
                         "> tenant_mod_list", returnStatus: true)
       if (mdStatus == 0)  { 
         sh "${scriptPath}/enableTenantModules.sh $okapiUrl $tenant < tenant_mod_list"

@@ -37,7 +37,7 @@ def call(body) {
   def runTestOptions = config.runTestOptions ?: ''
 
   // default Stripes platform.  '
-  def stripesPlatform = config.stripesPlatform ?: null
+  env.stripesPlatform = config.stripesPlatform ?: null
 
   // use the smaller nodejs build node since most 
   // Nodejs builds are Stripes.
@@ -102,7 +102,7 @@ def call(body) {
           env.projUrl = foliociLib.getProjUrl()
 
           echo "Package Name: $env.npmName"
-          echo "Package Simplfied Name: $env.simpleName"
+          echo "Package FOLIO Name: $env.simpleName"
           echo "Package Short Name: $env.npmShortName"
           echo "Package Version: $env.version"
           echo "Project Name: $env.projectName"
@@ -210,7 +210,7 @@ def call(body) {
         }
 
         // Build stripes, deploy tenant on backend, run ui regression
-        buildStripes("$okapiUrl","$tenant",stripesPlatform)
+        buildStripes("$okapiUrl","$tenant",env.stripesPlatform)
         if (runRegression != 'none') { 
           def tenantStatus = deployTenant("$okapiUrl","$tenant") 
           if (tenantStatus != 0) {
