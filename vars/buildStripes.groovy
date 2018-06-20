@@ -37,12 +37,10 @@ def call(String okapiUrl, String tenant, String stripesPlatform = null) {
           // we need to update the version of node_modules/PACKAGE module in package.json
           // since we are getting it from git before we generate a mod descriptor.
           // Format:  VERSION-pr.$env{CHANGE_ID}
-          dir("node_modules/${env.npmName}") {
-            def gitVersion = sh(returnStdout: true, 
-                                script: "jq -r \".version\" package.json").trim()
+          def gitVersion = sh(returnStdout: true, 
+             script: "cd node_modules/${env.npmName} && jq -r \".version\" package.json").trim()
 
-            sh "npm version ${gitVersion}-pr.${env.CHANGE_ID}"
-          }
+          sh "cd node_modules/${env.npmName} && npm version ${gitVersion}-pr.${env.CHANGE_ID}"
         }
         else {
           // substitute git commit sha1 for package
