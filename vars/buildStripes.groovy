@@ -31,17 +31,8 @@ def call(String okapiUrl, String tenant, String stripesPlatform = null) {
           }
         
           // substitute PR commit for package
-          sh "yarn add folio-org/${env.projectName}#${env.CHANGE_ID}/head"
+          sh "yarn add file:../project
           sh "yarn upgrade $env.npmName"
-
-          // we need to update the version of node_modules/PACKAGE module in package.json
-          // since we are getting it from git before we generate a mod descriptor.
-          // Format:  VERSION-pr.$env{CHANGE_ID}
-          def gitVersion = sh(returnStdout: true, 
-             script: "cd node_modules/${env.npmName} && jq -r \".version\" package.json").trim()
-
-          sh "cd node_modules/${env.npmName} && " +
-             "npm version ${gitVersion}-pr.${env.CHANGE_ID}.${env.BUILD_NUMBER}"
         }
         else {
           // substitute git commit sha1 for package
