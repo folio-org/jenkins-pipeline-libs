@@ -31,7 +31,7 @@ def call(String okapiUrl, String tenant, String stripesPlatform = null) {
           }
         
           // substitute PR commit for package
-          sh "yarn add file:../project
+          sh "yarn add file:../project"
           sh "yarn upgrade $env.npmName"
         }
         else {
