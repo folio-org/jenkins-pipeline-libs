@@ -46,6 +46,11 @@ def call(String okapiUrl, String tenant, String stripesPlatform = null) {
         sh "PREFIX=/usr/local/share/.config/yarn " +
            "stripes build --okapi $okapiUrl --tenant $tenant stripes.config.js bundle" 
 
+        // start simple webserver to serve webpack
+        withEnv(['JENKINS_NODE_COOKIE=dontkill']) {
+          sh 'http-server -p 3000 ./bundle &'
+        }
+
         // publish generated yarn.lock for possible debugging
         sh 'mkdir -p ci'
         sh 'cp yarn.lock ci/yarnLock.html'
@@ -60,11 +65,6 @@ def call(String okapiUrl, String tenant, String stripesPlatform = null) {
       // build in stripes-cli 'app' mode
       sh 'PREFIX=/usr/local/share/.config/yarn stripes build --output=./bundle'
       sh "stripes mod descriptor --full --strict > ${env.projectName}.json"
-    }
-
-    // start simple webserver to serve webpack
-    withEnv(['JENKINS_NODE_COOKIE=dontkill']) {
-      sh 'http-server -p 3000 ./bundle &'
     }
 
   } // end stage
