@@ -22,6 +22,14 @@ def npmSnapshotVersion() {
 
 }
 
+def npmPrVersion() {
+  def gitVersion = sh(returnStdout: true,
+      script: "cd node_modules/${env.npmName} && jq -r \".version\" package.json").trim()
+
+  sh "npm version ${gitVersion}-pr.${env.CHANGE_ID}.${env.BUILD_NUMBER}"
+}
+
+
 // get the NPM package name and scope
 def npmName(String npmPackageFile = 'package.json') {
   
