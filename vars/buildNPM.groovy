@@ -205,7 +205,8 @@ def call(body) {
         // def tenant = "${env.BRANCH_NAME}_${env.BUILD_NUMBER}"
         def tenant = "pr_${env.CHANGE_ID}_${env.BUILD_NUMBER}"
         tenant = foliociLib.replaceHyphen(tenant)
-        def okapiUrl = 'http://folio-snapshot-stable.aws.indexdata.com:9130'
+        //def okapiUrl = 'http://folio-snapshot-stable.aws.indexdata.com:9130'
+        def okapiUrl = 'http://folio-snapshot-test.aws.indexdata.com:9130'
 
         dir("${env.WORKSPACE}/project") {
           // clean up previous 'yarn install'
