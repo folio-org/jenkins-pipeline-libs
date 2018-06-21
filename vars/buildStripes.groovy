@@ -40,7 +40,8 @@ def call(String okapiUrl, String tenant, String stripesPlatform = null) {
           def gitVersion = sh(returnStdout: true, 
              script: "cd node_modules/${env.npmName} && jq -r \".version\" package.json").trim()
 
-          sh "cd node_modules/${env.npmName} && npm version ${gitVersion}-pr.${env.CHANGE_ID}"
+          sh "cd node_modules/${env.npmName} && " +
+             "npm version ${gitVersion}-pr.${env.CHANGE_ID}.${env.BUILD_NUMBER}"
         }
         else {
           // substitute git commit sha1 for package
