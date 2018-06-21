@@ -43,8 +43,11 @@ def call(body) {
   // Nodejs builds are Stripes.
   def buildNode = config.buildNode ?: 'jenkins-slave-all'
 
-  // right now, all builds are snapshots
-  env.snapshot = true
+  // right now, all builds are snapshots unless they are PRs
+  if (!env.CHANGE_ID) {
+    env.snapshot = true
+  }
+  
   env.dockerRepo = 'folioci'
   
   node(buildNode) {
@@ -80,6 +83,11 @@ def call(body) {
           if (env.snapshot) {
             foliociLib.npmSnapshotVersion()
           }
+ 
+          if (env.CHANGE_ID) {
+            foliociLib.npmPrVersion()
+          } 
+          
 
           // the actual NPM package name as defined in package.json
           env.npmName = foliociLib.npmName('package.json')
@@ -201,12 +209,12 @@ def call(body) {
 
         dir("${env.WORKSPACE}/project") {
           // clean up previous 'yarn install'
-          sh 'rm -rf node_modules yarn.lock'
-          sh 'yarn link'
+          // sh 'rm -rf node_modules yarn.lock'
+          // sh 'yarn link'
           /* a bit of NPM voodoo. Link to project itself so as not to install
           *  package from NPM repository. */
-          sh "yarn link $env.npmName"
-          sh 'yarn install'
+          // sh "yarn link $env.npmName"
+          // sh 'yarn install'
         }
 
         // Build stripes, deploy tenant on backend, run ui regression
