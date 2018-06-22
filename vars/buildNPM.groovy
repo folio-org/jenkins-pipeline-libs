@@ -209,15 +209,17 @@ def call(body) {
         def okapiUrl = 'http://folio-snapshot-test.aws.indexdata.com:9130'
         env.PGHOST = 'folio-snapshot-test.aws.indexdata.com'
 
-        dir("${env.WORKSPACE}/project") {
-          // clean up previous 'yarn install'
-          sh 'rm -rf node_modules yarn.lock'
-          sh 'yarn link'
-          /* a bit of NPM voodoo. Link to project itself so as not to install
-          *  package from NPM repository. */
-          sh "yarn link $env.npmName"
-          sh 'yarn install'
-        }
+        /*
+        * dir("${env.WORKSPACE}/project") {
+        *  // clean up previous 'yarn install'
+        *  sh 'rm -rf node_modules yarn.lock'
+        *  sh 'yarn link'
+        *  // A bit of NPM voodoo. Link to project itself so as not to install
+        *  // package from NPM repository.
+        *  sh "yarn link $env.npmName"
+        *  sh 'yarn install'
+        * }
+        */
 
         // Build stripes, deploy tenant on backend, run ui regression
         buildStripes("$okapiUrl","$tenant",env.stripesPlatform)
