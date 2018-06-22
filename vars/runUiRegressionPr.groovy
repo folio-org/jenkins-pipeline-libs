@@ -24,7 +24,7 @@ def call(String runRegression, String folioUser, String folioPassword, String fo
       // sh "yarn link $env.npmName"
       // sh 'rm -f yarn.lock'
 
-      sudo 'npm install -g xvfb-maybe'
+      sh 'sudo npm install -g xvfb-maybe'
     
       withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
         withNPM(npmrcConfig: 'jenkins-npm-folioci') {
