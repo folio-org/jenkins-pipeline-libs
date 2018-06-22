@@ -21,13 +21,14 @@ def call(String runRegression, String folioUser, String folioPassword, String fo
 
     dir ("${env.WORKSPACE}/ui-testing") { 
 
-      // sh "yarn link $env.npmName"
-      // sh 'rm -f yarn.lock'
+      sh "yarn link $env.npmName"
+      sh 'rm -f yarn.lock'
     
       withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
         withNPM(npmrcConfig: 'jenkins-npm-folioci') {
-          sh 'yarn add file:../project'
-          sh "yarn upgrade ${env.npmName}"
+          // sh 'yarn add file:../project'
+          // sh "yarn upgrade ${env.npmName}"
+          sh 'yarn install'
           sh 'sudo /usr/bin/Xvfb :2 &'
           sh 'sleep 1'
 

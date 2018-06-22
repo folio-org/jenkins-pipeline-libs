@@ -212,10 +212,10 @@ def call(body) {
         dir("${env.WORKSPACE}/project") {
           // clean up previous 'yarn install'
           sh 'rm -rf node_modules yarn.lock'
-          // sh 'yarn link'
+          sh 'yarn link'
           /* a bit of NPM voodoo. Link to project itself so as not to install
           *  package from NPM repository. */
-          // sh "yarn link $env.npmName"
+          sh "yarn link $env.npmName"
           sh 'yarn install'
         }
 
@@ -227,7 +227,7 @@ def call(body) {
             echo "Problem deploying tenant. Skipping UI Regression testing."
           }
           else {
-            runUiRegressionPr(runRegression,"${tenant}_admin",'admin','http://127.0.0.1:3000')
+            runUiRegressionPr(runRegression,"${tenant}_admin",'admin','http://localhost:3000')
           }  
         }
       }
