@@ -24,12 +24,12 @@ def call(String runRegression, String folioUser, String folioPassword, String fo
       // sh "yarn link $env.npmName"
       // sh 'rm -f yarn.lock'
 
-      sh 'sudo npm install -g xvfb-maybe'
+      // sh 'sudo npm install -g xvfb-maybe'
     
       withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
         withNPM(npmrcConfig: 'jenkins-npm-folioci') {
           sh 'yarn add file:../project'
-          sh "yarn upgrade ${env.npmName}"
+          //sh "yarn upgrade ${env.npmName}"
           //sh 'yarn install'
           withEnv(['JENKINS_NODE_COOKIE=dontkill']) {
             sh 'sudo /usr/bin/Xvfb :2 &'
@@ -47,7 +47,7 @@ def call(String runRegression, String folioUser, String folioPassword, String fo
             echo "Running partial UI Regression test against $folioUrl"
             //status = sh(script: "DISPLAY=:2 yarn test-module -o --run=${env.npmShortName} " +
             //               ">> ci/rtest.html 2>&1", returnStatus:true)
-            sh "DEBUG=* xvfb-maybe ./node_modules/.bin/mocha test-module -o --run=${env.npmShortName}"
+            sh "DEBUG=* DISPLAY=:2 yarn test-module -o --run=${env.npmShortName}"
           } 
           else {
             // run 'full'
