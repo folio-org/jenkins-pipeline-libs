@@ -6,6 +6,11 @@ import jenkins.model.Jenkins
 import com.cloudbees.groovy.cps.NonCPS
 import java.text.SimpleDateFormat
 
+// get git commit/sha1
+def getCommitSha(){
+    return sh(returnStdout: true, script: 'git rev-parse HEAD')
+}
+
 // Update npm package.json version to "snapshot" version for FOLIO CI
 def npmSnapshotVersion() {
 
@@ -16,6 +21,12 @@ def npmSnapshotVersion() {
   sh 'rm -f folioci_npmver.sh'
 
 }
+
+def npmPrVersion() {
+  def gitVersion = sh(returnStdout: true, script: "jq -r \".version\" package.json").trim()
+  sh "npm version ${gitVersion}-pr.${env.CHANGE_ID}.${env.BUILD_NUMBER}"
+}
+
 
 // get the NPM package name and scope
 def npmName(String npmPackageFile = 'package.json') {
@@ -51,10 +62,17 @@ def getNpmShortName(String string) {
 // get base repo/project name
 def getProjName() {
 
-  def proj_name = sh(returnStdout: true, 
+  def projName = sh(returnStdout: true, 
       script: 'git config remote.origin.url | awk -F \'/\' \'{print $5}\' | sed -e \'s/\\.git//\'').trim()
 
-  return proj_name
+  return projName
+}
+
+// get project URL
+def getProjUrl() {
+  def projUrl = sh(returnStdout: true, script: 'git config remote.origin.url').trim()
+
+  return projUrl
 }
 
 // update the 'Id' field (for snapshot versions, etc)

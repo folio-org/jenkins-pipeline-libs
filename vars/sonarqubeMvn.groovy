@@ -25,7 +25,7 @@ def call(String sqBranch = null) {
                   "-Dsonar.organization=folio-org -Dsonar.verbose=true " +
                   "-Dsonar.analysis.mode=preview " +
                   "-Dsonar.github.pullRequest=${env.CHANGE_ID} " +
-                  "-Dsonar.github.repository=folio-org/${env.project_name} " +
+                  "-Dsonar.github.repository=folio-org/${env.projectName} " +
                   "-Dsonar.github.oauth=${GITHUB_ACCESS_TOKEN}"
         }
       }  

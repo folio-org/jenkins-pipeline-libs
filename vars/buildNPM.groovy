@@ -8,7 +8,9 @@
  * doDocker:  Build, test, and publish Docker image via 'buildDocker' (Default: 'no')
  * runLint: Run ESLint via 'yarn lint' (Default: 'no')
  * runTest: Run unit tests via 'yarn test' (Default: 'no')
+ * runTestOptions:  Extra opts to pass to 'yarn test'
  * runRegression: Run UI regression tests for PRs - 'none','full' or 'partial' (Default: 'none') 
+ * stripesPlatform:  Specifiy Stripes platform.  (Default: 'none' - build in 'app' context')
  * npmDeploy: Publish NPM artifacts to NPM repository (Default: 'yes')
  * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no')
  * modDescriptor: path to standalone Module Descriptor file (Optional)
@@ -34,12 +36,18 @@ def call(body) {
   // default runTestOptions
   def runTestOptions = config.runTestOptions ?: ''
 
+  // default Stripes platform.  '
+  env.stripesPlatform = config.stripesPlatform ?: null
+
   // use the smaller nodejs build node since most 
   // Nodejs builds are Stripes.
   def buildNode = config.buildNode ?: 'jenkins-slave-all'
 
-  // right now, all builds are snapshots
-  env.snapshot = true
+  // right now, all builds are snapshots unless they are PRs
+  if (!env.CHANGE_ID) {
+    env.snapshot = true
+  }
+  
   env.dockerRepo = 'folioci'
   
   node(buildNode) {
@@ -73,11 +81,16 @@ def call(body) {
           if (env.snapshot) {
             foliociLib.npmSnapshotVersion()
           }
+ 
+          if (env.CHANGE_ID) {
+            foliociLib.npmPrVersion()
+          } 
+          
 
           // the actual NPM package name as defined in package.json
-          env.npm_name = foliociLib.npmName('package.json')
+          env.npmName = foliociLib.npmName('package.json')
 
-          // simpleName is similar to npm_name except make name okapi compliant
+          // simpleName is similar to npmName except make name okapi compliant
           def Map simpleNameVerMap = foliociLib.npmSimpleNameVersion('package.json')          
           simpleNameVerMap.each { key, value ->
             env.simpleName = key
@@ -88,12 +101,19 @@ def call(body) {
 
           // project name is the GitHub repo name and is typically
           // different from mod name specified in package.json
-          env.project_name = foliociLib.getProjName()
+          env.projectName = foliociLib.getProjName()
 
-          echo "Package Simplfied Name: $env.simpleName"
+          //git commit sha1
+          env.gitCommit = foliociLib.getCommitSha()
+          env.projUrl = foliociLib.getProjUrl()
+
+          echo "Package Name: $env.npmName"
+          echo "Package FOLIO Name: $env.simpleName"
           echo "Package Short Name: $env.npmShortName"
           echo "Package Version: $env.version"
-          echo "Project Name: $env.project_name"
+          echo "Project Name: $env.projectName"
+          echo "Git SHA1: $env.gitCommit"
+          echo "Project Url: $env.projUrl"
         }
  
         withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
@@ -127,8 +147,8 @@ def call(body) {
 
         if (config.doDocker) {
           stage('Docker Build') {
-            // use env.project_name as name of docker artifact
-            env.name = env.project_name
+            // use env.projectName as name of docker artifact
+            env.name = env.projectName
             echo "Building Docker image for $env.name:$env.version" 
             config.doDocker.delegate = this
             config.doDocker.resolveStrategy = Closure.DELEGATE_FIRST
@@ -143,7 +163,7 @@ def call(body) {
               def modDescriptor = ''
               if (config.modDescriptor) { 
                 modDescriptor = config.modDescriptor
-                env.name = env.project_name
+                env.name = env.projectName
                 if (env.snapshot) {
                   // update the version to the snapshot version
                   echo "Update Module Descriptor version to snapshot version"
@@ -185,18 +205,8 @@ def call(body) {
         tenant = foliociLib.replaceHyphen(tenant)
         def okapiUrl = 'http://folio-snapshot-stable.aws.indexdata.com:9130'
 
-        dir("${env.WORKSPACE}/project") {
-          // clean up previous 'yarn install'
-          sh 'rm -rf node_modules yarn.lock'
-          sh 'yarn link'
-          /* a bit of NPM voodoo. Link to project itself so as not to install
-          *  package from NPM repository. */
-          sh "yarn link $env.npm_name"
-          sh 'yarn install'
-        }
-
         // Build stripes, deploy tenant on backend, run ui regression
-        buildStripes("$okapiUrl","$tenant")
+        buildStripes("$okapiUrl","$tenant",env.stripesPlatform)
         if (runRegression != 'none') { 
           def tenantStatus = deployTenant("$okapiUrl","$tenant") 
           if (tenantStatus != 0) {

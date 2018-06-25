@@ -21,14 +21,14 @@ def call(String runRegression, String folioUser, String folioPassword, String fo
 
     dir ("${env.WORKSPACE}/ui-testing") { 
 
-      sh "yarn link $env.npm_name"
-      sh 'rm -f yarn.lock'
-    
       withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
         withNPM(npmrcConfig: 'jenkins-npm-folioci') {
-          sh 'yarn install' 
-          sh 'sudo /usr/bin/Xvfb :2 &'
-          sh 'sleep 1'
+          sh 'yarn add file:../project'
+          sh "yarn upgrade ${env.npmName}"
+
+          withEnv(['JENKINS_NODE_COOKIE=dontkill']) {
+            sh 'sudo /usr/bin/Xvfb :2 &'
+          }    
 
           env.FOLIO_UI_USERNAME = folioUser
           env.FOLIO_UI_PASSWORD = folioPassword
@@ -41,13 +41,14 @@ def call(String runRegression, String folioUser, String folioPassword, String fo
           if (runRegression == 'partial') {
             echo "Running partial UI Regression test against $folioUrl"
             status = sh(script: "DISPLAY=:2 yarn test-module -o --run=${env.npmShortName} " +
-                          ">> ci/rtest.html 2>&1", returnStatus:true)
+                           ">> ci/rtest.html 2>&1", returnStatus:true)
+            // sh "DEBUG=* DISPLAY=:2 yarn test-module -o --run=${env.npmShortName}"
           } 
           else {
             // run 'full'
-            echo "Running full UI Regression test against $folioUrl:="
-            //status = sh(script: "DEBUG=* DISPLAY=:2 yarn test >> ci/rtest.html 2>&1", returnStatus:true)
+            echo "Running full UI Regression test against $folioUrl"
             status = sh(script: "DISPLAY=:2 yarn test >> ci/rtest.html 2>&1", returnStatus:true)
+            // sh 'DEBUG=* DISPLAY=:2 yarn test'
           }
           sh 'echo "</pre><body></html>" >> ci/rtest.html'
         }

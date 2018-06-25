@@ -69,8 +69,8 @@ def call(body) {
 
         // project name is the GitHub repo name and is typically
         // different from mod name specified in package.json
-        env.project_name = foliociLib.getProjName()
-        echo "Project Name: $env.project_name"
+        env.projectName = foliociLib.getProjName()
+        echo "Project Name: $env.projectName"
       }
 
       stage('Maven Build') {
