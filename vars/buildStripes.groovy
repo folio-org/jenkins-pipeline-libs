@@ -63,7 +63,7 @@ def call(String okapiUrl, String tenant, String stripesPlatform = null) {
     else { 
       // build in stripes-cli 'app' mode
       sh 'PREFIX=/usr/local/share/.config/yarn stripes build --output=./bundle'
-      sh "PREFIX=/usr/local/share/.config/yarn stripes mod descriptor --full --strict > ${env.projectName}.json"
+      // sh "PREFIX=/usr/local/share/.config/yarn stripes mod descriptor --full --strict > ${env.projectName}.json"
     }
 
   } // end stage
