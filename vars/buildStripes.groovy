@@ -9,7 +9,7 @@ def call(String okapiUrl, String tenant, String stripesPlatform = null) {
 
   stage('Build Stripes') {
 
-    if (stripesPlatform != null) {
+    if (stripesPlatform != 'none') {
       dir("${env.WORKSPACE}") {
         sh "git clone https://github.com/folio-org/${stripesPlatform}"
       }

@@ -37,7 +37,7 @@ def call(body) {
   def runTestOptions = config.runTestOptions ?: ''
 
   // default Stripes platform.  '
-  env.stripesPlatform = config.stripesPlatform ?: null
+  env.stripesPlatform = config.stripesPlatform ?: 'none'
 
   // use the smaller nodejs build node since most 
   // Nodejs builds are Stripes.
