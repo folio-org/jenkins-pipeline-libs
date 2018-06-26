@@ -37,7 +37,7 @@ def call(body) {
   def runTestOptions = config.runTestOptions ?: ''
 
   // default Stripes platform.  '
-  env.stripesPlatform = config.stripesPlatform ?: 'none'
+  env.stripesPlatform = config.stripesPlatform ?: 'folio-testing-platform'
 
   // use the smaller nodejs build node since most 
   // Nodejs builds are Stripes.
