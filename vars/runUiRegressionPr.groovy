@@ -11,6 +11,7 @@ def call(String runRegression, Boolean regressionDebugMode = false, String folio
   def status = 1
   def testMessage
   def regressionReportUrl = "${env.BUILD_URL}UI_20Regression_20Test_20Report/"
+  def XVFB = "xvfb-run --server-args="-screen 0 1024x768x24"
  
   stage('Run UI Regression Tests') {
 
@@ -26,9 +27,9 @@ def call(String runRegression, Boolean regressionDebugMode = false, String folio
           sh 'yarn add file:../project'
           sh "yarn upgrade ${env.npmName}"
 
-          withEnv(['JENKINS_NODE_COOKIE=dontkill']) {
-            sh 'sudo /usr/bin/Xvfb :2 &'
-          }    
+          //withEnv(['JENKINS_NODE_COOKIE=dontkill']) {
+          //  sh 'sudo /usr/bin/Xvfb :2 &'
+          //}    
 
           env.FOLIO_UI_USERNAME = folioUser
           env.FOLIO_UI_PASSWORD = folioPassword
@@ -41,12 +42,12 @@ def call(String runRegression, Boolean regressionDebugMode = false, String folio
           if (runRegression == 'partial') {
             echo "Running partial UI Regression test against $folioUrl"
             if (regressionDebugMode) {
-              status = sh(script: "DEBUG=* DISPLAY=:2 yarn test-module -o " +
+              status = sh(script: "DEBUG=* $XVFB yarn test-module -o " +
                                   "--run=${env.npmShortName} " +
                                   ">> ci/rtest.html 2>&1", returnStatus:true)
             }
             else {
-              status = sh(script: "DISPLAY=:2 yarn test-module -o --run=${env.npmShortName} " +
+              status = sh(script: "$XVFB yarn test-module -o --run=${env.npmShortName} " +
                             ">> ci/rtest.html 2>&1", returnStatus:true)
             }
           } 
@@ -54,11 +55,11 @@ def call(String runRegression, Boolean regressionDebugMode = false, String folio
             // run 'full'
             echo "Running full UI Regression test against $folioUrl"
             if (regressionDebugMode) {
-              status = sh(script: "DEBUG=* DISPLAY=:2 yarn test >> ci/rtest.html 2>&1", 
+              status = sh(script: "DEBUG=* $XVFB yarn test >> ci/rtest.html 2>&1", 
                           returnStatus:true)
             }
             else {
-              status = sh(script: "DISPLAY=:2 yarn test >> ci/rtest.html 2>&1", 
+              status = sh(script: "$XVFB yarn test >> ci/rtest.html 2>&1", 
                           returnStatus:true)
             }
           }

@@ -16,12 +16,10 @@
 def call(String runTestOptions = '') {
 
   stage('Run Local Tests') {
-
-    // start Xvfb for tests that require browsers/displays
-    sh 'sudo Xvfb :20 &'
+   
+    def XVFB = "xvfb-run --server-args="-screen 0 1024x768x24"
 
     withEnv([ 
-      'DISPLAY=:20',
       'CHROME_BIN=/usr/bin/google-chrome-stable',
       'FIREFOX_BIN=/usr/bin/firefox',
       'DEBIAN_FRONTEND=noninteractive'
@@ -37,14 +35,11 @@ def call(String runTestOptions = '') {
       sh "$CHROME_BIN --version"
       sh "$FIREFOX_BIN --version"
 
-      // install karma junit reporter
-      // sh 'yarn add --dev karma-junit-reporter'
-
       // inject karma config for karma testing
       // def karmaConf = libraryResource('org/folio/karma.conf.js.ci')
       // writeFile file: 'karma.conf.js', text: "$karmaConf"
 
-      def testStatus = sh(returnStatus:true, script: "yarn test $runTestOptions")
+      def testStatus = sh(returnStatus:true, script: "$XVFB yarn test $runTestOptions")
 
       // publish junit tests if available
       junit allowEmptyResults: true, testResults: 'artifacts/**/*.xml'
@@ -52,7 +47,6 @@ def call(String runTestOptions = '') {
       // cleanup CI stuff
       // sh 'rm -rf runTest'
       // sh 'rm -f karma.conf.js'
-      // sh 'yarn remove karma-junit-reporter'
 
       if (testStatus != 0) { 
         def message = "Test errors found. See ${env.BUILD_URL}"
