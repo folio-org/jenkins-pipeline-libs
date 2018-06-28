@@ -5,7 +5,7 @@
  * Run UI Regression tests on PRs
  */
 
-def call(String runRegression, String folioUser, String folioPassword, String folioUrl) {
+def call(String runRegression, Boolean regressionDebugMode = false, String folioUser, String folioPassword, String folioUrl) {
 
   // default to failed regression test
   def status = 1
@@ -40,15 +40,27 @@ def call(String runRegression, String folioUser, String folioPassword, String fo
 
           if (runRegression == 'partial') {
             echo "Running partial UI Regression test against $folioUrl"
-            status = sh(script: "DISPLAY=:2 yarn test-module -o --run=${env.npmShortName} " +
-                           ">> ci/rtest.html 2>&1", returnStatus:true)
-            // sh "DEBUG=* DISPLAY=:2 yarn test-module -o --run=${env.npmShortName}"
+            if (regressionDebugMode) {
+              status = sh(script: "DEBUG=* DISPLAY=:2 yarn test-module -o " +
+                                  "--run=${env.npmShortName} " +
+                                  ">> ci/rtest.html 2>&1", returnStatus:true)
+            }
+            else {
+              status = sh(script: "DISPLAY=:2 yarn test-module -o --run=${env.npmShortName} " +
+                            ">> ci/rtest.html 2>&1", returnStatus:true)
+            }
           } 
           else {
             // run 'full'
             echo "Running full UI Regression test against $folioUrl"
-            status = sh(script: "DISPLAY=:2 yarn test >> ci/rtest.html 2>&1", returnStatus:true)
-            // sh 'DEBUG=* DISPLAY=:2 yarn test'
+            if (regressionDebugMode) {
+              status = sh(script: "DEBUG=* DISPLAY=:2 yarn test >> ci/rtest.html 2>&1", 
+                          returnStatus:true)
+            }
+            else {
+              status = sh(script: "DISPLAY=:2 yarn test >> ci/rtest.html 2>&1", 
+                          returnStatus:true)
+            }
           }
           sh 'echo "</pre><body></html>" >> ci/rtest.html'
         }

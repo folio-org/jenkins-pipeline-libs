@@ -10,6 +10,7 @@
  * runTest: Run unit tests via 'yarn test' (Default: 'no')
  * runTestOptions:  Extra opts to pass to 'yarn test'
  * runRegression: Run UI regression tests for PRs - 'none','full' or 'partial' (Default: 'none') 
+ * regressionDebugMode:  Enable extra debug logging in regression tests (Default: false)
  * stripesPlatform:  Specifiy Stripes platform.  (Default: 'none' - build in 'app' context')
  * npmDeploy: Publish NPM artifacts to NPM repository (Default: 'yes')
  * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no')
@@ -32,6 +33,9 @@ def call(body) {
 
   // default is don't run regression tests for PRs
   def runRegression = config.runRegression ?: 'none'
+
+  // enable debugging logging on regression tests 
+  def regressionDebugMode = config.regressionDebugMode ?: false
 
   // default runTestOptions
   def runTestOptions = config.runTestOptions ?: ''
@@ -213,7 +217,7 @@ def call(body) {
             echo "Problem deploying tenant. Skipping UI Regression testing."
           }
           else {
-            runUiRegressionPr(runRegression,"${tenant}_admin",'admin','http://localhost:3000')
+            runUiRegressionPr(runRegression,regressionDebugMode,"${tenant}_admin",'admin','http://localhost:3000')
           }  
         }
       }
