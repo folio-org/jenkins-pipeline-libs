@@ -11,7 +11,7 @@ def call(String runRegression, Boolean regressionDebugMode = false, String folio
   def status = 1
   def testMessage
   def regressionReportUrl = "${env.BUILD_URL}UI_20Regression_20Test_20Report/"
-  def XVFB = "xvfb-run --server-args="-screen 0 1024x768x24"
+  def XVFB = 'xvfb-run --server-args="-screen 0 1024x768x24"'
  
   stage('Run UI Regression Tests') {
 

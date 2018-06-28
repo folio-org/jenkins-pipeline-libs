@@ -17,7 +17,7 @@ def call(String runTestOptions = '') {
 
   stage('Run Local Tests') {
    
-    def XVFB = "xvfb-run --server-args="-screen 0 1024x768x24"
+    def XVFB = 'xvfb-run --server-args="-screen 0 1024x768x24"'
 
     withEnv([ 
       'CHROME_BIN=/usr/bin/google-chrome-stable',
