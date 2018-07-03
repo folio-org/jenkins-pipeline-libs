@@ -98,13 +98,15 @@ def call(String runRegression, Boolean regressionDebugMode = false, String folio
         def comment = pullRequest.comment(testMessage)
       }
 
-      if (status != 0) {
-        // fail the build
-        error(testMessage)
-      }
-      else {
-        echo "$testMessage"
-      }
+      // temporarily disable tests failing the build
+      // if (status != 0) {
+      //   // fail the build
+      //   error(testMessage)
+      // }
+      // else {
+      //   echo "$testMessage"
+      // }
+      echo "$testMessage"
 
     } // end dir
   } // end stage
