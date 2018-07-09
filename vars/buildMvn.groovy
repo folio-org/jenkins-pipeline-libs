@@ -9,7 +9,8 @@
  * doDocker:  Build, test, and publish Docker image via 'buildJavaDocker' (Default: 'no')
  * mvnDeploy: Deploy built artifacts to Maven repository (Default: 'no')
  * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no')
- * publishApi: Publish API/RAML documentation.  (Default: 'no')
+ * publishApi: Publish API RAML documentation.  (Default: 'no')
+ * runLintRamlCop: Run 'raml-cop' on back-end modules that have declared RAML in api.yml (Default: 'no')
 */
  
 
@@ -105,6 +106,10 @@ def call(body) {
       else {
         sonarqubeMvn() 
       }
+
+      if (config.runLintRamlCop ==~ /(?i)(Y|YES|T|TRUE)/) {
+        runLintRamlCop()
+      } 
 
       // master branch or tagged releases
       if (( env.BRANCH_NAME == 'master' ) ||     

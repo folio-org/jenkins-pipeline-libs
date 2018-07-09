@@ -1,31 +1,31 @@
 #!/usr/bin/env groovy
 
 /*
- * Run 'yarn lint' on UI modules
+ * Run 'raml-cop' on back-end modules that have declared RAML in api.yml
  */
 
 def call() {
-  stage('Lint') {
-    echo "Running 'yarn lint...'"
+  stage('Lint raml-cop') {
+    echo "Running 'raml-cop' ..."
     sh 'mkdir -p ci'
-    sh 'echo "<html><body><pre>" > ci/lint.html'
+    sh 'echo "<html><body><pre>" > ci/lintRamlCop.html'
 
-    def lintStatus = sh(returnStatus:true, script: 'yarn lint 2>&1 >>  ci/lint.html')
+    def lintStatus = sh(returnStatus:true, script: 'python3 /usr/local/bin/lint_raml_cop.py -l info 2>&1 >>  ci/lintRamlCop.html')
 
-    sh 'echo "</pre><body></html>" >> ci/lint.html'
+    sh 'echo "</pre><body></html>" >> ci/lintRamlCop.html'
 
-    def lintReport = readFile('ci/lint.html')
+    def lintReport = readFile('ci/lintRamlCop.html')
 
     publishHTML([allowMissing: false, alwaysLinkToLastBuild: false,
                  keepAll: true, reportDir: 'ci',
-                 reportFiles: 'lint.html',
-                 reportName: 'Lint Report',
-                 reportTitles: 'Lint Report'])
+                 reportFiles: 'lintRamlCop.html',
+                 reportName: 'Lint raml-cop Report',
+                 reportTitles: 'Lint raml-cop Report'])
 
     sh 'rm -rf ci'
 
     if (lintStatus != 0) {
-      echo "Lint errors detected:"
+      echo "Issues detected:"
       echo "$lintReport"
       // PR
       if (env.CHANGE_ID) {
@@ -35,7 +35,7 @@ def call() {
       }
     }
     else {
-      echo "No lint errors detected."
+      echo "No issues detected."
     }
   }
 }
