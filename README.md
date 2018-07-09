@@ -60,7 +60,9 @@ buildMvn {
 }
 ```
 
- * 'publishAPI' - Convert RAML-based API to HTML and publish to http://dev.folio.org/doc/api/ 
+ * 'publishAPI' - Convert RAML-based API to HTML and publish to https://dev.folio.org/reference/api/ 
+
+ * `runLintRamlCop` - Run 'raml-cop' on back-end modules that have declared RAML in api.yml
 
  * 'mvnDeploy' - Deploy Maven artifacts to FOLIO Maven repository.
 
