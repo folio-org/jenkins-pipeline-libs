@@ -11,7 +11,7 @@ def call(String okapiUrl, String tenant) {
 
   stage('Enable Tenant') {
     dir("${env.WORKSPACE}/folio-infrastructure") {
-      checkout([$class: 'GitSCM', branches: [[name: '*/master']],
+      checkout([$class: 'GitSCM', branches: [[name: '*/FOLIO-1338']],
                 doGenerateSubmoduleConfigurations: false,
                 extensions: [[$class: 'SubmoduleOption',
                                        disableSubmodules: false,
