@@ -34,13 +34,9 @@ def call(String okapiUrl, String tenant) {
       def mdStatus = sh(script: "${scriptPath}/createTenantModuleList.sh $okapiUrl " +
                         "$tenant ${env.WORKSPACE}/${env.stripesPlatform}/ModuleDescriptors " +
                         "> tenant_mod_list", returnStatus: true)
+
       if (mdStatus == 0)  { 
         sh "${scriptPath}/enableTenantModules.sh $okapiUrl $tenant < tenant_mod_list"
-
-        // create tenant admin user which defaults to TENANTNAME_admin with password of 'admin'
-        withCredentials([string(credentialsId: 'folio_admin-pgpassword',variable: 'PGPASSWORD')]) {
-          sh "${scriptPath}/createTenantAdminUser.sh $tenant"
-        }
 
         // set vars in include file 
         sh "echo --- > vars_pr.yml"
