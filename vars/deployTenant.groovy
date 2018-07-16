@@ -11,7 +11,7 @@ def call(String okapiUrl, String tenant) {
 
   stage('Enable Tenant') {
     dir("${env.WORKSPACE}/folio-infrastructure") {
-      checkout([$class: 'GitSCM', branches: [[name: '*/master']],
+      checkout([$class: 'GitSCM', branches: [[name: '*/FOLIO-1338']],
                 doGenerateSubmoduleConfigurations: false,
                 extensions: [[$class: 'SubmoduleOption',
                                        disableSubmodules: false,
@@ -34,19 +34,24 @@ def call(String okapiUrl, String tenant) {
       def mdStatus = sh(script: "${scriptPath}/createTenantModuleList.sh $okapiUrl " +
                         "$tenant ${env.WORKSPACE}/${env.stripesPlatform}/ModuleDescriptors " +
                         "> tenant_mod_list", returnStatus: true)
+
       if (mdStatus == 0)  { 
         sh "${scriptPath}/enableTenantModules.sh $okapiUrl $tenant < tenant_mod_list"
 
-        // create tenant admin user which defaults to TENANTNAME_admin with password of 'admin'
-        withCredentials([string(credentialsId: 'folio_admin-pgpassword',variable: 'PGPASSWORD')]) {
-          sh "${scriptPath}/createTenantAdminUser.sh $tenant"
-        }
+        // THE escape sequence from HELL
+        def permissions = '\\\"\\\\\\\\\\\\\\\"perms.all\\\\\\\\\\\\\\\",\\\\\\\\\\\\\\\"login.all\\\\\\\\\\\\\\\",\\\\\\\\\\\\\\\"users.all\\\\\\\\\\\\\\\"\\\"'
 
-        // set vars in include file 
+        // set vars in include file
         sh "echo --- > vars_pr.yml"
         sh "echo okapi_url: $okapiUrl >> vars_pr.yml"
         sh "echo tenant: $tenant >> vars_pr.yml"
-        sh "echo admin_user: { username: ${tenant}_admin, password: admin } >> vars_pr.yml"
+        sh "echo admin_user: { username: ${tenant}_admin, password: admin, " +
+           "hash: 52DCA1934B2B32BEA274900A496DF162EC172C1E, " +
+           "salt: 483A7C864569B90C24A0A6151139FF0B95005B16, " +
+           "permissions: ${permissions}, " +
+           "first_name: Admin, " +
+           "last_name: ${tenant}, " +
+           "email: admin@example.org } >> vars_pr.yml"
 
         // debug
         sh 'cat vars_pr.yml'
