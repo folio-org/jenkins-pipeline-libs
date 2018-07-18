@@ -19,20 +19,20 @@ def call(String okapiUrl, String tenant, String stripesPlatform = null) {
           // remove yarn.lock if it exists 
           sh 'rm -f yarn.lock'
 
-          // grab yarn lock from folio-snapshot-stable
-          sh 'wget -O yarn.lock http://folio-snapshot-stable.aws.indexdata.com/yarn.lock'
+          // Disable use of yarn.lock for now
+          /* 
+          * // grab yarn lock from folio-snapshot-stable
+          * sh 'wget -O yarn.lock http://folio-snapshot-stable.aws.indexdata.com/yarn.lock'
+          * 
+          * // check to see we actually have a real yarn.lock
+          * def isYarnLock = sh (script: 'grep "yarn lockfile" yarn.lock > /dev/null', 
+          *                     returnStatus: true)
+          * 
+          * if (isYarnLock != 0) { 
+          *   error('unable to fetch yarn.lock for folio-snapshot-stable')
+          * }
+          */
 
-          // check to see we actually have a real yarn.lock
-          def isYarnLock = sh (script: 'grep "yarn lockfile" yarn.lock > /dev/null', 
-                               returnStatus: true)
-
-          if (isYarnLock != 0) { 
-            error('unable to fetch yarn.lock for folio-snapshot-stable')
-          }
-
-          // test without yarn.lock 
-          sh 'rm -f yarn.lock'
-        
           // substitute PR commit for package
           sh "yarn add file:../project"
           sh "yarn upgrade $env.npmName"
