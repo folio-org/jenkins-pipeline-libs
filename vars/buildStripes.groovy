@@ -29,6 +29,9 @@ def call(String okapiUrl, String tenant, String stripesPlatform = null) {
           if (isYarnLock != 0) { 
             error('unable to fetch yarn.lock for folio-snapshot-stable')
           }
+
+          // test without yarn.lock 
+          sh 'rm -f yarn.lock'
         
           // substitute PR commit for package
           sh "yarn add file:../project"
