@@ -10,9 +10,7 @@ def call() {
     sh 'mkdir -p ci'
     sh 'echo "<html><body><pre>" > ci/lintRamlCop.html'
 
-    withEnv(['PYTHONUNBUFFERED=1']) {
-      def lintStatus = sh(returnStatus:true, script: 'python3 /usr/local/bin/lint_raml_cop.py -l info >> ci/lintRamlCop.html 2>&1')
-    }
+    def lintStatus = sh(returnStatus:true, script: 'python3 /usr/local/bin/lint_raml_cop.py -l info >> ci/lintRamlCop.html 2>&1')
 
     sh 'echo "</pre><body></html>" >> ci/lintRamlCop.html'
 
