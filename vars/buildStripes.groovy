@@ -43,7 +43,12 @@ def call(String okapiUrl, String tenant, String stripesPlatform = null) {
         }
 
         // generate mod descriptors with dependencies
-        sh 'yarn postinstall --strict'
+        if (stripesPlatform == 'folio-testing-platform') { 
+          sh 'yarn postinstall --strict'
+        }
+        else {
+          sh 'yarn generate-mod-descriptors --strict'
+        }
 
         // build webpack with stripes-cli. See STCLI-66 re: PREFIX env
         sh "stripes build --okapi $okapiUrl --tenant $tenant stripes.config.js bundle" 
