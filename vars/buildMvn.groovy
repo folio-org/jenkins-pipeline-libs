@@ -66,8 +66,6 @@ def call(body) {
           env.dockerRepo = 'folioorg'
         }
 
-        echo "Building Maven artifact: ${env.name} Version: ${env.version}"
-
         // project name is the GitHub repo name and is typically
         // different from mod name specified in package.json
         env.projectName = foliociLib.getProjName()
@@ -75,6 +73,7 @@ def call(body) {
       }
 
       stage('Maven Build') {
+        echo "Building Maven artifact: ${env.name} Version: ${env.version}"
         timeout(30) {
           withMaven(jdk: 'openjdk-8-jenkins-slave-all',  
                     maven: 'maven3-jenkins-slave-all',  
