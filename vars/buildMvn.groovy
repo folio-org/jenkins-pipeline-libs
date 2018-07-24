@@ -72,6 +72,10 @@ def call(body) {
         echo "Project Name: $env.projectName"
       }
 
+      if (config.runLintRamlCop ==~ /(?i)(Y|YES|T|TRUE)/) {
+        runLintRamlCop()
+      } 
+
       stage('Maven Build') {
         echo "Building Maven artifact: ${env.name} Version: ${env.version}"
         timeout(30) {
@@ -105,10 +109,6 @@ def call(body) {
       else {
         sonarqubeMvn() 
       }
-
-      if (config.runLintRamlCop ==~ /(?i)(Y|YES|T|TRUE)/) {
-        runLintRamlCop()
-      } 
 
       // master branch or tagged releases
       if (( env.BRANCH_NAME == 'master' ) ||     
