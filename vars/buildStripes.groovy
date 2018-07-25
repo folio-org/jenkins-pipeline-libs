@@ -66,6 +66,9 @@ def call(String okapiUrl, String tenant, String stripesPlatform = null) {
                     reportFiles: 'yarnLock.html',
                     reportName: "YarnLock",
                     reportTitles: "YarnLock"])
+
+        // publish stripes bundle for debugging
+        archiveWebpack('./bundle')
       }
     }
     else { 
