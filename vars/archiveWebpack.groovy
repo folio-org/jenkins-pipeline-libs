@@ -8,7 +8,7 @@
 
 def call(String webpackDir) {
 
-  def archiveVer = "${env.projName}.${env.BRANCH_NAME}.${env.BUILD_NUMBER}"
+  def archiveVer = "${env.projectName}.${env.BRANCH_NAME}.${env.BUILD_NUMBER}"
  
   sh "mkdir -p artifacts/webpack"
   sh "tar cf artifacts/webpack/stripes-${archiveVer}.tar $webpackDir"
