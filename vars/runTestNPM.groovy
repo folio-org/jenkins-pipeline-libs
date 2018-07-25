@@ -35,18 +35,10 @@ def call(String runTestOptions = '') {
       sh "$CHROME_BIN --version"
       sh "$FIREFOX_BIN --version"
 
-      // inject karma config for karma testing
-      // def karmaConf = libraryResource('org/folio/karma.conf.js.ci')
-      // writeFile file: 'karma.conf.js', text: "$karmaConf"
-
       def testStatus = sh(returnStatus:true, script: "$XVFB yarn test $runTestOptions")
 
       // publish junit tests if available
-      junit allowEmptyResults: true, testResults: 'artifacts/**/*.xml'
-
-      // cleanup CI stuff
-      // sh 'rm -rf runTest'
-      // sh 'rm -f karma.conf.js'
+      junit allowEmptyResults: true, testResults: 'artifacts/runTest/*.xml'
 
       if (testStatus != 0) { 
         def message = "Test errors found. See ${env.BUILD_URL}"
