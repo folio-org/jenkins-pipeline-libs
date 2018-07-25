@@ -7,14 +7,16 @@
  */
 
 def call(String webpackDir) {
+
+  def archiveVer = "${env.projName}.${env.BRANCH_NAME}.${env.BUILD_NUMBER}"
  
   sh "mkdir -p artifacts/webpack"
-  sh "tar cf artifacts/webpack/stripes_webpack.tar $webpackDir"
-  sh "bzip2 artifacts/webpack/stripes_webpack.tar"
+  sh "tar cf artifacts/webpack/stripes-${archiveVer}.tar $webpackDir"
+  sh "bzip2 artifacts/webpack/stripes-${archiveVer}.tar"
 
   publishHTML([allowMissing: false, alwaysLinkToLastBuild: false,
                keepAll: true, reportDir: 'artifacts/webpack',
-               reportFiles: 'stripes_webpack.tar.bz2',
+               reportFiles: "stripes-${archiveVer}.tar.bz2",
                reportName: "Generated Webpack Bundle",
                reportTitles: "Generated Webpack Bundle"]) 
 }
