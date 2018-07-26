@@ -16,6 +16,9 @@ def call(String okapiUrl, String tenant, String stripesPlatform = null) {
 
       dir("${env.WORKSPACE}/${stripesPlatform}") {
         if (env.CHANGE_ID) { 
+          // remove node_modules directory in proj dir created by previous 'yarn install'. See FOLIO-1338
+          sh 'rm -rf ../proj/node_modules'
+
           // remove yarn.lock if it exists 
           sh 'rm -f yarn.lock'
 
