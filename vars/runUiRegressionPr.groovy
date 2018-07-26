@@ -20,16 +20,16 @@ def call(String runRegression, Boolean regressionDebugMode = false, String folio
       sh 'git clone https://github.com/folio-org/ui-testing'
     }
 
+    
     dir ("${env.WORKSPACE}/ui-testing") { 
 
+      // remove node_modules directory in proj dir created by previous 'yarn install'. See FOLIO-1338
+      sh 'rm -rf ../proj/node_modules'
+      
       withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
         withNPM(npmrcConfig: 'jenkins-npm-folioci') {
           sh 'yarn add file:../project'
           sh "yarn upgrade ${env.npmName}"
-
-          //withEnv(['JENKINS_NODE_COOKIE=dontkill']) {
-          //  sh 'sudo /usr/bin/Xvfb :2 &'
-          //}    
 
           env.FOLIO_UI_USERNAME = folioUser
           env.FOLIO_UI_PASSWORD = folioPassword
