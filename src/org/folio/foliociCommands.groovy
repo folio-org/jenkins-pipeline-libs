@@ -113,6 +113,17 @@ def replaceHyphen(String string) {
   return convertedString
 }
 
+def isRelease() {
+  def gitTag = sh(returnStdout: true, script: 'git tag -l --points-at HEAD').trim()
+  if ( gitTag ==~ /^v[0-9]/ ) { 
+    isRelease = true
+  }
+  else {
+    isRelease = false
+  }
+}
+    
+
 @NonCPS
 def currentDateTime() {
   def dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm")
