@@ -23,8 +23,8 @@ def call(String runRegression, Boolean regressionDebugMode = false, String folio
     
     dir ("${env.WORKSPACE}/ui-testing") { 
 
-      // remove node_modules directory in proj dir created by previous 'yarn install'. See FOLIO-1338
-      sh 'rm -rf ../proj/node_modules'
+      // remove node_modules directory in project dir created by previous 'yarn install'. See FOLIO-1338
+      sh 'rm -rf ../project/node_modules'
       
       withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
         withNPM(npmrcConfig: 'jenkins-npm-folioci') {
