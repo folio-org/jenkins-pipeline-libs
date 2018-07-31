@@ -80,7 +80,20 @@ def call(body) {
       }
 
       dir("${env.WORKSPACE}/project") {
-        stage('Prep') {
+        stage('Configure Envirnment') {
+
+          // boolean to determine if this is a tagged release
+          def isRelease = foliociLib.isRelease()
+
+          // if not as PR or a tagged release
+          if ( (!env.CHANGE_ID) || (!isRelease) {
+            env.snapshot = true
+            env.dockerRepo = 'folioci'
+          }
+          // this is a release
+          else {
+            env.dockerRepo = 'folioorg'
+          }
 
           if (env.snapshot) {
             foliociLib.npmSnapshotVersion()
