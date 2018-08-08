@@ -218,7 +218,7 @@ def call(body) {
               echo "Problem deploying tenant. Skipping UI Regression testing."
             }
             else {
-              runUiRegressionPr(runRegression,regressionDebugMode,"${tenant}_admin",'admin','http://localhost:3000')
+              runUiRegressionPr(runRegression,regressionDebugMode,"${tenant}_admin",'admin')
             }  
           }
         }
