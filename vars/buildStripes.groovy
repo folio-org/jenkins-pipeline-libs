@@ -54,7 +54,7 @@ def call(String okapiUrl, String tenant, String stripesPlatform = null) {
         }
 
         // build webpack with stripes-cli. See STCLI-66 re: PREFIX env
-        sh "yarn build --okapi $okapiUrl --tenant $tenant stripes.config.js ./bundle" 
+        sh "yarn build --okapi $okapiUrl --tenant $tenant ./bundle" 
 
         // start simple webserver to serve webpack
         withEnv(['JENKINS_NODE_COOKIE=dontkill']) {
