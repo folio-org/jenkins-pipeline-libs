@@ -54,11 +54,11 @@ def call(String okapiUrl, String tenant, String stripesPlatform = null) {
         }
 
         // build webpack with stripes-cli. See STCLI-66 re: PREFIX env
-        sh "stripes build --okapi $okapiUrl --tenant $tenant stripes.config.js bundle" 
+        sh "yarn build --okapi $okapiUrl --tenant $tenant stripes.config.js ./bundle" 
 
         // start simple webserver to serve webpack
         withEnv(['JENKINS_NODE_COOKIE=dontkill']) {
-          sh 'http-server -p 3000 ./bundle &'
+          sh 'yarn stripes serve --existing-build &'
         }
 
         // publish generated yarn.lock for possible debugging
@@ -77,7 +77,7 @@ def call(String okapiUrl, String tenant, String stripesPlatform = null) {
     else { 
       // build in stripes-cli 'app' mode
       sh 'PREFIX=/usr/local/share/.config/yarn stripes build --output=./bundle'
-      // sh "PREFIX=/usr/local/share/.config/yarn stripes mod descriptor --full --strict > ${env.projectName}.json"
+      sh "PREFIX=/usr/local/share/.config/yarn stripes mod descriptor --full --strict > ${env.projectName}.json"
     }
 
   } // end stage
