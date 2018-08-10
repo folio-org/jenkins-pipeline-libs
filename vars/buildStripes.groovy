@@ -16,6 +16,9 @@ def call(String okapiUrl, String tenant, String stripesPlatform = null) {
 
       dir("${env.WORKSPACE}/${stripesPlatform}") {
         if (env.CHANGE_ID) { 
+          // remove node_modules directory in proj dir created by previous 'yarn install'. See FOLIO-1338
+          sh 'rm -rf ../project/node_modules'
+
           // remove yarn.lock if it exists 
           sh 'rm -f yarn.lock'
 
@@ -66,6 +69,9 @@ def call(String okapiUrl, String tenant, String stripesPlatform = null) {
                     reportFiles: 'yarnLock.html',
                     reportName: "YarnLock",
                     reportTitles: "YarnLock"])
+
+        // publish stripes bundle for debugging
+        archiveWebpack('./bundle')
       }
     }
     else { 
