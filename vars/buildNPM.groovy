@@ -209,17 +209,19 @@ def call(body) {
           tenant = foliociLib.replaceHyphen(tenant)
           def okapiUrl = 'http://folio-snapshot-stable.aws.indexdata.com:9130'
 
+
           if (runRegression ==~ /(?i)(Y|YES|T|TRUE)/) { 
+            echo "Generating Module Descriptor"
+            sh 'mkdir -p artifacts/md'
+            sh "stripes mod descriptor --full --strict | jq '.[]' " +
+               "> artifacts/md/${env.projectName}.json"
+
             def tenantStatus = deployTenant("$okapiUrl","$tenant") 
+
             if (tenantStatus != 0) {
               echo "Problem deploying tenant. Skipping UI Regression testing."
             }
             else { 
-              echo "Generate Module Descriptor"
-              sh 'mkdir -p artifacts/md'
-              sh "stripes mod descriptor --full --strict | jq '.[]' " +
-                 "> artifacts/md/${env.projectName}.json"
-
               echo "Running UI Integration tests in $testDir"
               runIntegrationTests(regressionDebugMode,"${tenant}_admin",'admin')
             }
