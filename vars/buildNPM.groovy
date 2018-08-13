@@ -39,6 +39,9 @@ def call(body) {
   // default runTestOptions
   def runTestOptions = config.runTestOptions ?: ''
 
+  // default mod descriptor
+  def modDescriptor = config.modDescriptor ?: ''
+
   // default Stripes platform.  '
   // env.stripesPlatform = config.stripesPlatform ?: ''
 
@@ -134,6 +137,26 @@ def call(body) {
                 runTestNPM(runTestOptions)
               }
 
+              stage('Generate Module Descriptor') { 
+                // really meant to cover non-Stripes module cases. e.g mod-graphql
+                if (modDescriptor) {       
+                  env.name = env.projectName
+                  if (env.snapshot) {
+                    // update the version to the snapshot version
+                    echo "Update Module Descriptor version to snapshot version"
+                    foliociLib.updateModDescriptorId(modDescriptor)
+                  }
+                }
+                // Stripe modules
+                else {
+                  echo "Generating Stripes module descriptor from package.json"
+                  sh 'mkdir -p artifacts/md'
+                  sh "stripes mod descriptor --full --strict | jq '.[]' " +
+                     "> artifacts/md/${env.simpleName}.json"
+                  modDescriptor = 'artifacts/md/${env.simpleName}.json'
+                }
+              } 
+
               if ( env.BRANCH_NAME == 'master' ) {
                 if (npmDeploy ==~ /(?i)(Y|YES|T|TRUE)/) {
                   stage('NPM Publish') {
@@ -164,23 +187,6 @@ def call(body) {
             if (config.publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) {
               // We assume that MDs are included in package.json
               stage('Publish Module Descriptor') {
-                def modDescriptor = ''
-                if (config.modDescriptor) { 
-                  modDescriptor = config.modDescriptor
-                  env.name = env.projectName
-                  if (env.snapshot) {
-                    // update the version to the snapshot version
-                    echo "Update Module Descriptor version to snapshot version"
-                    foliociLib.updateModDescriptorId(modDescriptor)
-                  }
-                }
-                else {
-                  echo "Generating Stripes Module Descriptor from package.json"
-                  env.name = env.simpleName
-                  sh 'git clone https://github.com/folio-org/stripes-core'
-                  sh 'stripes-core/util/package2md.js --strict package.json > ModuleDescriptor.json'
-                  modDescriptor = 'ModuleDescriptor.json'
-                }
                 echo "Publishing Module Descriptor to FOLIO registry"
                 postModuleDescriptor(modDescriptor) 
               }
@@ -211,19 +217,16 @@ def call(body) {
 
 
           if (runRegression ==~ /(?i)(Y|YES|T|TRUE)/) { 
-            echo "Generating Module Descriptor"
-            sh 'mkdir -p artifacts/md'
-            sh "stripes mod descriptor --full --strict | jq '.[]' " +
-               "> artifacts/md/${env.projectName}.json"
-
             def tenantStatus = deployTenant("$okapiUrl","$tenant") 
 
             if (tenantStatus != 0) {
               echo "Problem deploying tenant. Skipping UI Regression testing."
             }
             else { 
-              echo "Running UI Integration tests in $testDir"
-              runIntegrationTests(regressionDebugMode,"${tenant}_admin",'admin')
+              dir("${WORKSPACE}/project") { 
+                echo "Running UI Integration tests"
+                runIntegrationTests(regressionDebugMode,"${tenant}_admin",'admin')
+              }
             }
           }
         }
