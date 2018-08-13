@@ -19,7 +19,7 @@ def call(Boolean regressionDebugMode = false, String folioUser, String folioPass
 
     // Determine if this is an app context or platform context
     def context = sh(returnStdout: true, 
-                     script: "stripes status | grep context | awk -F ':' '{ print $2 }'")
+                     script: 'stripes status | grep context | awk -F \':\' \'{ print $2 }\'')
 
     if (context ==~ /platform/) { 
       // use 'platform' context
