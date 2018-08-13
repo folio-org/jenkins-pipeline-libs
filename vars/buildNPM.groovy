@@ -9,9 +9,8 @@
  * runLint: Run ESLint via 'yarn lint' (Default: 'no')
  * runTest: Run unit tests via 'yarn test' (Default: 'no')
  * runTestOptions:  Extra opts to pass to 'yarn test'
- * runRegression: Run UI regression tests for PRs - 'none','full' or 'partial' (Default: 'none') 
+ * runRegression: Run UI regression module tests for PRs - 'yes' or 'no' (Default: 'no') 
  * regressionDebugMode:  Enable extra debug logging in regression tests (Default: false)
- * stripesPlatform:  Specifiy Stripes platform.  (Default: 'none' - build in 'app' context')
  * npmDeploy: Publish NPM artifacts to NPM repository (Default: 'yes')
  * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no')
  * modDescriptor: path to standalone Module Descriptor file (Optional)
@@ -32,7 +31,7 @@ def call(body) {
   def npmDeploy = config.npmDeploy ?: 'yes'
 
   // default is don't run regression tests for PRs
-  def runRegression = config.runRegression ?: 'none'
+  def runRegression = config.runRegression ?: 'no'
 
   // enable debugging logging on regression tests 
   def regressionDebugMode = config.regressionDebugMode ?: false
@@ -41,7 +40,7 @@ def call(body) {
   def runTestOptions = config.runTestOptions ?: ''
 
   // default Stripes platform.  '
-  env.stripesPlatform = config.stripesPlatform ?: 'folio-testing-platform'
+  // env.stripesPlatform = config.stripesPlatform ?: ''
 
   // use the smaller nodejs build node since most 
   // Nodejs builds are Stripes.
@@ -208,18 +207,22 @@ def call(body) {
           // def tenant = "${env.BRANCH_NAME}_${env.BUILD_NUMBER}"
           def tenant = "pr_${env.CHANGE_ID}_${env.BUILD_NUMBER}"
           tenant = foliociLib.replaceHyphen(tenant)
-          def okapiUrl = 'http://folio-snapshot-latest.aws.indexdata.com:9130'
+          def okapiUrl = 'http://folio-snapshot-stable.aws.indexdata.com:9130'
 
-          // Build stripes, deploy tenant on backend, run ui regression
-          buildStripes("$okapiUrl","$tenant",env.stripesPlatform)
-          if (runRegression != 'none') { 
+          if (runRegression ==~ /(?i)(Y|YES|T|TRUE)/) { 
             def tenantStatus = deployTenant("$okapiUrl","$tenant") 
             if (tenantStatus != 0) {
               echo "Problem deploying tenant. Skipping UI Regression testing."
             }
-            else {
-              runUiRegressionPr(runRegression,regressionDebugMode,"${tenant}_admin",'admin')
-            }  
+            else { 
+              echo "Generate Module Descriptor"
+              sh 'mkdir -p artifacts/md'
+              sh "stripes mod descriptor --full --strict | jq '.[]' " +
+                 "> artifacts/md/${env.projectName}.json"
+
+              echo "Running UI Integration tests in $testDir"
+              runIntegrationTests(regressionDebugMode,"${tenant}_admin",'admin')
+            }
           }
         }
       }  // end try

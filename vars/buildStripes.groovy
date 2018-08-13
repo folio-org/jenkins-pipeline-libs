@@ -9,7 +9,7 @@ def call(String okapiUrl, String tenant, String stripesPlatform = null) {
 
   stage('Build Stripes') {
 
-    if (stripesPlatform != 'none') {
+    if (stripesPlatform) {
       dir("${env.WORKSPACE}") {
         sh "git clone https://github.com/folio-org/${stripesPlatform}"
       }
@@ -72,7 +72,7 @@ def call(String okapiUrl, String tenant, String stripesPlatform = null) {
 
         // publish stripes bundle for debugging
         archiveWebpack('./bundle')
-      }
+      } // end dir
     }
     else { 
       // build in stripes-cli 'app' context mode.  generate mod descriptor.

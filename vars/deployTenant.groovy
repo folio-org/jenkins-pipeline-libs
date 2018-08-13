@@ -32,7 +32,7 @@ def call(String okapiUrl, String tenant) {
 
       // post MDs and enable tenant modules
       def mdStatus = sh(script: "${scriptPath}/createTenantModuleList.sh $okapiUrl " +
-                        "$tenant ${env.WORKSPACE}/${env.stripesPlatform}/ModuleDescriptors " +
+                        "$tenant ${env.WORKSPACE}/project/artifacts/md " +
                         "> tenant_mod_list", returnStatus: true)
 
       if (mdStatus == 0)  { 
@@ -52,9 +52,6 @@ def call(String okapiUrl, String tenant) {
            "first_name: Admin, " +
            "last_name: ${tenant}, " +
            "email: admin@example.org } >> vars_pr.yml"
-
-        // debug
-        sh 'cat vars_pr.yml'
 
         withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
                            accessKeyVariable: 'AWS_ACCESS_KEY_ID',
