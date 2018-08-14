@@ -5,7 +5,7 @@
  * Run UI Regression tests 
  */
 
-def call(Boolean regressionDebugMode = false, String folioUser, String folioPassword) {
+def call(Boolean regressionDebugMode = false, String okapiUrl, String tenant, String folioUser, String folioPassword) {
 
   // default to failed regression test
   def status = 1
@@ -23,11 +23,11 @@ def call(Boolean regressionDebugMode = false, String folioUser, String folioPass
 
     if (context ==~ /platform/) { 
       // use 'platform' context
-      testCmd = "yarn test-integration $uitestOpts --local"
+      testCmd = "yarn test-integration $uitestOpts --local --okapi $okapiUrl --tenant $tenant"
     }  
     else { 
       // assume 'app' context. run module tests
-      testCmd = "yarn test-int $uitestOpts --local"
+      testCmd = "yarn test-int $uitestOpts --local --okapi $okapiUrl --tenant $tenant"
     }
 
    

@@ -225,7 +225,7 @@ def call(body) {
             else { 
               dir("${WORKSPACE}/project") { 
                 echo "Running UI Integration tests"
-                runIntegrationTests(regressionDebugMode,"${tenant}_admin",'admin')
+                runIntegrationTests(regressionDebugMode,okapiUrl,tenant,"${tenant}_admin",'admin')
               }
             }
           }
