@@ -23,7 +23,7 @@ def call(Boolean regressionDebugMode = false, String folioUser, String folioPass
 
     if (context ==~ /platform/) { 
       // use 'platform' context
-      testCmd = "yarn test-integration $uitestOpts --local
+      testCmd = "yarn test-integration $uitestOpts --local"
     }  
     else { 
       // assume 'app' context. run module tests
