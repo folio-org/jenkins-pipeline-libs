@@ -213,7 +213,7 @@ def call(body) {
           // def tenant = "${env.BRANCH_NAME}_${env.BUILD_NUMBER}"
           def tenant = "pr_${env.CHANGE_ID}_${env.BUILD_NUMBER}"
           tenant = foliociLib.replaceHyphen(tenant)
-          def okapiUrl = 'http://folio-snapshot-latest.aws.indexdata.com:9130'
+          def okapiUrl = 'http://folio-snapshot-stable.aws.indexdata.com:9130'
 
 
           if (runRegression ==~ /(?i)(Y|YES|T|TRUE)/) { 
