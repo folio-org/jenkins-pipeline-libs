@@ -27,7 +27,7 @@ def call(Boolean regressionDebugMode = false, String okapiUrl, String tenant, St
     }  
     else { 
       // assume 'app' context. run module tests
-      testCmd = "yarn test-int $uitestOpts --local --okapi $okapiUrl --tenant $tenant"
+      testCmd = "yarn test-int $uitestOpts --show --okapi $okapiUrl --tenant $tenant"
     }
 
    
