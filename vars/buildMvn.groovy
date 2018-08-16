@@ -140,8 +140,10 @@ def call(body) {
           }
         }
 
-        if (config.runLintRamlCop ==~ /(?i)(Y|YES|T|TRUE)/) {
-          runLintRamlCop()
+        stage('Lint raml-cop') {
+          if (config.runLintRamlCop ==~ /(?i)(Y|YES|T|TRUE)/) {
+            runLintRamlCop()
+          } 
         } 
       } // end try
       catch (Exception err) {
