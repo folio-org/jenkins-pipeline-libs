@@ -9,7 +9,7 @@
  * doDocker:  Build, test, and publish Docker image via 'buildJavaDocker' (Default: 'no')
  * mvnDeploy: Deploy built artifacts to Maven repository (Default: 'no')
  * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no')
- * publishApi: Publish API RAML documentation.  (Default: 'no')
+ * publishAPI: Publish API RAML documentation.  (Default: 'no')
  * runLintRamlCop: Run 'raml-cop' on back-end modules that have declared RAML in api.yml (Default: 'no')
 */
  
@@ -70,10 +70,6 @@ def call(body) {
           // different from mod name specified in package.json
           env.projectName = foliociLib.getProjName()
           echo "Project Name: $env.projectName"
-        }
-
-        if (config.runLintRamlCop ==~ /(?i)(Y|YES|T|TRUE)/) {
-          runLintRamlCop()
         }
 
         stage('Maven Build') {
@@ -142,6 +138,10 @@ def call(body) {
               }
             }
           }
+        }
+
+        if (config.runLintRamlCop ==~ /(?i)(Y|YES|T|TRUE)/) {
+          runLintRamlCop()
         } 
       } // end try
       catch (Exception err) {
