@@ -55,6 +55,12 @@ def call(body) {
   }
   
   env.dockerRepo = 'folioci'
+
+  properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '', 
+                                          artifactNumToKeepStr: '30', 
+                                          daysToKeepStr: '', 
+                                          numToKeepStr: '30'))]) 
+ 
   
   node(buildNode) {
     timeout(60) { 
@@ -127,6 +133,7 @@ def call(body) {
             withNPM(npmrcConfig: 'jenkins-npm-folioci') {
               stage('NPM Install') {
                 sh 'yarn install' 
+             
               }
 
               if (config.runLint ==~ /(?i)(Y|YES|T|TRUE)/) {
