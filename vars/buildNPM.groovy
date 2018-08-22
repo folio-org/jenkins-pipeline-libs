@@ -159,8 +159,8 @@ def call(body) {
                   echo "Generating Stripes module descriptor from package.json"
                   sh 'mkdir -p artifacts/md'
                   sh "stripes mod descriptor --full --strict | jq '.[]' " +
-                     "> artifacts/md/${env.simpleName}.json"
-                  modDescriptor = 'artifacts/md/${env.simpleName}.json'
+                     "> ${env.WORKSPACE}/artifacts/md/${env.simpleName}.json"
+                  modDescriptor = "${env.WORKSPACE}/artifacts/md/${env.simpleName}.json"
                 }
               } 
 
