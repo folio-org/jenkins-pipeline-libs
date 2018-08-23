@@ -25,7 +25,7 @@ def call(Boolean regressionDebugMode = false, String okapiUrl, String tenant, St
       sh 'yarn stripes serve --existing-build ./bundle &'
     }
     // use 'platform' context
-    testCmd = "yarn test-integration $uitestOpts --show --local"
+    testCmd = "yarn test-regression $uitestOpts --show --local"
   }  
   else { 
     // assume 'app' context. run module tests
