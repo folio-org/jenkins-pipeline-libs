@@ -22,6 +22,10 @@ def call(Boolean regressionDebugMode = false, String okapiUrl, String tenant, St
                      script: 'stripes status | grep context | awk -F \':\' \'{ print $2 }\'')
 
     if (context ==~ /platform/) { 
+      // start simple webserver to serve webpack created by buildStripesPlatform
+      withEnv(['JENKINS_NODE_COOKIE=dontkill']) {
+        sh 'yarn stripes serve --existing-build ./bundle &'
+      }
       // use 'platform' context
       testCmd = "yarn test-integration $uitestOpts --show --local"
     }  
