@@ -212,8 +212,9 @@ def call(body) {
             }
             else { 
               dir("${WORKSPACE}") { 
-                echo "Running UI Integration tests"
-                runIntegrationTests(regressionDebugMode,okapiUrl,tenant,"${tenant}_admin",'admin')
+                stage('Run UI Integration Tests') { 
+                  runIntegrationTests(regressionDebugMode,okapiUrl,tenant,"${tenant}_admin",'admin')
+                }
               }
             }
           }
