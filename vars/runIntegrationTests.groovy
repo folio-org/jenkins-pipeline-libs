@@ -23,7 +23,7 @@ def call(Boolean regressionDebugMode = false, String okapiUrl, String tenant, St
 
     if (context ==~ /platform/) { 
       // use 'platform' context
-      testCmd = "yarn test-integration $uitestOpts --local --okapi $okapiUrl --tenant $tenant"
+      testCmd = "yarn test-integration $uitestOpts --show --local"
     }  
     else { 
       // assume 'app' context. run module tests
