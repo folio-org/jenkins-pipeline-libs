@@ -66,154 +66,134 @@ def call(body) {
     timeout(60) { 
 
       try {
-        stage('Checkout') {
-          deleteDir()
+        stage('Setup') {
+
           currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.JOB_BASE_NAME}"
           sendNotifications 'STARTED'
+          echo "Checked out branch:  $env.BRANCH_NAME"
 
-          checkout([
-                 $class: 'GitSCM',
-                 branches: scm.branches,
-                 extensions: scm.extensions + [[$class: 'RelativeTargetDirectory',
-                                                       relativeTargetDir: 'project'],
-                                              [$class: 'SubmoduleOption',
-                                                       disableSubmodules: false,
-                                                       parentCredentials: false,
-                                                       recursiveSubmodules: true,
-                                                       reference: '',
-                                                       trackingSubmodules: false]],
-                 userRemoteConfigs: scm.userRemoteConfigs
-           ])
-
-           echo "Checked out branch:  $env.BRANCH_NAME"
-        }
-
-        dir("${env.WORKSPACE}/project") {
-          stage('Prep') {
-
-            if (env.snapshot) {
-              foliociLib.npmSnapshotVersion()
-            }
+          if (env.snapshot) {
+            foliociLib.npmSnapshotVersion()
+          }
  
-            if (env.CHANGE_ID) {
-              foliociLib.npmPrVersion()
-            } 
+          if (env.CHANGE_ID) {
+            foliociLib.npmPrVersion()
+          } 
           
 
-            // the actual NPM package name as defined in package.json
-            env.npmName = foliociLib.npmName('package.json')
+          // the actual NPM package name as defined in package.json
+          env.npmName = foliociLib.npmName('package.json')
 
-            // simpleName is similar to npmName except make name okapi compliant
-            def Map simpleNameVerMap = foliociLib.npmSimpleNameVersion('package.json')          
-            simpleNameVerMap.each { key, value ->
-              env.simpleName = key
-              env.version = value
-            }
-            // "short" name e.g. 'folio_users' -> 'users'
-            env.npmShortName = foliociLib.getNpmShortName(env.simpleName)
+          // simpleName is similar to npmName except make name okapi compliant
+          def Map simpleNameVerMap = foliociLib.npmSimpleNameVersion('package.json')          
+          simpleNameVerMap.each { key, value ->
+            env.simpleName = key
+            env.version = value
+          }
+          // "short" name e.g. 'folio_users' -> 'users'
+          env.npmShortName = foliociLib.getNpmShortName(env.simpleName)
 
-            // project name is the GitHub repo name and is typically
-            // different from mod name specified in package.json
-            env.projectName = foliociLib.getProjName()
+          // project name is the GitHub repo name and is typically
+          // different from mod name specified in package.json
+          env.projectName = foliociLib.getProjName()
 
-            //git commit sha1
-            env.gitCommit = foliociLib.getCommitSha()
-            env.projUrl = foliociLib.getProjUrl()
+          //git commit sha1
+          env.gitCommit = foliociLib.getCommitSha()
+          env.projUrl = foliociLib.getProjUrl()
 
-            echo "Package Name: $env.npmName"
-            echo "Package FOLIO Name: $env.simpleName"
-            echo "Package Short Name: $env.npmShortName"
-            echo "Package Version: $env.version"
-            echo "Project Name: $env.projectName"
-            echo "Git SHA1: $env.gitCommit"
-            echo "Project Url: $env.projUrl"
-          }  
+          echo "Package Name: $env.npmName"
+          echo "Package FOLIO Name: $env.simpleName"
+          echo "Package Short Name: $env.npmShortName"
+          echo "Package Version: $env.version"
+          echo "Project Name: $env.projectName"
+          echo "Git SHA1: $env.gitCommit"
+          echo "Project Url: $env.projUrl"
+        }
  
-          withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
-            withNPM(npmrcConfig: 'jenkins-npm-folioci') {
-              stage('NPM Install') {
-                sh 'yarn install' 
-             
-              }
-
-              if (config.runLint ==~ /(?i)(Y|YES|T|TRUE)/) {
-                runLintNPM()
-              } 
-
-              if (config.runTest ==~ /(?i)(Y|YES|T|TRUE)/) {
-                runTestNPM(runTestOptions)
-              }
-
-              stage('Generate Module Descriptor') { 
-                // really meant to cover non-Stripes module cases. e.g mod-graphql
-                if (modDescriptor) {       
-                  env.name = env.projectName
-                  if (env.snapshot) {
-                    // update the version to the snapshot version
-                    echo "Update Module Descriptor version to snapshot version"
-                    foliociLib.updateModDescriptorId(modDescriptor)
-                  }
-                }
-                // Stripe modules
-                else {
-                  echo "Generating Stripes module descriptor from package.json"
-                  sh 'mkdir -p ${env.WORKSPACE}/artifacts/md'
-                  sh "stripes mod descriptor --full --strict | jq '.[]' " +
-                     "> ${env.WORKSPACE}/artifacts/md/${env.simpleName}.json"
-                  modDescriptor = "${env.WORKSPACE}/artifacts/md/${env.simpleName}.json"
-                }
-              } 
-
-              if ( env.BRANCH_NAME == 'master' ) {
-                if (npmDeploy ==~ /(?i)(Y|YES|T|TRUE)/) {
-                  stage('NPM Publish') {
-                    // npm is more flexible than yarn for this stage. 
-                    echo "Deploying NPM packages to Nexus repository"
-                    sh 'npm publish -f'
-                  }
-                }
-              }
-
-            }  // end withNPM
-            // remove .npmrc put in directory by withNPM
-            sh 'rm -f .npmrc'
-          }  // end WithCred    
-
-          if (config.doDocker) {
-            stage('Docker Build') {
-              // use env.projectName as name of docker artifact
-              env.name = env.projectName
-              echo "Building Docker image for $env.name:$env.version" 
-              config.doDocker.delegate = this
-              config.doDocker.resolveStrategy = Closure.DELEGATE_FIRST
-              config.doDocker.call()
+        withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
+          withNPM(npmrcConfig: 'jenkins-npm-folioci') {
+            stage('NPM Install') {
+              sh 'yarn install' 
             }
-          } 
 
-          if ( env.BRANCH_NAME == 'master' ) {
-            if (config.publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) {
-              // We assume that MDs are included in package.json
-              stage('Publish Module Descriptor') {
-                echo "Publishing Module Descriptor to FOLIO registry"
-                postModuleDescriptor(modDescriptor) 
+            if (config.runLint ==~ /(?i)(Y|YES|T|TRUE)/) {
+              runLintNPM()
+            } 
+
+            if (config.runTest ==~ /(?i)(Y|YES|T|TRUE)/) {
+              runTestNPM(runTestOptions)
+            }
+
+            stage('Generate Module Descriptor') { 
+              // really meant to cover non-Stripes module cases. e.g mod-graphql
+              if (modDescriptor) {       
+                env.name = env.projectName
+                if (env.snapshot) {
+                  // update the version to the snapshot version
+                  echo "Update Module Descriptor version to snapshot version"
+                  foliociLib.updateModDescriptorId(modDescriptor)
+                }
+              }
+              // Stripe modules
+              else {
+                echo "Generating Stripes module descriptor from package.json"
+                sh 'mkdir -p ${env.WORKSPACE}/artifacts/md'
+                sh "stripes mod descriptor --full --strict | jq '.[]' " +
+                   "> ${env.WORKSPACE}/artifacts/md/${env.simpleName}.json"
+                modDescriptor = "${env.WORKSPACE}/artifacts/md/${env.simpleName}.json"
+              }
+            } 
+
+            if ( env.BRANCH_NAME == 'master' ) {
+              if (npmDeploy ==~ /(?i)(Y|YES|T|TRUE)/) {
+                stage('NPM Publish') {
+                  // npm is more flexible than yarn for this stage. 
+                  echo "Deploying NPM packages to Nexus repository"
+                  sh 'npm publish -f'
+                }
               }
             }
 
-            if (config.publishAPI ==~ /(?i)(Y|YES|T|TRUE)/) {
-              stage('Publish API Docs') {
-                echo "Publishing API docs"
-                sh "python3 /usr/local/bin/generate_api_docs.py -r $env.project_name -l info -o folio-api-docs"
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
-                     accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                     credentialsId: 'jenkins-aws',
-                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                  sh 'aws s3 sync folio-api-docs s3://foliodocs/api'
-                }
+          }  // end withNPM
+          // remove .npmrc put in directory by withNPM
+          sh 'rm -f .npmrc'
+        }  // end WithCred    
+
+        if (config.doDocker) {
+          stage('Docker Build') {
+            // use env.projectName as name of docker artifact
+            env.name = env.projectName
+            echo "Building Docker image for $env.name:$env.version" 
+            config.doDocker.delegate = this
+            config.doDocker.resolveStrategy = Closure.DELEGATE_FIRST
+            config.doDocker.call()
+          }
+        } 
+
+        if ( env.BRANCH_NAME == 'master' ) {
+          if (config.publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) {
+            // We assume that MDs are included in package.json
+            stage('Publish Module Descriptor') {
+              echo "Publishing Module Descriptor to FOLIO registry"
+              postModuleDescriptor(modDescriptor) 
+            }
+          }
+
+          if (config.publishAPI ==~ /(?i)(Y|YES|T|TRUE)/) {
+            stage('Publish API Docs') {
+              echo "Publishing API docs"
+              sh "python3 /usr/local/bin/generate_api_docs.py -r $env.project_name -l info -o folio-api-docs"
+              withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
+                   accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                   credentialsId: 'jenkins-aws',
+                   secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                sh 'aws s3 sync folio-api-docs s3://foliodocs/api'
               }
             }
-          } 
-        } // end dir
+          }
+        } 
 
+        // actions specific to PRs
         if (env.CHANGE_ID) {
 
           // ensure tenant id is unique
@@ -222,15 +202,16 @@ def call(body) {
           tenant = foliociLib.replaceHyphen(tenant)
           def okapiUrl = 'http://folio-snapshot-stable.aws.indexdata.com:9130'
 
-
           if (runRegression ==~ /(?i)(Y|YES|T|TRUE)/) { 
-            def tenantStatus = deployTenant("$okapiUrl","$tenant") 
+            stage('Bootstrap Tenant') { 
+              def tenantStatus = deployTenant("$okapiUrl","$tenant") 
+            }
 
             if (tenantStatus != 0) {
               echo "Problem deploying tenant. Skipping UI Regression testing."
             }
             else { 
-              dir("${WORKSPACE}/project") { 
+              dir("${WORKSPACE}") { 
                 echo "Running UI Integration tests"
                 runIntegrationTests(regressionDebugMode,okapiUrl,tenant,"${tenant}_admin",'admin')
               }
