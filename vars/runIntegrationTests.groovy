@@ -15,7 +15,7 @@ def call(Boolean regressionDebugMode = false, String okapiUrl, String tenant, St
   def testCmd
   def uitestOpts = "--uiTest.username $folioUser --uiTest.password $folioPassword"
  
-  stage('Run UI Regression Tests') {
+  stage('Run UI Integration Tests') {
 
     // Determine if this is an app context or platform context
     def context = sh(returnStdout: true, 
