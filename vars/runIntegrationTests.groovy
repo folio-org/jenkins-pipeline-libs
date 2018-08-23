@@ -19,7 +19,7 @@ def call(Boolean regressionDebugMode = false, String okapiUrl, String tenant, St
 
     // Determine if this is an app context or platform context
     def context = sh(returnStdout: true, 
-                     script: 'stripes status | grep context | awk -F \':\' \'{ print $2 }\'')
+                     script: 'stripes status | grep context | awk -F \':\' \'{ print $2 }\' | | tr -d \'[:space:]\'')
 
     if (context ==~ /platform/) { 
       // start simple webserver to serve webpack created by buildStripesPlatform
