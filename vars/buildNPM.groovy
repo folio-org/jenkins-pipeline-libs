@@ -66,12 +66,27 @@ def call(body) {
     timeout(60) { 
 
       try {
-        stage('Setup') {
-
+        stage('Checkout') {
+          deleteDir()
           currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.JOB_BASE_NAME}"
           sendNotifications 'STARTED'
-          echo "Checked out branch:  $env.BRANCH_NAME"
 
+          checkout([
+                 $class: 'GitSCM',
+                 branches: scm.branches,
+                 extensions: scm.extensions + [[$class: 'SubmoduleOption',
+                                                       disableSubmodules: false,
+                                                       parentCredentials: false,
+                                                       recursiveSubmodules: true,
+                                                       reference: '',
+                                                       trackingSubmodules: false]],
+                 userRemoteConfigs: scm.userRemoteConfigs
+          ])
+
+          echo "Checked out branch: $env.BRANCH_NAME"
+        }
+
+        stage('Setup') {
           if (env.snapshot) {
             foliociLib.npmSnapshotVersion()
           }
