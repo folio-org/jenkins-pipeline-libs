@@ -152,7 +152,7 @@ def call(body) {
               // Stripe modules
               else {
                 echo "Generating Stripes module descriptor from package.json"
-                sh 'mkdir -p ${env.WORKSPACE}/artifacts/md'
+                sh "mkdir -p ${env.WORKSPACE}/artifacts/md"
                 sh "stripes mod descriptor --full --strict | jq '.[]' " +
                    "> ${env.WORKSPACE}/artifacts/md/${env.simpleName}.json"
                 modDescriptor = "${env.WORKSPACE}/artifacts/md/${env.simpleName}.json"
@@ -226,7 +226,7 @@ def call(body) {
               echo "Problem deploying tenant. Skipping UI Regression testing."
             }
             else { 
-              dir("${WORKSPACE}") { 
+              dir("${env.WORKSPACE}") { 
                 stage('Run UI Integration Tests') { 
                   runIntegrationTests(regressionDebugMode,okapiUrl,tenant,"${tenant}_admin",'admin')
                 }
