@@ -219,8 +219,11 @@ def call(body) {
 
           if (runRegression ==~ /(?i)(Y|YES|T|TRUE)/) { 
             stage('Bootstrap Tenant') { 
-              env.tenantStatus = deployTenant("$okapiUrl","$tenant") 
+              def tenantStatus = deployTenant("$okapiUrl","$tenant") 
+              env.tenantStatus = tenantStatus
             }
+     
+            echo "Tenant Bootstrap Status: $env.tenantStatus"
             if (env.tenantStatus != 0) {
               echo "Problem deploying tenant. Skipping UI Regression testing."
             }
