@@ -223,8 +223,8 @@ def call(body) {
               env.tenantStatus = tenantStatus
             }
      
-            echo "Tenant Bootstrap Status: $env.tenantStatus"
-            if (env.tenantStatus != 0) {
+            if (env.tenantStatus != '0') {
+              echo "Tenant Bootstrap Status: $env.tenantStatus"
               echo "Problem deploying tenant. Skipping UI Regression testing."
             }
             else { 
