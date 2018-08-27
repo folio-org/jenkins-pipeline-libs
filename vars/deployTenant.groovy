@@ -52,6 +52,7 @@ def call(String okapiUrl, String tenant) {
          "first_name: Admin, " +
          "last_name: ${tenant}, " +
          "email: admin@example.org } >> vars_pr.yml"
+      sh 'echo num_users: 30 >> vars_pr.yml'
 
       withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
                            accessKeyVariable: 'AWS_ACCESS_KEY_ID',
