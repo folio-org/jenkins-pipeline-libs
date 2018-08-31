@@ -2,10 +2,26 @@
 
 
 /*
- * Run UI Regression tests 
+ * Run UI Integration tests 
+ * 
+ * Optional parameters passed in as Map, 'testOpts'
+ *
+ * folioUrl - URL of the FOLIO UI
+ * okapiUrl - URL of Okapi
+ * tenant - FOLIO tenant
+ * folioUser - FOLIO tenant admin user
+ * folioPassword - password for folioUser
+ * 
  */
 
-def call(Boolean regressionDebugMode = false, String okapiUrl, String tenant, String folioUser, String folioPassword) {
+def call(Map testOpts = [:], regressionDebugMode = false) {
+
+  // optional map parameters with defaults
+  def tenant = testOpts.tenant ?: 'diku'
+  def folioUser = testOpts.folioUser ?: 'diku_admin'
+  def folioPassword = testOpts.folioPassword ?: 'admin'
+  def folioUrl = testOpts.folioUrl ?: 'http://localhost:3000'
+  def okapiUrl = testOpts.okapiUrl ?: 'http://localhost:9130'
 
   // default to failed regression test
   def status = 1
@@ -14,7 +30,7 @@ def call(Boolean regressionDebugMode = false, String okapiUrl, String tenant, St
   def XVFB = 'xvfb-run --server-args="-screen 0 1024x768x24"'
   def testCmd
   def uitestOpts = "--uiTest.username $folioUser --uiTest.password $folioPassword"
- 
+
   // Determine if this is an app context or platform context
   def context = sh(returnStdout: true, 
     script: 'stripes status | grep context | awk -F \':\' \'{ print $2 }\' | tr -d \'[:space:]\'')
@@ -24,11 +40,11 @@ def call(Boolean regressionDebugMode = false, String okapiUrl, String tenant, St
     withEnv(['JENKINS_NODE_COOKIE=dontkill']) {
       sh 'yarn stripes serve --existing-build ./bundle &'
     }
-    // use 'platform' context
-    testCmd = "yarn test-regression $uitestOpts --show --local"
+    // use 'platform' context. Assumes bundle has been built
+    testCmd = "yarn test-regression $uitestOpts --show --url $folioUrl"
   }  
   else { 
-    // assume 'app' context. run module tests
+    // assume 'app' context. run module tests.  Bundle is not pre-built
     testCmd = "yarn test-int $uitestOpts --show --okapi $okapiUrl --tenant $tenant"
   }
   
