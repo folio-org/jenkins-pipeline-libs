@@ -230,7 +230,12 @@ def call(body) {
             else { 
               dir("${env.WORKSPACE}") { 
                 stage('Run UI Integration Tests') { 
-                  runIntegrationTests(regressionDebugMode,okapiUrl,tenant,"${tenant}_admin",'admin')
+                  def testOpts = [ tenant: tenant,
+                                   folioUser: tenant + '_admin',
+                                   folioPassword: 'admin',
+                                   okapiUrl: okapiUrl ]
+ 
+                    runIntegrationTests(testOpts,regressionDebugMode)
                 }
               }
             }
