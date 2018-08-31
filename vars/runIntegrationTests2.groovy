@@ -21,7 +21,7 @@ def call(Map testOpts = [:], regressionDebugMode = false) {
   def folioUser = testOpts.folioUser ?: 'diku_admin'
   def folioPassword = testOpts.folioPassword ?: 'admin'
   def folioUrl = testOpts.folioUrl ?: 'http://localhost:3000'
-  def okapiUrl = testOpst.okapiUrl ?: 'http://localhost:9130'
+  def okapiUrl = testOpts.okapiUrl ?: 'http://localhost:9130'
 
   // default to failed regression test
   def status = 1
