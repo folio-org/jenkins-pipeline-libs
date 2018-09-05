@@ -90,13 +90,11 @@ def call(body) {
             env.snapshot = true
             env.dockerRepo = 'folioci'
             env.npmConfig = 'jenkins-npm-folioci'
-            echo "This is a snapshot build"
           }
           // this is a release
           else {
             env.dockerRepo = 'folioorg'
             env.npmConfig = 'jenkins-npm-folio'
-            echo "This is a release build"
           }
 
 
@@ -172,7 +170,7 @@ def call(body) {
               }
             } 
 
-            if (( env.BRANCH_NAME == 'master' ) ||  ( isRelease )) {
+            if (( env.BRANCH_NAME == 'master' ) ||  ( !env.snapshot )) {
               if (npmDeploy ==~ /(?i)(Y|YES|T|TRUE)/) {
                 stage('NPM Publish') {
                   // npm is more flexible than yarn for this stage. 
