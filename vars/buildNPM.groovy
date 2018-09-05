@@ -49,12 +49,6 @@ def call(body) {
   // Nodejs builds are Stripes.
   def buildNode = config.buildNode ?: 'jenkins-slave-all'
 
-  // right now, all builds are snapshots unless they are PRs
-  if (!env.CHANGE_ID) {
-    env.snapshot = true
-  }
-  
-  env.dockerRepo = 'folioci'
 
   properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '', 
                                           artifactNumToKeepStr: '30', 
@@ -89,16 +83,18 @@ def call(body) {
         stage('Setup') {
 
           // boolean to determine if this is a tagged release
-          def isRelease = foliociLib.isRelease()
+          def Boolean isRelease = foliociLib.isRelease()
 
           // if not as PR or a tagged release
           if ( (!env.CHANGE_ID) || (!isRelease) {
             env.snapshot = true
             env.dockerRepo = 'folioci'
+            env.npmConfig = 'jenkins-npm-folioci'
           }
           // this is a release
           else {
             env.dockerRepo = 'folioorg'
+            env.npmConfig = 'jenkins-npm-folio'
           }
 
 
@@ -141,7 +137,7 @@ def call(body) {
         }
  
         withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
-          withNPM(npmrcConfig: 'jenkins-npm-folioci') {
+          withNPM(npmrcConfig: env.npmConfig) {
             stage('NPM Install') {
               sh 'yarn install' 
             }
@@ -179,7 +175,7 @@ def call(body) {
                 stage('NPM Publish') {
                   // npm is more flexible than yarn for this stage. 
                   echo "Deploying NPM packages to Nexus repository"
-                  sh 'npm publish -f'
+                  sh 'npm publish'
                 }
               }
             }

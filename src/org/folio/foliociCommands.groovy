@@ -113,13 +113,14 @@ def replaceHyphen(String string) {
   return convertedString
 }
 
+// determine if this is a release or snapshot
 def isRelease() {
   def gitTag = sh(returnStdout: true, script: 'git tag -l --points-at HEAD').trim()
   if ( gitTag ==~ /^v[0-9]/ ) { 
-    isRelease = true
+    return true
   }
   else {
-    isRelease = false
+    return false
   }
 }
     
