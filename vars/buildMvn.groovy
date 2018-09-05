@@ -140,11 +140,11 @@ def call(body) {
           }
         }
 
-        stage('Lint raml-cop') {
-          if (config.runLintRamlCop ==~ /(?i)(Y|YES|T|TRUE)/) {
+        if (config.runLintRamlCop ==~ /(?i)(Y|YES|T|TRUE)/) {
+          stage('Lint raml-cop') {
             runLintRamlCop()
-          } 
-        } 
+          }
+        }
       } // end try
       catch (Exception err) {
         currentBuild.result = 'FAILED'
