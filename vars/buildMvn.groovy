@@ -9,7 +9,8 @@
  * doDocker:  Build, test, and publish Docker image via 'buildJavaDocker' (Default: 'no')
  * mvnDeploy: Deploy built artifacts to Maven repository (Default: 'no')
  * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no')
- * publishApi: Publish API/RAML documentation.  (Default: 'no')
+ * publishAPI: Publish API RAML documentation.  (Default: 'no')
+ * runLintRamlCop: Run 'raml-cop' on back-end modules that have declared RAML in api.yml (Default: 'no')
 */
  
 
@@ -25,14 +26,15 @@ def call(body) {
   def buildNode = config.buildNode ?: 'jenkins-slave-all'
 
   node(buildNode) {
+    timeout(60) {
 
-    try {
-      stage('Checkout') {
-        deleteDir()
-        currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.JOB_BASE_NAME}"
-         sendNotifications 'STARTED'
+      try {
+        stage('Checkout') {
+          deleteDir()
+          currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.JOB_BASE_NAME}"
+          sendNotifications 'STARTED'
 
-         checkout([
+          checkout([
                  $class: 'GitSCM',
                  branches: scm.branches,
                  extensions: scm.extensions + [[$class: 'SubmoduleOption',
@@ -42,117 +44,118 @@ def call(body) {
                                                        reference: '',
                                                        trackingSubmodules: false]],
                  userRemoteConfigs: scm.userRemoteConfigs
-         ])
+          ])
 
-         echo "Checked out branch: $env.BRANCH_NAME"
-
-      }
-
-      stage('Prep') {
-        def mvn_artifact = readMavenPom().getArtifactId()
-        def mvn_version =  readMavenPom().getVersion()
-        env.name = mvn_artifact
-
-        if (mvn_version ==~ /.*-SNAPSHOT$/) {
-          echo "This is a snapshot build"
-          env.version = "${mvn_version}.${env.BUILD_NUMBER}"
-          env.snapshot = true
-          env.dockerRepo = 'folioci'
-        }
-        else {
-          echo "This is a release build"
-          env.version = mvn_version
-          env.dockerRepo = 'folioorg'
+          echo "Checked out branch: $env.BRANCH_NAME"
         }
 
-        echo "Building Maven artifact: ${env.name} Version: ${env.version}"
+        stage('Prep') {
+          def mvn_artifact = readMavenPom().getArtifactId()
+          def mvn_version =  readMavenPom().getVersion()
+          env.name = mvn_artifact
 
-        // project name is the GitHub repo name and is typically
-        // different from mod name specified in package.json
-        env.projectName = foliociLib.getProjName()
-        echo "Project Name: $env.projectName"
-      }
+          if (mvn_version ==~ /.*-SNAPSHOT$/) {
+            echo "This is a snapshot build"
+            env.version = "${mvn_version}.${env.BUILD_NUMBER}"
+            env.snapshot = true
+            env.dockerRepo = 'folioci'
+          }
+          else {
+            echo "This is a release build"
+            env.version = mvn_version
+            env.dockerRepo = 'folioorg'
+          }
 
-      stage('Maven Build') {
-        timeout(30) {
+          // project name is the GitHub repo name and is typically
+          // different from mod name specified in package.json
+          env.projectName = foliociLib.getProjName()
+          echo "Project Name: $env.projectName"
+        }
+
+        stage('Maven Build') {
+          echo "Building Maven artifact: ${env.name} Version: ${env.version}"
           withMaven(jdk: 'openjdk-8-jenkins-slave-all',  
                     maven: 'maven3-jenkins-slave-all',  
                     mavenSettingsConfig: 'folioci-maven-settings') {
             sh 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install'
           }
         }
-      }
 
       
-      // Docker stuff
-      if (config.doDocker) {
-        stage('Docker Build') {
-          echo "Building Docker image for $env.name:$env.version" 
-          config.doDocker.delegate = this
-          config.doDocker.resolveStrategy = Closure.DELEGATE_FIRST
-	  config.doDocker.call()
-        }
-      } 
+        // Docker stuff
+        if (config.doDocker) {
+          stage('Docker Build') {
+            echo "Building Docker image for $env.name:$env.version" 
+            config.doDocker.delegate = this
+            config.doDocker.resolveStrategy = Closure.DELEGATE_FIRST
+	    config.doDocker.call()
+          }
+        } 
 
-      // Run Sonarqube stage
-      if (config.sqBranch) {
-        for (branch in config.sqBranch) {
-          if (branch == env.BRANCH_NAME) {
-            sonarqubeMvn(branch) 
+        // Run Sonarqube stage
+        if (config.sqBranch) {
+          for (branch in config.sqBranch) {
+            if (branch == env.BRANCH_NAME) {
+              sonarqubeMvn(branch) 
+            }
           }
         }
-      }
-      else {
-        sonarqubeMvn() 
-      }
+        else {
+          sonarqubeMvn() 
+        }
 
-      // master branch or tagged releases
-      if (( env.BRANCH_NAME == 'master' ) ||     
-         ( env.BRANCH_NAME ==~ /^v\d+\.\d+\.\d+$/ )) {
+        // master branch or tagged releases
+        if (( env.BRANCH_NAME == 'master' ) ||     
+           ( env.BRANCH_NAME ==~ /^v\d+\.\d+\.\d+$/ )) {
 
-        if ( config.mvnDeploy ==~ /(?i)(Y|YES|T|TRUE)/ ) {
-          stage('Maven Deploy') {
-            echo "Deploying artifacts to Maven repository"
-            withMaven(jdk: 'openjdk-8-jenkins-slave-all', 
+          if ( config.mvnDeploy ==~ /(?i)(Y|YES|T|TRUE)/ ) {
+            stage('Maven Deploy') {
+              echo "Deploying artifacts to Maven repository"
+              withMaven(jdk: 'openjdk-8-jenkins-slave-all', 
                       maven: 'maven3-jenkins-slave-all', 
                       mavenSettingsConfig: 'folioci-maven-settings') {
-              sh 'mvn -DskipTests deploy'
+                sh 'mvn -DskipTests deploy'
+              }
+            }
+          }
+          if (config.publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) {
+            stage('Publish Module Descriptor') {
+              echo "Publishing Module Descriptor to FOLIO registry"
+              def modDescriptor = 'target/ModuleDescriptor.json'
+              foliociLib.updateModDescriptor(modDescriptor)
+              postModuleDescriptor(modDescriptor) 
+            }
+          }
+          if (config.publishAPI ==~ /(?i)(Y|YES|T|TRUE)/) {
+            stage('Publish API Docs') {
+              echo "Publishing API docs"
+              sh "python3 /usr/local/bin/generate_api_docs.py -r $env.projectName -l info -o folio-api-docs"
+              withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', 
+                   accessKeyVariable: 'AWS_ACCESS_KEY_ID', 
+                   credentialsId: 'jenkins-aws', 
+                   secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                sh 'aws s3 sync folio-api-docs s3://foliodocs/api'
+              }
             }
           }
         }
-        if (config.publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) {
-          stage('Publish Module Descriptor') {
-            echo "Publishing Module Descriptor to FOLIO registry"
-            def modDescriptor = 'target/ModuleDescriptor.json'
-            foliociLib.updateModDescriptor(modDescriptor)
-            postModuleDescriptor(modDescriptor) 
+
+        if (config.runLintRamlCop ==~ /(?i)(Y|YES|T|TRUE)/) {
+          stage('Lint raml-cop') {
+            runLintRamlCop()
           }
         }
-        if (config.publishAPI ==~ /(?i)(Y|YES|T|TRUE)/) {
-          stage('Publish API Docs') {
-            echo "Publishing API docs"
-            sh "python3 /usr/local/bin/generate_api_docs.py -r $env.projectName -l info -o folio-api-docs"
-            withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', 
-                 accessKeyVariable: 'AWS_ACCESS_KEY_ID', 
-                 credentialsId: 'jenkins-aws', 
-                 secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-              sh 'aws s3 sync folio-api-docs s3://foliodocs/api'
-            }
-          }
-        }
-      } 
-    } // end try
-    catch (Exception err) {
-      currentBuild.result = 'FAILED'
-      println(err.getMessage());
-      echo "Build Result: $currentBuild.result"
-      throw err
-    
-    }
-    finally {
-       sendNotifications currentBuild.result
-    }
-  } //end node
-    
+      } // end try
+      catch (Exception err) {
+        currentBuild.result = 'FAILED'
+        println(err.getMessage());
+        echo "Build Result: $currentBuild.result"
+        throw err
+      }
+      finally {
+        sendNotifications currentBuild.result
+      }
+    } //end timeout
+  } // end node
 } 
 

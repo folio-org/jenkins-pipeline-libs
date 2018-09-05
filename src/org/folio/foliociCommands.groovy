@@ -123,7 +123,22 @@ def isRelease() {
   }
 }
     
+// generate mod descriptors for Stripes
+def genStripesModDescriptors(String outputDir = null) { 
+  def script = libraryResource('org/folio/genStripesModDescriptors.sh')
+  writeFile file: 'genStripesModDescriptors.sh', text: script
+  sh 'chmod +x genStripesModDescriptors.sh'
 
+  if (outputDir) { 
+    sh "./genStripesModDescriptors.sh -o $outputDir"
+  } 
+  else { 
+    sh './genStripesModDescriptors.sh'
+  }
+
+  sh 'rm -f genStripesModDescriptors.sh'
+}
+  
 @NonCPS
 def currentDateTime() {
   def dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm")
@@ -131,4 +146,5 @@ def currentDateTime() {
 
   return dateFormat.format(date)
 }
+
 

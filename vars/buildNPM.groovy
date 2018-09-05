@@ -9,9 +9,8 @@
  * runLint: Run ESLint via 'yarn lint' (Default: 'no')
  * runTest: Run unit tests via 'yarn test' (Default: 'no')
  * runTestOptions:  Extra opts to pass to 'yarn test'
- * runRegression: Run UI regression tests for PRs - 'none','full' or 'partial' (Default: 'none') 
+ * runRegression: Run UI regression module tests for PRs - 'yes' or 'no' (Default: 'no') 
  * regressionDebugMode:  Enable extra debug logging in regression tests (Default: false)
- * stripesPlatform:  Specifiy Stripes platform.  (Default: 'none' - build in 'app' context')
  * npmDeploy: Publish NPM artifacts to NPM repository (Default: 'yes')
  * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no')
  * modDescriptor: path to standalone Module Descriptor file (Optional)
@@ -32,7 +31,7 @@ def call(body) {
   def npmDeploy = config.npmDeploy ?: 'yes'
 
   // default is don't run regression tests for PRs
-  def runRegression = config.runRegression ?: 'none'
+  def runRegression = config.runRegression ?: 'no'
 
   // enable debugging logging on regression tests 
   def regressionDebugMode = config.regressionDebugMode ?: false
@@ -40,8 +39,11 @@ def call(body) {
   // default runTestOptions
   def runTestOptions = config.runTestOptions ?: ''
 
+  // default mod descriptor
+  def modDescriptor = config.modDescriptor ?: ''
+
   // default Stripes platform.  '
-  env.stripesPlatform = config.stripesPlatform ?: 'folio-testing-platform'
+  // env.stripesPlatform = config.stripesPlatform ?: ''
 
   // use the smaller nodejs build node since most 
   // Nodejs builds are Stripes.
@@ -53,34 +55,38 @@ def call(body) {
   }
   
   env.dockerRepo = 'folioci'
+
+  properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '', 
+                                          artifactNumToKeepStr: '30', 
+                                          daysToKeepStr: '', 
+                                          numToKeepStr: '30'))]) 
+ 
   
   node(buildNode) {
+    timeout(60) { 
 
-    try {
-      stage('Checkout') {
-        deleteDir()
-        currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.JOB_BASE_NAME}"
-        sendNotifications 'STARTED'
+      try {
+        stage('Checkout') {
+          deleteDir()
+          currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.JOB_BASE_NAME}"
+          sendNotifications 'STARTED'
 
-        checkout([
+          checkout([
                  $class: 'GitSCM',
                  branches: scm.branches,
-                 extensions: scm.extensions + [[$class: 'RelativeTargetDirectory',
-                                                       relativeTargetDir: 'project'],
-                                              [$class: 'SubmoduleOption',
+                 extensions: scm.extensions + [[$class: 'SubmoduleOption',
                                                        disableSubmodules: false,
                                                        parentCredentials: false,
                                                        recursiveSubmodules: true,
                                                        reference: '',
                                                        trackingSubmodules: false]],
                  userRemoteConfigs: scm.userRemoteConfigs
-         ])
+          ])
 
-         echo "Checked out branch:  $env.BRANCH_NAME"
-      }
+          echo "Checked out branch: $env.BRANCH_NAME"
+        }
 
-      dir("${env.WORKSPACE}/project") {
-        stage('Configure Envirnment') {
+        stage('Setup') {
 
           // boolean to determine if this is a tagged release
           def isRelease = foliociLib.isRelease()
@@ -94,6 +100,7 @@ def call(body) {
           else {
             env.dockerRepo = 'folioorg'
           }
+
 
           if (env.snapshot) {
             foliociLib.npmSnapshotVersion()
@@ -147,6 +154,26 @@ def call(body) {
               runTestNPM(runTestOptions)
             }
 
+            stage('Generate Module Descriptor') { 
+              // really meant to cover non-Stripes module cases. e.g mod-graphql
+              if (modDescriptor) {       
+                env.name = env.projectName
+                if (env.snapshot) {
+                  // update the version to the snapshot version
+                  echo "Update Module Descriptor version to snapshot version"
+                  foliociLib.updateModDescriptorId(modDescriptor)
+                }
+              }
+              // Stripe modules
+              else {
+                echo "Generating Stripes module descriptor from package.json"
+                sh "mkdir -p ${env.WORKSPACE}/artifacts/md"
+                sh "stripes mod descriptor --full --strict | jq '.[]' " +
+                   "> ${env.WORKSPACE}/artifacts/md/${env.simpleName}.json"
+                modDescriptor = "${env.WORKSPACE}/artifacts/md/${env.simpleName}.json"
+              }
+            } 
+
             if ( env.BRANCH_NAME == 'master' ) {
               if (npmDeploy ==~ /(?i)(Y|YES|T|TRUE)/) {
                 stage('NPM Publish') {
@@ -177,23 +204,6 @@ def call(body) {
           if (config.publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) {
             // We assume that MDs are included in package.json
             stage('Publish Module Descriptor') {
-              def modDescriptor = ''
-              if (config.modDescriptor) { 
-                modDescriptor = config.modDescriptor
-                env.name = env.projectName
-                if (env.snapshot) {
-                  // update the version to the snapshot version
-                  echo "Update Module Descriptor version to snapshot version"
-                  foliociLib.updateModDescriptorId(modDescriptor)
-                }
-              }
-              else {
-                echo "Generating Stripes Module Descriptor from package.json"
-                env.name = env.simpleName
-                sh 'git clone https://github.com/folio-org/stripes-core'
-                sh 'stripes-core/util/package2md.js --strict package.json > ModuleDescriptor.json'
-                modDescriptor = 'ModuleDescriptor.json'
-              }
               echo "Publishing Module Descriptor to FOLIO registry"
               postModuleDescriptor(modDescriptor) 
             }
@@ -212,38 +222,51 @@ def call(body) {
             }
           }
         } 
-      } // end dir
 
-      if (env.CHANGE_ID) {
+        // actions specific to PRs
+        if (env.CHANGE_ID) {
 
-        // ensure tenant id is unique
-        // def tenant = "${env.BRANCH_NAME}_${env.BUILD_NUMBER}"
-        def tenant = "pr_${env.CHANGE_ID}_${env.BUILD_NUMBER}"
-        tenant = foliociLib.replaceHyphen(tenant)
-        def okapiUrl = 'http://folio-snapshot-stable.aws.indexdata.com:9130'
+          // ensure tenant id is unique
+          // def tenant = "${env.BRANCH_NAME}_${env.BUILD_NUMBER}"
+          def tenant = "pr_${env.CHANGE_ID}_${env.BUILD_NUMBER}"
+          tenant = foliociLib.replaceHyphen(tenant)
+          def okapiUrl = 'http://folio-snapshot-stable.aws.indexdata.com:9130'
 
-        // Build stripes, deploy tenant on backend, run ui regression
-        buildStripes("$okapiUrl","$tenant",env.stripesPlatform)
-        if (runRegression != 'none') { 
-          def tenantStatus = deployTenant("$okapiUrl","$tenant") 
-          if (tenantStatus != 0) {
-            echo "Problem deploying tenant. Skipping UI Regression testing."
-          }
-          else {
-            runUiRegressionPr(runRegression,regressionDebugMode,"${tenant}_admin",'admin','http://localhost:3000')
+          if (runRegression ==~ /(?i)(Y|YES|T|TRUE)/) { 
+            stage('Bootstrap Tenant') { 
+              def tenantStatus = deployTenant("$okapiUrl","$tenant") 
+              env.tenantStatus = tenantStatus
+            }
+     
+            if (env.tenantStatus != '0') {
+              echo "Tenant Bootstrap Status: $env.tenantStatus"
+              echo "Problem deploying tenant. Skipping UI Regression testing."
+            }
+            else { 
+              dir("${env.WORKSPACE}") { 
+                stage('Run UI Integration Tests') { 
+                  def testOpts = [ tenant: tenant,
+                                   folioUser: tenant + '_admin',
+                                   folioPassword: 'admin',
+                                   okapiUrl: okapiUrl ]
+ 
+                    runIntegrationTests(testOpts,regressionDebugMode)
+                }
+              }
+            }
           }  
         }
+      }  // end try
+      catch (Exception err) {
+        currentBuild.result = 'FAILED'
+        println(err.getMessage());
+        echo "Build Result: $currentBuild.result"
+        throw err
       }
-    }  // end try
-    catch (Exception err) {
-      currentBuild.result = 'FAILED'
-      println(err.getMessage());
-      echo "Build Result: $currentBuild.result"
-      throw err
-    }
-    finally {
-      sendNotifications currentBuild.result
-    }
+      finally {
+        sendNotifications currentBuild.result
+      }
+    } // end timeout
   } // end node
     
 } 
