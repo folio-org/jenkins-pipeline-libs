@@ -90,11 +90,13 @@ def call(body) {
             env.snapshot = true
             env.dockerRepo = 'folioci'
             env.npmConfig = 'jenkins-npm-folioci'
+            echo "This is a snapshot build"
           }
           // this is a release
           else {
             env.dockerRepo = 'folioorg'
             env.npmConfig = 'jenkins-npm-folio'
+            echo "This is a release build"
           }
 
 
