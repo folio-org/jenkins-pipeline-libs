@@ -117,9 +117,11 @@ def replaceHyphen(String string) {
 def isRelease() {
   def gitTag = sh(returnStdout: true, script: 'git tag -l --points-at HEAD').trim()
   if ( gitTag ==~ /^v[0-9]/ ) { 
+    echo "This is a release build: $gitTag"
     return true
   }
   else {
+    echo "This is a snapshot build: $gitTag"
     return false
   }
 }
