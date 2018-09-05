@@ -86,7 +86,7 @@ def call(body) {
           def Boolean isRelease = foliociLib.isRelease()
 
           // if not as PR or a tagged release
-          if ( (!env.CHANGE_ID) || (!isRelease) {
+          if ( (!env.CHANGE_ID) || (!isRelease) ) {
             env.snapshot = true
             env.dockerRepo = 'folioci'
             env.npmConfig = 'jenkins-npm-folioci'
