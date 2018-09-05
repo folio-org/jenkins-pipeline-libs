@@ -162,7 +162,7 @@ def call(body) {
                   foliociLib.updateModDescriptorId(modDescriptor)
                 }
               }
-              // Stripe modules
+              // Stripes modules
               else {
                 echo "Generating Stripes module descriptor from package.json"
                 sh "mkdir -p ${env.WORKSPACE}/artifacts/md"
@@ -172,7 +172,7 @@ def call(body) {
               }
             } 
 
-            if ( env.BRANCH_NAME == 'master' ) {
+            if (( env.BRANCH_NAME == 'master' ) ||  ( isRelease )) {
               if (npmDeploy ==~ /(?i)(Y|YES|T|TRUE)/) {
                 stage('NPM Publish') {
                   // npm is more flexible than yarn for this stage. 
