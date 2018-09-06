@@ -85,19 +85,24 @@ def call(body) {
           // boolean to determine if this is a tagged release
           def Boolean isRelease = foliociLib.isRelease()
 
-          // if not as PR or a tagged release
-          if ( (!env.CHANGE_ID) || (!isRelease) ) {
+          // if release
+          if ( isRelease == true ) {
+            env.dockerRepo = 'folioorg'
+            env.npmConfig = 'jenkins-npm-folio'
+            env.isRelease = true
+          }
+          // if PR
+          else if (env.CHANGE_ID) {
+            env.dockerRepo = 'folioci'
+            env.npmConfig = 'jenkins-npm-folioci'
+          }
+          // else snapshot
+          else {
             env.snapshot = true
             env.dockerRepo = 'folioci'
             env.npmConfig = 'jenkins-npm-folioci'
           }
-          // this is a release
-          else {
-            env.dockerRepo = 'folioorg'
-            env.npmConfig = 'jenkins-npm-folio'
-          }
-
-
+            
           if (env.snapshot) {
             foliociLib.npmSnapshotVersion()
           }
@@ -170,7 +175,7 @@ def call(body) {
               }
             } 
 
-            if (( env.BRANCH_NAME == 'master' ) ||  ( !env.snapshot )) {
+            if (( env.BRANCH_NAME == 'master' ) ||  ( env.isRelease )) {
               if (npmDeploy ==~ /(?i)(Y|YES|T|TRUE)/) {
                 stage('NPM Publish') {
                   // npm is more flexible than yarn for this stage. 
@@ -196,7 +201,7 @@ def call(body) {
           }
         } 
 
-        if ( env.BRANCH_NAME == 'master' ) {
+        if (( env.BRANCH_NAME == 'master' ) || ( env.isRelease )) {
           if (config.publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) {
             // We assume that MDs are included in package.json
             stage('Publish Module Descriptor') {
