@@ -123,6 +123,12 @@ def isRelease() {
     return false
   }
 }
+
+// get git tag
+def gitTag() {
+  def gitTag = sh(returnStdout: true, script: 'git tag -l --points-at HEAD').trim()
+  return gitTag
+}
     
 // generate mod descriptors for Stripes
 def genStripesModDescriptors(String outputDir = null) { 
