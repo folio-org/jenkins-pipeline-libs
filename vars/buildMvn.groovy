@@ -49,25 +49,30 @@ def call(body) {
           echo "Checked out branch: $env.BRANCH_NAME"
         }
 
-        stage('Prep') {
+        stage('Setup') {
           def mvn_artifact = readMavenPom().getArtifactId()
           def mvn_version =  readMavenPom().getVersion()
           env.name = mvn_artifact
 
-          if (mvn_version ==~ /.*-SNAPSHOT$/) {
-            echo "This is a snapshot build"
+          // if release
+          if ( foliociLib.isRelease() )  {
+            // make sure git tag and maven version match
+            if ( foliociLib.tagMatch(mvn_version) ) {
+              env.version = mvn_version
+              env.isRelease = true
+              env.dockerRepo = 'folioorg'
+            }
+            else { 
+              error('Git release tag and Maven version mismatch')
+            }
+          } 
+          // else snapshot
+          else {
             env.version = "${mvn_version}.${env.BUILD_NUMBER}"
             env.snapshot = true
             env.dockerRepo = 'folioci'
           }
-          else {
-            echo "This is a release build"
-            env.version = mvn_version
-            env.dockerRepo = 'folioorg'
-          }
-
-          // project name is the GitHub repo name and is typically
-          // different from mod name specified in package.json
+            
           env.projectName = foliociLib.getProjName()
           echo "Project Name: $env.projectName"
         }
@@ -105,8 +110,7 @@ def call(body) {
         }
 
         // master branch or tagged releases
-        if (( env.BRANCH_NAME == 'master' ) ||     
-           ( env.BRANCH_NAME ==~ /^v\d+\.\d+\.\d+$/ )) {
+        if (( env.BRANCH_NAME == 'master' ) || ( env.isRelease )) {
 
           if ( config.mvnDeploy ==~ /(?i)(Y|YES|T|TRUE)/ ) {
             stage('Maven Deploy') {

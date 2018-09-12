@@ -112,7 +112,7 @@ EOF
       // publish image if master branch
 
       if ((env.BRANCH_NAME == 'master') ||
-          (env.BRANCH_NAME ==~ /^v\d+\.\d+\.\d+$/) && 
+          (env.isRelease) && 
           (publishMaster ==~ /(?i)(Y|YES|T|TRUE)/)) {
         // publish images to ci docker repo
         echo "Publishing Docker images"
