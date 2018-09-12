@@ -114,7 +114,7 @@ def replaceHyphen(String string) {
 }
 
 // determine if this is a release or snapshot
-def isRelease() {
+def boolean isRelease() {
   def gitTag = sh(returnStdout: true, script: 'git tag -l --points-at HEAD').trim()
   if ( gitTag ==~ /^v\d+.*/ ) { 
     return true
@@ -129,6 +129,18 @@ def gitTag() {
   def gitTag = sh(returnStdout: true, script: 'git tag -l --points-at HEAD').trim()
   return gitTag
 }
+
+// compare git tag with version
+def boolean tagMatch(String version) {
+  def gitTag = sh(returnStdout: true, script: 'git tag -l --points-at HEAD | tr -d v').trim()
+  if (gitTag == version) { 
+    return true
+  } 
+  else {
+    return false
+  }
+}
+
     
 // generate mod descriptors for Stripes
 def genStripesModDescriptors(String outputDir = null) { 
