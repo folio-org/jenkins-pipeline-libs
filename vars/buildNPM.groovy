@@ -82,19 +82,11 @@ def call(body) {
 
         stage('Setup') {
 
-          // boolean to determine if this is a tagged release
-          def Boolean isRelease = foliociLib.isRelease()
-
           // if release
-          if ( isRelease == true ) {
+          if ( foliociLib.isRelease() ) {
             env.dockerRepo = 'folioorg'
             env.npmConfig = 'jenkins-npm-folio'
             env.isRelease = true
-          }
-          // if PR
-          else if (env.CHANGE_ID) {
-            env.dockerRepo = 'folioci'
-            env.npmConfig = 'jenkins-npm-folioci'
           }
           // else snapshot
           else {
@@ -103,11 +95,11 @@ def call(body) {
             env.npmConfig = 'jenkins-npm-folioci'
           }
             
-          if (env.snapshot) {
+          if ((env.snapshot) && (!env.CHANGE_ID))  {
             foliociLib.npmSnapshotVersion()
           }
  
-          if (env.CHANGE_ID) {
+          if ((env.CHANGE_ID) && (env.snapshot)) {
             foliociLib.npmPrVersion()
           } 
           
@@ -140,7 +132,14 @@ def call(body) {
           echo "Git SHA1: $env.gitCommit"
           echo "Project Url: $env.projUrl"
         }
- 
+
+        // add check to ensure git tag and NPM version match if release
+        if (env.isRelease) {
+          if ( !foliociLib.tagMatch(env.version) {
+             error('Git release tag and Maven version mismatch')
+          }
+        }
+            
         withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
           withNPM(npmrcConfig: env.npmConfig) {
             stage('NPM Install') {
