@@ -136,7 +136,7 @@ def call(body) {
         // add check to ensure git tag and NPM version match if release
         if (env.isRelease) {
           if ( !foliociLib.tagMatch(env.version) ) {
-             error('Git release tag and Maven version mismatch')
+             error('Git release tag and NPM version mismatch')
           }
         }
             
