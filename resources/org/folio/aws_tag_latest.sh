@@ -5,7 +5,7 @@ base_build=$(awk -F '_' '{ print $1 "_" $2}'<<< $group_tag)
 
 export PATH=/usr/local/bin:$PATH
 
-aws="aws --region us-east-1"
+aws="aws --output text --region us-east-1"
 
 
 # Get instance IDs of previous instances tagged with 'Build:folio_BUILDNAME_latest'...
