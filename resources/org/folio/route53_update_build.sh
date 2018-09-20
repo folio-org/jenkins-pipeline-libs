@@ -6,9 +6,11 @@ group_tag=$1
 # 'latest' or 'stable'
 build=$2
 
+export PATH=/usr/local/bin:$PATH
+
 base_build=$(awk -F '_' '{ print $1 "-" $2}'<<< $group_tag)
 hostname=$(awk -F '_' '{ print $1 "-" $2 "-" $3}'<<< $group_tag)
-aws="/usr/bin/aws --region us-east-1"
+aws="aws --region us-east-1"
 public_zoneid="Z2F9IQRBHKK7BO"
 private_zoneid="Z3JKLZ9JDZ7HCP"
 
