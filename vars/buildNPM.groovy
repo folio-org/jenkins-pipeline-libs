@@ -163,6 +163,7 @@ def call(body) {
                   echo "Update Module Descriptor version to snapshot version"
                   foliociLib.updateModDescriptorId(modDescriptor)
                 }
+                foliociLib.updateModDescriptor(modDescriptor)
               }
               // Stripes modules
               else {
