@@ -26,6 +26,7 @@ def call(Map testOpts = [:], regressionDebugMode = false) {
   // default to failed regression test
   def status = 1
   def testMessage
+  def testStatus
   def regressionReportUrl = "${env.BUILD_URL}UI_20Regression_20Test_20Report/"
   def XVFB = 'xvfb-run --server-args="-screen 0 1024x768x24"'
   def testCmd
@@ -75,23 +76,16 @@ def call(Map testOpts = [:], regressionDebugMode = false) {
 
   if (status != 0) { 
     testMessage = "UI Regression Tests FAILURES. Details at:  $regressionReportUrl"
+    testStatus = 'FAILED'
   }
   else {
     testMessage = "All UI Regression Tests PASSED. Details at:  $regressionReportUrl" 
+    testStatus = 'SUCCESS'
   }
      
   if (env.CHANGE_ID) { 
     @NonCPS
     def comment = pullRequest.comment(testMessage)
   }
-
-  // temporarily disable tests failing the build
-  // if (status != 0) {
-  //   // fail the build
-  //   error(testMessage)
-  // }
-  // else {
-  //   echo "$testMessage"
-  // }
-  echo "$testMessage"
+  return testStatus
 }
