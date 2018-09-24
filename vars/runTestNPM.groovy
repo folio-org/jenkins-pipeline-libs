@@ -40,6 +40,17 @@ def call(String runTestOptions = '') {
       // publish junit tests if available
       junit allowEmptyResults: true, testResults: 'artifacts/runTest/*.xml'
 
+      // publish karma/istanbul coverage html reports 
+      publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, 
+                   keepAll: true, reportDir: 'artifacts/coverage/lcov-report', 
+                   reportFiles: 'index.html', 
+                   reportName: 'Karma Coverage Report', 
+                   reportTitles: 'Karma Coverage Report'])
+
+      // publish istanbul lcov report to Sonarqube
+      sonarqubeScanLcov('artifacts/coverage')
+
+
       if (testStatus != 0) { 
         def message = "Test errors found. See ${env.BUILD_URL}"
         // PR
