@@ -10,7 +10,7 @@ def call(String okapiUrl, String tenant) {
   def foliociLib = new org.folio.foliociCommands()
 
   // remove yarn.lock if it exists 
-  sh 'rm -f yarn.lock'
+  // sh 'rm -f yarn.lock'
 
   // Disable use of yarn.lock for now
   /* 
