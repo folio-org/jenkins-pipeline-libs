@@ -160,9 +160,8 @@ def call(body) {
 
             // Stage 'Run NPM scripts'
             if (runScripts.size() >= 1) { 
-              work = [:]
-              for (kv in mapToList(runScripts)) {
-                work[kv[0]] = runNPMScripts(kv[0],kv[1])
+              for (element in runScripts) {
+                runNPMScript(element.key,element.value)
               }
             }
          
