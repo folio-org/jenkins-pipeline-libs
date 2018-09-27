@@ -9,6 +9,7 @@
  * runLint: Run ESLint via 'yarn lint' (Default: 'no')
  * runTest: Run unit tests via 'yarn test' (Default: 'no')
  * runTestOptions:  Extra opts to pass to 'yarn test'
+ * runScripts: A Map of optional script commands and script arguments.  (Default: [:])
  * runRegression: Run UI regression module tests for PRs - 'yes' or 'no' (Default: 'no') 
  * regressionDebugMode:  Enable extra debug logging in regression tests (Default: false)
  * npmDeploy: Publish NPM artifacts to NPM repository (Default: 'yes')
@@ -44,6 +45,9 @@ def call(body) {
 
   // default Stripes platform.  '
   // env.stripesPlatform = config.stripesPlatform ?: ''
+
+  // run NPM script.  An empty Map
+  def Map runScripts = config.runScripts ?: [:]
 
   // use the smaller nodejs build node since most 
   // Nodejs builds are Stripes.
@@ -153,6 +157,9 @@ def call(body) {
             if (config.runTest ==~ /(?i)(Y|YES|T|TRUE)/) {
               runTestNPM(runTestOptions)
             }
+
+            // Run NPM scripts
+            runScripts(runScripts)
 
             stage('Generate Module Descriptor') { 
               // really meant to cover non-Stripes module cases. e.g mod-graphql
