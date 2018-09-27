@@ -159,7 +159,7 @@ def call(body) {
             }
 
             // Stage 'Run NPM scripts'
-            runScripts(runNPMScripts)
+            runNPMScripts(runScripts)
 
             stage('Generate Module Descriptor') { 
               // really meant to cover non-Stripes module cases. e.g mod-graphql
