@@ -159,8 +159,13 @@ def call(body) {
             }
 
             // Stage 'Run NPM scripts'
-            runNPMScripts(runScripts)
-
+            if (runScripts.size() >= 1) { 
+              work = [:]
+              for (kv in mapToList(runScripts)) {
+                work[kv[0]] = runNPMScripts(kv[0],kv[1])
+              }
+            }
+         
             stage('Generate Module Descriptor') { 
               // really meant to cover non-Stripes module cases. e.g mod-graphql
               if (modDescriptor) {       

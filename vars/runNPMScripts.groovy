@@ -12,13 +12,13 @@
  * 
  */
 
-def call(Map runScripts = [:]) {
+def call(String scriptName, String scriptArgs) {
 
   def XVFB = 'xvfb-run --server-args="-screen 0 1024x768x24"'
   def status
   def message
 
-  stage('Run NPM scripts') {
+  stage('Run yarn $scriptName') {
     withEnv([ 
       'CHROME_BIN=/usr/bin/google-chrome-stable',
       'FIREFOX_BIN=/usr/bin/firefox',
@@ -42,7 +42,7 @@ def call(Map runScripts = [:]) {
             errorMessage = "Test errors found for ${script.key}. See ${env.BUILD_URL}" 
             if (env.CHANGE_ID) {
               // Requires https://github.com/jenkinsci/pipeline-github-plugin
-              // @NonCPS
+              @NonCPS
               comment = pullRequest.comment(errorMessage)
             }
             junit allowEmptyResults: true, testResults: 'artifacts/runTest/*.xml'
