@@ -39,22 +39,22 @@ def call(Map runScripts = [:]) {
         for (script in runScripts) {
           scriptStatus = sh(returnStatus:true, script: "$XVFB yarn ${script.key} ${script.value}")
           if (scriptStatus != 0) { 
-            message = "Test errors found. See ${env.BUILD_URL}" 
+            errorMessage = "Test errors found for ${script.key}. See ${env.BUILD_URL}" 
             if (env.CHANGE_ID) {
               // Requires https://github.com/jenkinsci/pipeline-github-plugin
               // @NonCPS
-              comment = pullRequest.comment(message)
+              comment = pullRequest.comment(errorMessage)
             }
-            error(message)
+            junit allowEmptyResults: true, testResults: 'artifacts/runTest/*.xml'
+            error(errorMessage)
           }
         }
+        // publish junit tests if available
+        junit allowEmptyResults: true, testResults: 'artifacts/runTest/*.xml'
       }
-      // publish junit tests if available
       else {
         echo "No scripts to run."
       }
-      // publish junit tests if available
-      junit allowEmptyResults: true, testResults: 'artifacts/runTest/*.xml'
     } 
   } // end stage 
 }
