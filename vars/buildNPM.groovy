@@ -160,8 +160,8 @@ def call(body) {
 
             // Stage 'Run NPM scripts'
             if (runScripts.size() >= 1) { 
-              for (element in runScripts) {
-                runNPMScript(element.key,element.value)
+              runScripts.each { scriptName,scriptArgs ->
+                runNPMScript(scriptName,scriptArgs)
               }
             }
          
