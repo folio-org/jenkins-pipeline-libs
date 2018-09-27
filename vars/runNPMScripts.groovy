@@ -2,7 +2,7 @@
 
 
 /*
- * Run Node/NPM-based optional sxript  
+ * Run Node/NPM-based optional scripts 
  * 
  * Example:
  *

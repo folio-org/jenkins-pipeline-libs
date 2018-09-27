@@ -158,7 +158,7 @@ def call(body) {
               runTestNPM(runTestOptions)
             }
 
-            // Run NPM scripts
+            // Stage 'Run NPM scripts'
             runScripts(runNPMScripts)
 
             stage('Generate Module Descriptor') { 
