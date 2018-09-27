@@ -42,7 +42,7 @@ def call(Map runScripts = [:]) {
             message = "Test errors found. See ${env.BUILD_URL}" 
             if (env.CHANGE_ID) {
               // Requires https://github.com/jenkinsci/pipeline-github-plugin
-              @NonCPS
+              // @NonCPS
               comment = pullRequest.comment(message)
             }
             error(message)
