@@ -15,8 +15,8 @@
 def call(String scriptName, String scriptArgs) {
 
   def XVFB = 'xvfb-run --server-args="-screen 0 1024x768x24"'
-  def status
-  def message
+  def scriptStatus
+  def errorMessage
 
   stage("Run yarn $scriptName") {
     withEnv([ 
