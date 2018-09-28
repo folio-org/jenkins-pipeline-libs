@@ -37,9 +37,6 @@ def call(String runTestOptions = '') {
 
       def testStatus = sh(returnStatus:true, script: "$XVFB yarn test $runTestOptions")
 
-      // publish junit tests if available
-      junit allowEmptyResults: true, testResults: 'artifacts/runTest/*.xml'
-
       if (testStatus != 0) { 
         def message = "Test errors found. See ${env.BUILD_URL}"
         // PR

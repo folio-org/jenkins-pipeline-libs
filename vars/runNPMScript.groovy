@@ -30,8 +30,6 @@ def call(String scriptName, String scriptArgs) {
       sh "$FIREFOX_BIN --version"
 
       scriptStatus = sh(returnStatus:true, script: "$XVFB yarn ${scriptName} ${scriptArgs}")
-      // publish junit tests if available
-      junit allowEmptyResults: true, testResults: 'artifacts/runTest/*.xml'
 
       if (scriptStatus != 0) { 
         errorMessage = "Test errors found for ${scriptName}. See ${env.BUILD_URL}" 

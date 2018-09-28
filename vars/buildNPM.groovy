@@ -11,6 +11,7 @@
  * runTestOptions:  Extra opts to pass to 'yarn test'
  * runScripts: A Map of optional script commands and script arguments.  (Default: [:])
  * runRegression: Run UI regression module tests for PRs - 'yes' or 'no' (Default: 'no') 
+ * runSonarqube: Run the Sonarqube scanner and generate reports on sonarcloud.io (Default: 'no']
  * regressionDebugMode:  Enable extra debug logging in regression tests (Default: false)
  * npmDeploy: Publish NPM artifacts to NPM repository (Default: 'yes')
  * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no')
@@ -39,6 +40,9 @@ def call(body) {
 
   // default runTestOptions
   def runTestOptions = config.runTestOptions ?: ''
+
+  // default runSonarqube 
+  def runSonarqube = config.runSonarqube ?: false
 
   // default mod descriptor
   def modDescriptor = config.modDescriptor ?: ''
@@ -154,6 +158,7 @@ def call(body) {
               runLintNPM()
             } 
 
+            // runTest is deprecated in favor of RunScripts
             if (config.runTest ==~ /(?i)(Y|YES|T|TRUE)/) {
               runTestNPM(runTestOptions)
             }
@@ -162,6 +167,13 @@ def call(body) {
             if (runScripts.size() >= 1) { 
               runScripts.each { scriptName,scriptArgs ->
                 runNPMScript(scriptName,scriptArgs)
+              }
+            }
+
+            // Run Sonarqube scanner       
+            if (runSonarqube) {
+              stage('Run Sonarqube') {
+                sonarqubeScanNPM() 
               }
             }
          
@@ -276,6 +288,17 @@ def call(body) {
         throw err
       }
       finally {
+        // publish junit tests if available
+        junit allowEmptyResults: true, testResults: 'artifacts/runTest/*.xml'
+
+        // publish lcov coverage html reports if available
+        publishHTML([allowMissing: true, alwaysLinkToLastBuild: false,
+                    keepAll: true, reportDir: 'artifacts/coverage/lcov-report',
+                    reportFiles: 'index.html',
+                    reportName: 'LCov Coverage Report',
+                    reportTitles: 'LCov Coverage Report'])
+
+
         sendNotifications currentBuild.result
       }
     } // end timeout
