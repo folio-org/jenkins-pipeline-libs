@@ -30,7 +30,6 @@ def call(String lcovPath = 'artifacts/coverage') {
           "-Dsonar.pullrequest.github.endpoint=https://api.github.com"
       }
       else {  
-        if (env.BRANCH_NAME == 'master') {
           sh "${scannerHome}/bin/sonar-scanner " +
             "-Dsonar.organization=folio-org " +
             "-Dsonar.projectKey=folio-org:${env.projectName} " +
@@ -38,7 +37,6 @@ def call(String lcovPath = 'artifacts/coverage') {
             "-Dsonar.language=js " +
             "-Dsonar.exclusions=${excludeFiles} " +
             "-Dsonar.javascript.lcov.reportPaths=${lcovPath}/lcov.info" 
-        }
       }
 
     } // end withSonarQubeenv
