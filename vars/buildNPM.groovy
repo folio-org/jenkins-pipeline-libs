@@ -154,6 +154,7 @@ def call(body) {
               runLintNPM()
             } 
 
+            // runTest is deprecated in favor of RunScripts
             if (config.runTest ==~ /(?i)(Y|YES|T|TRUE)/) {
               runTestNPM(runTestOptions)
             }
@@ -163,6 +164,11 @@ def call(body) {
               runScripts.each { scriptName,scriptArgs ->
                 runNPMScript(scriptName,scriptArgs)
               }
+            }
+
+            // Run Sonarqube scanner       
+            stage('Run Sonarqube') {
+              sonarqubeScanNPM() 
             }
          
             stage('Generate Module Descriptor') { 
