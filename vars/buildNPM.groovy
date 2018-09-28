@@ -11,6 +11,7 @@
  * runTestOptions:  Extra opts to pass to 'yarn test'
  * runScripts: A Map of optional script commands and script arguments.  (Default: [:])
  * runRegression: Run UI regression module tests for PRs - 'yes' or 'no' (Default: 'no') 
+ * runSonarqube: Run the Sonarqube scanner and generate reports on sonarcloud.io (Default: 'no']
  * regressionDebugMode:  Enable extra debug logging in regression tests (Default: false)
  * npmDeploy: Publish NPM artifacts to NPM repository (Default: 'yes')
  * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no')
@@ -39,6 +40,9 @@ def call(body) {
 
   // default runTestOptions
   def runTestOptions = config.runTestOptions ?: ''
+
+  // default runSonarqube 
+  def runSonarqube = config.runSonarqube ?: false
 
   // default mod descriptor
   def modDescriptor = config.modDescriptor ?: ''
@@ -167,8 +171,10 @@ def call(body) {
             }
 
             // Run Sonarqube scanner       
-            stage('Run Sonarqube') {
-              sonarqubeScanNPM() 
+            if (runSonarqube) {
+              stage('Run Sonarqube') {
+                sonarqubeScanNPM() 
+              }
             }
          
             stage('Generate Module Descriptor') { 
