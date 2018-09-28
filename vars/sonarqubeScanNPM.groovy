@@ -16,7 +16,7 @@ def call(String lcovPath = 'artifacts/coverage') {
 
       if (env.CHANGE_ID) {
         sh "${scannerHome}/bin/sonar-scanner " +
-          "-Dsonar.projectKey=folio-org:${env.projectName} " +
+          "-Dsonar.projectKey=org.folio:${env.projectName} " +
           "-Dsonar.projectName=${env.projectName} " +
           "-Dsonar.organization=folio-org " +
           "-Dsonar.sources=. " +
@@ -34,7 +34,7 @@ def call(String lcovPath = 'artifacts/coverage') {
         if (env.BRANCH_NAME != 'master' ) { 
           sh "${scannerHome}/bin/sonar-scanner " +
             "-Dsonar.organization=folio-org " +
-            "-Dsonar.projectKey=folio-org:${env.projectName} " +
+            "-Dsonar.projectKey=org.folio:${env.projectName} " +
             "-Dsonar.projectName=${env.projectName} " +
             "-Dsonar.branch.name=${env.BRANCH_NAME} " +
 	    "-Dsonar.branch.target=master " +
@@ -46,7 +46,7 @@ def call(String lcovPath = 'artifacts/coverage') {
         else {
           sh "${scannerHome}/bin/sonar-scanner " +
             "-Dsonar.organization=folio-org " +
-            "-Dsonar.projectKey=${env.projectName} " +
+            "-Dsonar.projectKey=org.folio:${env.projectName} " +
             "-Dsonar.projectName=${env.projectName} " +
             "-Dsonar.sources=. " +
             "-Dsonar.language=js " +
