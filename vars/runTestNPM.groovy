@@ -37,17 +37,6 @@ def call(String runTestOptions = '') {
 
       def testStatus = sh(returnStatus:true, script: "$XVFB yarn test $runTestOptions")
 
-      // publish junit tests if available
-      junit allowEmptyResults: true, testResults: 'artifacts/runTest/*.xml'
-
-      // publish lcov report in Jenkins if available
-      publishHTML([allowMissing: true, alwaysLinkToLastBuild: false, 
-                   keepAll: true, reportDir: 'artifacts/coverage/lcov-report', 
-                   reportFiles: 'index.html', 
-                   reportName: 'LCov Coverage Report', 
-                   reportTitles: 'LCov Coverage Report'])
-
-
       if (testStatus != 0) { 
         def message = "Test errors found. See ${env.BUILD_URL}"
         // PR
