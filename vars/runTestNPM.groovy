@@ -40,15 +40,12 @@ def call(String runTestOptions = '') {
       // publish junit tests if available
       junit allowEmptyResults: true, testResults: 'artifacts/runTest/*.xml'
 
-      // publish karma/istanbul coverage html reports 
-      publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, 
+      // publish lcov report in Jenkins if available
+      publishHTML([allowMissing: true, alwaysLinkToLastBuild: false, 
                    keepAll: true, reportDir: 'artifacts/coverage/lcov-report', 
                    reportFiles: 'index.html', 
-                   reportName: 'Karma Coverage Report', 
-                   reportTitles: 'Karma Coverage Report'])
-
-      // publish istanbul lcov report to Sonarqube
-      sonarqubeScanLcov('artifacts/coverage')
+                   reportName: 'LCov Coverage Report', 
+                   reportTitles: 'LCov Coverage Report'])
 
 
       if (testStatus != 0) { 

@@ -32,6 +32,14 @@ def call(String scriptName, String scriptArgs) {
       scriptStatus = sh(returnStatus:true, script: "$XVFB yarn ${scriptName} ${scriptArgs}")
       // publish junit tests if available
       junit allowEmptyResults: true, testResults: 'artifacts/runTest/*.xml'
+ 
+      // publish lcov coverage html reports if available
+      publishHTML([allowMissing: true, alwaysLinkToLastBuild: false,
+                   keepAll: true, reportDir: 'artifacts/coverage/lcov-report',
+                   reportFiles: 'index.html',
+                   reportName: 'LCov Coverage Report',
+                   reportTitles: 'LCov Coverage Report'])
+
 
       if (scriptStatus != 0) { 
         errorMessage = "Test errors found for ${scriptName}. See ${env.BUILD_URL}" 
