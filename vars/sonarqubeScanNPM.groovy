@@ -33,6 +33,8 @@ def call(String lcovPath = 'artifacts/coverage') {
           sh "${scannerHome}/bin/sonar-scanner " +
             "-Dsonar.organization=folio-org " +
             "-Dsonar.projectKey=folio-org:${env.projectName} " +
+            "-Dsonar.branch.name=${env.BRANCH_NAME} " +
+	    "-Dsonar.branch.target=master " +
             "-Dsonar.sources=. " +
             "-Dsonar.language=js " +
             "-Dsonar.exclusions=${excludeFiles} " +
