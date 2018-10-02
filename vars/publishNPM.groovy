@@ -29,8 +29,6 @@ def call(String repository) {
   
   withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
     withNPM(npmrcConfig: npmConfig) {
-      // clean up commonly generated artifacts before publishing
-      sh 'rm -rf ci artifacts output' 
       sh 'npm publish'
     }
   }
