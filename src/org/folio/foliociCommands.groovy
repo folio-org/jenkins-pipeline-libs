@@ -157,6 +157,12 @@ def genStripesModDescriptors(String outputDir = null) {
 
   sh 'rm -f genStripesModDescriptors.sh'
 }
+
+def gradleProperty(String property) {
+  def value = sh(returnStdout: true, 
+                 script: "grep '^${property}=' gradle.properties | awk -F '=' '{ print $2 }'").trim()
+  return value
+}
   
 @NonCPS
 def currentDateTime() {
