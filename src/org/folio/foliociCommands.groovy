@@ -160,7 +160,7 @@ def genStripesModDescriptors(String outputDir = null) {
 
 def gradleProperty(String property) {
   def value = sh(returnStdout: true, 
-                 script: "grep '^${property}=' gradle.properties | awk -F '=' '{ print $2 }'").trim()
+                 script: sh "grep \'^${property}=\' gradle.properties | awk -F \'=\' \'{ print $2 }\'").trim()
   return value
 }
   
