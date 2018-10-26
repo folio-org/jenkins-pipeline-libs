@@ -6,73 +6,92 @@ import jenkins.model.Jenkins
 import com.cloudbees.groovy.cps.NonCPS
 import java.text.SimpleDateFormat
 
-// get git commit/sha1
-def getCommitSha(){
-    return sh(returnStdout: true, script: 'git rev-parse HEAD')
-}
 
 // Update npm package.json version to "snapshot" version for FOLIO CI
 def npmSnapshotVersion() {
-
   def folioci_npmver = libraryResource('org/folio/folioci_npmver.sh')
   writeFile file: 'folioci_npmver.sh', text: folioci_npmver
   sh 'chmod +x folioci_npmver.sh'
   sh 'npm version `./folioci_npmver.sh`'
   sh 'rm -f folioci_npmver.sh'
-
 }
 
+// set an unique npm package version for PR testing
 def npmPrVersion() {
-  def gitVersion = sh(returnStdout: true, script: "jq -r \".version\" package.json").trim()
-  sh "npm version ${gitVersion}-pr.${env.CHANGE_ID}.${env.BUILD_NUMBER}"
+  def version = sh(returnStdout: true, script: "jq -r \".version\" package.json").trim()
+  sh "npm version ${version}-pr.${env.CHANGE_ID}.${env.BUILD_NUMBER}"
 }
-
 
 // get the NPM package name and scope
 def npmName(String npmPackageFile = 'package.json') {
-  
   def json = readJSON(file: npmPackageFile)
   def name = json.name
-
   return name
 }
 
-// get the unscoped module name and version from package.json. 
-// Return name:version map.
-def npmSimpleNameVersion(String npmPackageFile = 'package.json') {
-  
-  def simpleNameVersion = [:]
+// get the module name and version from package.json and
+// convert scoped name format to "FOLIO" name.  e.g folio_NAME
+def npmFolioNameVersion(String npmPackageFile = 'package.json') {
+  def map = [:]
   def json = readJSON(file: npmPackageFile)
   def n = json.name.replaceAll(~/\//, "_")  
 
   name = n.replaceAll(~/@/, "")  
   version = json.version
   
-  simpleNameVersion = [(name):version]
-  
-  return simpleNameVersion
+  map = [(name):version]
+  return map
 }
 
-// get NPM module short name
-def getNpmShortName(String string) {
-  def npmShortName = string.replaceAll(~/folio_/, "")
-  return npmShortName
+// get NPM module short name (unscoped name)
+def npmShortName(String string) {
+  def n = string.replaceAll(~/folio_/, "")
+  return n
+}
+
+// get git commit/sha1
+def gitCommit(){
+    return sh(returnStdout: true, script: 'git rev-parse HEAD')
 }
 
 // get base repo/project name
 def getProjName() {
-
-  def projName = sh(returnStdout: true, 
-      script: 'git config remote.origin.url | awk -F \'/\' \'{print $5}\' | sed -e \'s/\\.git//\'').trim()
-
-  return projName
+  def n = sh(returnStdout: true, script: 'git config remote.origin.url | awk -F \'/\' \'{print $5}\' | sed -e \'s/\\.git//\'').trim()
+  return n
 }
 
 // get project URL
 def getProjUrl() {
-  def projUrl = sh(returnStdout: true, script: 'git config remote.origin.url').trim()
+  def url = sh(returnStdout: true, script: 'git config remote.origin.url').trim()
+  return url
+}
 
-  return projUrl
+// determine if this is a release or snapshot
+def boolean isRelease() {
+  def gitTag = sh(returnStdout: true, script: 'git tag -l --points-at HEAD').trim()
+  if ( gitTag ==~ /^v\d+.*/ ) {
+    return true
+  }
+  else {
+    return false
+  }
+}
+
+// get git tag
+def gitTag() {
+  def tag = sh(returnStdout: true, script: 'git tag -l --points-at HEAD').trim()
+  return tag
+}
+
+// compare git tag with env.version
+def boolean tagMatch(String version) {
+  def tag = sh(returnStdout: true, script: 'git tag -l --points-at HEAD | tr -d v').trim()
+  if (tag == version) {
+    return true
+  }
+  else {
+    return false
+  }
 }
 
 // update the 'Id' field (for snapshot versions, etc)
@@ -99,49 +118,20 @@ def getModuleDescriptorIdVer(String modDescriptor) {
   def id = sh(returnStdout: true,
       script: "jq -r '.id' $modDescriptor").trim()
 
-  def proj_name = getProjName() 
+  def name = getProjName() 
 
   def version = sh(returnStdout: true, 
-      script: "echo $id | sed -e s/$proj_name-//").trim()
+      script: "echo $id | sed -e s/$name-//").trim()
 
   return version
 }
 
 // replace all instances of '-' in string with '_'
 def replaceHyphen(String string) {
-  def convertedString  = string.replaceAll(~/-/, "_")
-  return convertedString
+  def string  = string.replaceAll(~/-/, "_")
+  return string
 }
 
-// determine if this is a release or snapshot
-def boolean isRelease() {
-  def gitTag = sh(returnStdout: true, script: 'git tag -l --points-at HEAD').trim()
-  if ( gitTag ==~ /^v\d+.*/ ) { 
-    return true
-  }
-  else {
-    return false
-  }
-}
-
-// get git tag
-def gitTag() {
-  def gitTag = sh(returnStdout: true, script: 'git tag -l --points-at HEAD').trim()
-  return gitTag
-}
-
-// compare git tag with version
-def boolean tagMatch(String version) {
-  def gitTag = sh(returnStdout: true, script: 'git tag -l --points-at HEAD | tr -d v').trim()
-  if (gitTag == version) { 
-    return true
-  } 
-  else {
-    return false
-  }
-}
-
-    
 // generate mod descriptors for Stripes
 def genStripesModDescriptors(String outputDir = null) { 
   def script = libraryResource('org/folio/genStripesModDescriptors.sh')
