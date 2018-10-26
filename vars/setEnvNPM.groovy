@@ -49,6 +49,7 @@ def call() {
 
   // project name is the GitHub repo name
   env.projectName = foliociLib.getProjName()
+  env.name = env.projectName
 
   //git commit sha1
   env.gitCommit = foliociLib.gitCommit()
