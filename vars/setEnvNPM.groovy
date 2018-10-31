@@ -56,7 +56,7 @@ def call() {
   env.projUrl = foliociLib.getProjUrl()
 
   echo "NPM Package Name: $env.npmName"
-  echo "NPM FOLIO Name: $env.simpleName"
+  echo "NPM FOLIO Name: $env.folioName"
   echo "NPM Package Unscoped Name: $env.npmShortName"
   echo "NPM Package Version: $env.version"
   echo "Git Project Name: $env.projectName"
