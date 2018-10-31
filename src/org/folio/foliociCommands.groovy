@@ -128,8 +128,8 @@ def getModuleDescriptorIdVer(String modDescriptor) {
 
 // replace all instances of '-' in string with '_'
 def replaceHyphen(String string) {
-  def string  = string.replaceAll(~/-/, "_")
-  return string
+  def s  = string.replaceAll(~/-/, "_")
+  return s
 }
 
 // generate mod descriptors for Stripes
