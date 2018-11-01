@@ -6,6 +6,7 @@
 
 
 def call(String okapiUrl, String tenant) {
+  def foliociLib = new org.folio.foliociCommands()
 
   // remove node_modules from previous 'yarn install'
   sh "rm -rf ${env.WORKSPACE}/project/node_modules"
