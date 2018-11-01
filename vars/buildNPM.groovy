@@ -72,7 +72,7 @@ def call(body) {
   def modDescriptor = config.modDescriptor ?: ''
 
   // default Stripes platform.  Empty Map
-  def stripesPlatform = config.stripesPlatform ?: [:]
+  def Map stripesPlatform = config.stripesPlatform ?: [:]
 
   // run NPM script.  An empty Map
   def Map runScripts = config.runScripts ?: [:]
