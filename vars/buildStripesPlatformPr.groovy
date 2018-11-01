@@ -7,11 +7,13 @@
 
 def call(String okapiUrl, String tenant) {
 
+  // remove node_modules from previous 'yarn install'
   sh "rm -rf ${env.WORKSPACE}/project/node_modules"
+
   sh "yarn add ${env.WORKSPACE}/project"
   sh "yarn upgrade $env.npmName"
 
-  sh 'yarn install'
+  sh 'yarn list --pattern @folio'
 
   // generate platform mod descriptors
   sh 'mkdir -p artifacts/md'
