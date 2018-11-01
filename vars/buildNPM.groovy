@@ -227,19 +227,11 @@ def call(body) {
 
           if (stripesPlatform != null) { 
             stage('Build Stripes Platform') {
-              dir(env.WORKSPACE) {
-                checkout([$class: 'GitSCM', 
-                      branches: [[name: "*/${stripesPlatform.branch}"]], 
-                      doGenerateSubmoduleConfigurations: false, 
-                      extensions: [[$class: 'RelativeTargetDirectory', 
-                                     relativeTargetDir: stripesPlatform.repo]], 
-                      submoduleCfg: [], 
-                      userRemoteConfigs: [[url: "https://github.com/folio-org/${stripesPlatform.repo}"]]])
-              }
-         
-              dir("${env.WORKSPACE}/${stripesPlatform.repo}") {
+              dir("${env.WORKSPACE}/$stripesPlatform.repo") {
+                git branch: stripesPlatform.branch, 
+                    url: "https://github.com/folio-org/${stripesPlatform.repo}"
                 buildStripesPlatformPr(env.okapiUrl,tenant) 
-              } 
+              }
             } 
           }
 
