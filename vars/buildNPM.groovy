@@ -226,20 +226,22 @@ def call(body) {
           tenant = foliociLib.replaceHyphen(tenant)
 
           if (stripesPlatform != null) { 
-            dir(env.WORKSPACE) {
-              checkout([$class: 'GitSCM', 
+            stage('Build Stripes Platform') {
+              dir(env.WORKSPACE) {
+                checkout([$class: 'GitSCM', 
                       branches: [[name: "*/${stripesPlatform.branch}"]], 
                       doGenerateSubmoduleConfigurations: false, 
                       extensions: [[$class: 'RelativeTargetDirectory', 
                                      relativeTargetDir: stripesPlatform.repo]], 
                       submoduleCfg: [], 
                       userRemoteConfigs: [[url: "https://github.com/folio-org/${stripesPlatform.repo}"]]])
-            }
+              }
          
-            dir("${env.WORKSPACE}/${stripesPlatform.repo}") {
-              buildStripesPlatformPr(env.okapiUrl,tenant) 
+              dir("${env.WORKSPACE}/${stripesPlatform.repo}") {
+                buildStripesPlatformPr(env.okapiUrl,tenant) 
+              } 
             } 
-          } 
+          }
 
           if (runRegression) { 
             stage('Bootstrap Tenant') { 
