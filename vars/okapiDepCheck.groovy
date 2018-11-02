@@ -19,7 +19,7 @@ def call(String tenant,String prModDesc,String installJson) {
     // pull all MDs
     httpRequest acceptType: 'APPLICATION_JSON', 
                 contentType: 'APPLICATION_JSON', 
-                consoleLogResponseBody: true
+                consoleLogResponseBody: true,
                 httpMode: 'POST',
                 requestBody: "${okapiPull}", 
                 url: "${okapiIp}:9130/_/proxy/pull/modules"
@@ -27,7 +27,7 @@ def call(String tenant,String prModDesc,String installJson) {
     // POST our MD
     httpRequest acceptType: 'APPLICATION_JSON', 
                 contentType: 'APPLICATION_JSON', 
-                consoleLogResponseBody: true
+                consoleLogResponseBody: true,
                 httpMode: 'POST',
                 requestBody: prModDesc, 
                 url: "${okapiIp}:9130/_/proxy/modules"
@@ -35,7 +35,7 @@ def call(String tenant,String prModDesc,String installJson) {
     // create tenant
     httpRequest acceptType: 'APPLICATION_JSON', 
                 contentType: 'APPLICATION_JSON', 
-                consoleLogResponseBody: true
+                consoleLogResponseBody: true,
                 httpMode: 'POST',
                 requestBody: tenantJson, 
                 url: "${okapiIp}:9130/_/proxy/tenants"
@@ -43,7 +43,7 @@ def call(String tenant,String prModDesc,String installJson) {
     // Enable Stripes Modules 
     httpRequest acceptType: 'APPLICATION_JSON', 
                 contentType: 'APPLICATION_JSON', 
-                consoleLogResponseBody: true
+                consoleLogResponseBody: true,
                 httpMode: 'POST',
                 requestBody: installJson, 
                 url: "${okapiIp}:9130/_/proxy/tenants/${tenant}/install?simulate=true"
