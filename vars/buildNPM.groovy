@@ -226,13 +226,26 @@ def call(body) {
           tenant = foliociLib.replaceHyphen(tenant)
 
           if (stripesPlatform != null) { 
-            stage('Build Stripes Platform') {
-              dir("${env.WORKSPACE}/$stripesPlatform.repo") {
+            dir("${env.WORKSPACE}/$stripesPlatform.repo") {
+              stage('Build Stripes Platform') {
                 git branch: stripesPlatform.branch, 
                     url: "https://github.com/folio-org/${stripesPlatform.repo}"
                 buildStripesPlatformPr(env.okapiUrl,tenant) 
               }
-            } 
+              stage('Okapi Dependency Check') {
+                def myMD = readFile("artifacts/md/${env.folioName}-${env.version}.json")
+               
+                def md2Install = libraryResource('org/folio/md2install.sh')
+                writeFile file: 'md2install.sh', text: md2Install
+                sh 'chmod +x md2install.sh'
+
+                def stripesInstall = sh(returnStdout: true,
+                                        script: './md2install.sh ./ModuleDescriptors')
+                sh 'rm -f ./md2install.sh'
+
+                okapiDepCheck(tenant,myMD,stripesInstall) 
+              }
+            }             
           }
 
           if (runRegression) { 
