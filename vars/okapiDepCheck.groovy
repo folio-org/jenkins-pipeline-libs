@@ -14,7 +14,7 @@ def call(String tenant,String prModDesc,String installJson) {
   def tenantJson = "{\"id\":\"${tenant}\"}"
 
   docker.image('folioorg/okapi:latest').withRun('', 'dev') { container ->
-    def okapiIp = sh returnStdout:true, script: "docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}} ${container.id}").trim()
+    def okapiIp = sh(returnStdout:true, script: "docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}} ${container.id}").trim()
 
     // pull all MDs
     httpRequest acceptType: 'APPLICATION_JSON', 
