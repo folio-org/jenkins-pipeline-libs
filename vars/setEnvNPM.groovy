@@ -11,6 +11,10 @@ def call() {
 
   // static vars
   env.okapiUrl = 'http://folio-snapshot-stable.aws.indexdata.com:9130'
+  env.folioRegistry = 'http://folio-registry.indexdata.internal:9130'
+
+  echo "Okapi URL: ${env.okapiUrl}"
+  echo "FOLIO Registry: ${env.folioRegistry}"
   
   // if release
   if ( foliociLib.isRelease() ) {
