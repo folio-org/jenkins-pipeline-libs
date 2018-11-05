@@ -9,19 +9,22 @@
 def call(String tenant,String prModDesc,String installJson) {
 
  
-  def folioRegistry = 'http://folio-registry.indexdata.internal:9130'
+  def folioRegistry = 'folio-registry.indexdata.internal:9130'
   def okapiPull = "{ \"urls\" : [ \"http://${folioRegistry}\" ]}"
   def tenantJson = "{\"id\":\"${tenant}\"}"
 
   docker.image('folioorg/okapi:latest').withRun('', 'dev') { container ->
     def okapiIp = sh(returnStdout:true, script: "docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${container.id}").trim()
 
+    // make sure okapi is fully started
+    sleep 5
+
     // pull all MDs
     httpRequest acceptType: 'APPLICATION_JSON', 
                 contentType: 'APPLICATION_JSON', 
                 consoleLogResponseBody: true,
                 httpMode: 'POST',
-                requestBody: "${okapiPull}", 
+                requestBody: okapiPull, 
                 url: "http://${okapiIp}:9130/_/proxy/pull/modules"
 
     // POST our MD
