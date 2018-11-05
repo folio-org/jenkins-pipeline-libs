@@ -21,7 +21,7 @@ def call(String tenant,String prModDesc,String installJson) {
     // pull all MDs
     httpRequest acceptType: 'APPLICATION_JSON', 
                 contentType: 'APPLICATION_JSON', 
-                consoleLogResponseBody: true,
+                consoleLogResponseBody: false,
                 httpMode: 'POST',
                 requestBody: okapiPull, 
                 url: "http://${okapiIp}:9130/_/proxy/pull/modules"
