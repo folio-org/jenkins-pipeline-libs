@@ -240,7 +240,7 @@ def call(body) {
                 sh 'chmod +x md2install.sh'
 
                 def stripesInstall = sh(returnStdout: true,
-                                        script: './md2install.sh ./ModuleDescriptors')
+                                        script: './md2install.sh artifacts/md')
                 sh 'rm -f ./md2install.sh'
 
                 okapiDepCheck(tenant,myMD,stripesInstall) 
