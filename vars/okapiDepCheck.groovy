@@ -9,8 +9,7 @@
 def call(String tenant,String prModDesc,String installJson) {
 
  
-  def folioRegistry = 'folio-registry.indexdata.internal:9130'
-  def okapiPull = "{ \"urls\" : [ \"http://${folioRegistry}\" ]}"
+  def okapiPull = "{ \"urls\" : [ \"${env.folioRegistry}\" ]}"
   def tenantJson = "{\"id\":\"${tenant}\"}"
 
   docker.image('folioorg/okapi:latest').withRun('', 'dev') { container ->
