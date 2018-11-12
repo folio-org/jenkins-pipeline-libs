@@ -136,8 +136,12 @@ def call(body) {
 
               // Stage 'Run NPM scripts'
               if (runScripts.size() >= 1) { 
-                runScripts.each { scriptName,scriptArgs -> runNPMScript(scriptName,scriptArgs) }
+                 parallel ( 
+                   runScripts.each { scriptName,scriptArgs -> runNPMScript(scriptName,scriptArgs) }
+                 )
               }
+ 
+
 
               // Run Sonarqube scanner       
               if (runSonarqube) {
