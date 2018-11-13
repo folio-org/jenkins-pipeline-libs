@@ -5,19 +5,20 @@
  *
  * Configurable parameters: 
  *
+ * buildNode: label of jenkin's slave build node to use
  * doDocker:  Build, test, and publish Docker image via 'buildDocker' (Default: 'no')
+ * modDescriptor: path to standalone Module Descriptor file (Optional)
+ * npmDeploy: Publish NPM artifacts to NPM repository (Default: 'yes')
+ * publishApi: Publish API/RAML documentation.  (Default: 'no')
+ * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no')
+ * regressionDebugMode:  Enable extra debug logging in regression tests (Default: false)
  * runLint: Run ESLint via 'yarn lint' (Default: 'no')
+ * runRegression: Run UI regression module tests for PRs - 'yes' or 'no' (Default: 'no') 
+ * runScripts: A "collection" of script commands and script arguments.  (Default: [:])
+ * runSonarqube: Run the Sonarqube scanner and generate reports on sonarcloud.io (Default: 'no')
  * runTest: Run unit tests via 'yarn test' (Default: 'no')
  * runTestOptions:  Extra opts to pass to 'yarn test'
- * runScripts: A Map of optional script commands and script arguments.  (Default: [:])
- * runRegression: Run UI regression module tests for PRs - 'yes' or 'no' (Default: 'no') 
- * runSonarqube: Run the Sonarqube scanner and generate reports on sonarcloud.io (Default: 'no']
- * regressionDebugMode:  Enable extra debug logging in regression tests (Default: false)
- * npmDeploy: Publish NPM artifacts to NPM repository (Default: 'yes')
- * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no')
- * modDescriptor: path to standalone Module Descriptor file (Optional)
- * publishApi: Publish API/RAML documentation.  (Default: 'no')
- * buildNode: label of jenkin's slave build node to use
+ * stripesPlatform: Map consisting of modules's stripes platform and branch (Default: []) 
 */
 
 
@@ -75,7 +76,7 @@ def call(body) {
   def Map stripesPlatform = config.stripesPlatform ?: [:]
 
   // run NPM script.  An empty Map
-  def Map runScripts = config.runScripts ?: [:]
+  def runScripts = config.runScripts ?: []
 
   // use the smaller nodejs build node since most 
   // Nodejs builds are Stripes.
@@ -134,13 +135,17 @@ def call(body) {
                 runTestNPM(runTestOptions)
               }
 
+              // Stage 'Run NPM scripts' - Run parallel jobs
               // Stage 'Run NPM scripts'
               if (runScripts.size() >= 1) { 
-                 parallel ( 
-                   runScripts.each { scriptName,scriptArgs -> runNPMScript(scriptName,scriptArgs) }
-                 )
-              }
- 
+                def scriptJobs = [:]
+                runScripts.each { 
+                  it.each { 
+                    scriptName, scriptArgs -> scriptJobs[it] = { runNPMScript(scriptName,scriptArgs) }
+                  }
+                }
+                parallel scriptJobs
+              } 
 
 
               // Run Sonarqube scanner       
