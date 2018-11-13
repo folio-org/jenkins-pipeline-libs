@@ -145,7 +145,7 @@ def call(body) {
                     scriptName, scriptArgs -> scriptJobs[it] = { runNPMScript(scriptName,scriptArgs) }
                   }
                 }
-                parallel scriptJobs failFast: true
+                parallel scriptJobs
               } 
 
 
