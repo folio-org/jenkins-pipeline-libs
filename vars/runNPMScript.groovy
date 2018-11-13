@@ -14,7 +14,7 @@
 
 def call(String scriptName, String scriptArgs) {
 
-  def XVFB = 'xvfb-run --server-args="-screen 0 1024x768x24"'
+  def XVFB = 'xvfb-run -a --server-args="-screen 0 1024x768x24"'
   def scriptStatus
   def errorMessage
 
