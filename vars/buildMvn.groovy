@@ -97,7 +97,9 @@ def call(body) {
         } 
 
         // Run Sonarqube
-        sonarqubeMvn() 
+        stage('SonarQube Analysis') {
+          sonarqubeMvn() 
+        }
 
         // master branch or tagged releases
         if (( env.BRANCH_NAME == 'master' ) || ( env.isRelease )) {
