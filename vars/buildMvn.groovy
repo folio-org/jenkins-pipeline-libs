@@ -5,7 +5,6 @@
  *
  * Configurable parameters: 
  *
- * sqBranch:  List of additional branches to perform SonarQube Analysis (Default: none)
  * doDocker:  Build, test, and publish Docker image via 'buildJavaDocker' (Default: 'no')
  * mvnDeploy: Deploy built artifacts to Maven repository (Default: 'no')
  * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no')
@@ -97,15 +96,8 @@ def call(body) {
           }
         } 
 
-        // Run Sonarqube stage
-        if (config.sqBranch) {
-          for (branch in config.sqBranch) {
-            if (branch == env.BRANCH_NAME) {
-              sonarqubeMvn(branch) 
-            }
-          }
-        }
-        else {
+        // Run Sonarqube
+        stage('SonarQube Analysis') {
           sonarqubeMvn() 
         }
 
