@@ -14,7 +14,11 @@ def call(String modDescriptor) {
   echo "Module Descriptor:"
   echo "$request"
 
-  httpRequest acceptType: 'APPLICATION_JSON', contentType: 'APPLICATION_JSON', httpMode: 'POST', 
-              requestBody: "$request", url: "$folioRegistry"
+  httpRequest acceptType: 'APPLICATION_JSON', 
+              contentType: 'APPLICATION_JSON', 
+              httpMode: 'POST', 
+              consoleLogResponseBody: true,
+              requestBody: request, 
+              url: folioRegistry
       
 }
