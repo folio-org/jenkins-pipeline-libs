@@ -24,6 +24,12 @@ def call(body) {
 
   def buildNode = config.buildNode ?: 'jenkins-slave-all'
 
+  properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '',
+                                          artifactNumToKeepStr: '30',
+                                          daysToKeepStr: '',
+                                          numToKeepStr: '30'))])
+
+
   node(buildNode) {
     timeout(60) {
 
