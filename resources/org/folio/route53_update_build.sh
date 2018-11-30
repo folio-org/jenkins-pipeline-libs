@@ -2,14 +2,17 @@
 
 # ec2_group
 group_tag=$1
+base_build=$2
+#base_build=$(awk -F '_' '{ print $1 "-" $2}'<<< $group_tag)
 
 # 'latest' or 'stable'
-build=$2
+build=$3
 
 export PATH=/usr/local/bin:$PATH
 
-base_build=$(awk -F '_' '{ print $1 "-" $2}'<<< $group_tag)
-hostname=$(awk -F '_' '{ print $1 "-" $2 "-" $3}'<<< $group_tag)
+#hostname=$(awk -F '_' '{ print $1 "-" $2 "-" $3}'<<< $group_tag)
+hostname=$(sed -e 's/_/-/g' <<< $base_build)
+
 aws="aws --output text --region us-east-1"
 public_zoneid="Z2F9IQRBHKK7BO"
 private_zoneid="Z3JKLZ9JDZ7HCP"
