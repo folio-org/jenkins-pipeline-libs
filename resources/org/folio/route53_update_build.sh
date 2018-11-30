@@ -11,7 +11,8 @@ build=$3
 export PATH=/usr/local/bin:$PATH
 
 #hostname=$(awk -F '_' '{ print $1 "-" $2 "-" $3}'<<< $group_tag)
-hostname=$(sed -e 's/_/-/g' <<< $base_build)
+hostname=$(sed -e 's/_/-/g' <<< $group_tag)
+hostname_base=$(sed -e 's/_/-/g' <<< $base_build)
 
 aws="aws --output text --region us-east-1"
 public_zoneid="Z2F9IQRBHKK7BO"
@@ -24,7 +25,7 @@ public_record=$(cat <<EOF
     { 
       "Action": "UPSERT",
       "ResourceRecordSet": {
-        "Name": "${base_build}-${build}.aws.indexdata.com.",
+        "Name": "${hostname_base}-${build}.aws.indexdata.com.",
         "Type": "CNAME",
         "TTL": 60,
         "ResourceRecords": [
