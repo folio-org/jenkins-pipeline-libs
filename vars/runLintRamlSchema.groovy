@@ -1,25 +1,26 @@
 #!/usr/bin/env groovy
 
 /*
- * Run 'raml-cop' on back-end modules that have declared RAML in api.yml
+ * Assess the RAML JSON Schema "descriptions" for each property FOLIO-1447
+ * For back-end modules that have declared RAML in api.yml
  */
 
 def call() {
-  echo "Running 'raml-cop' ..."
+  echo "Assessing RAML JSON Schema descriptions ..."
   sh 'mkdir -p ci'
-  sh 'echo "<html><body><pre>" > ci/lintRamlCop.html'
+  sh 'echo "<html><body><pre>" > ci/lintRamlSchema.html'
 
-  def lintStatus = sh(returnStatus:true, script: 'python3 /usr/local/bin/lint_raml_cop.py -l info >> ci/lintRamlCop.html')
+  def lintStatus = sh(returnStatus:true, script: 'python3 /usr/local/bin/lint_raml_cop.py -l info --json-only >> ci/lintRamlSchema.html')
 
-  sh 'echo "</pre><body></html>" >> ci/lintRamlCop.html'
+  sh 'echo "</pre><body></html>" >> ci/lintRamlSchema.html'
 
-  def lintReport = readFile('ci/lintRamlCop.html')
+  def lintReport = readFile('ci/lintRamlSchema.html')
 
   publishHTML([allowMissing: false, alwaysLinkToLastBuild: false,
                keepAll: true, reportDir: 'ci',
-               reportFiles: 'lintRamlCop.html',
-               reportName: 'Lint raml-cop Report',
-               reportTitles: 'Lint raml-cop Report'])
+               reportFiles: 'lintRamlSchema.html',
+               reportName: 'LintRamlSchemaReport',
+               reportTitles: 'Lint RAML JSON Schema Report'])
 
   sh 'rm -rf ci'
 

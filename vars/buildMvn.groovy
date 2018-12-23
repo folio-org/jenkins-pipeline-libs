@@ -82,6 +82,12 @@ def call(body) {
           echo "Project Name: $env.projectName"
         }
 
+        if (config.runLintRamlCop ==~ /(?i)(Y|YES|T|TRUE)/) {
+          stage('Lint raml-cop') {
+            runLintRamlCop()
+          }
+        }
+
         stage('Maven Build') {
           echo "Building Maven artifact: ${env.name} Version: ${env.version}"
           withMaven(jdk: 'openjdk-8-jenkins-slave-all',  
@@ -143,8 +149,8 @@ def call(body) {
         }
 
         if (config.runLintRamlCop ==~ /(?i)(Y|YES|T|TRUE)/) {
-          stage('Lint raml-cop') {
-            runLintRamlCop()
+          stage('Lint raml schema') {
+            runLintRamlSchema()
           }
         }
       } // end try
