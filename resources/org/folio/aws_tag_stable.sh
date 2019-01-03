@@ -1,7 +1,8 @@
 #!/bin/bash
 
 group_tag=$1
-base_build=$(awk -F '_' '{ print $1 "_" $2}'<<< $group_tag)
+base_build=$2
+#base_build=$(awk -F '_' '{ print $1 "_" $2}'<<< $group_tag)
 
 export PATH=/usr/local/bin:$PATH
 

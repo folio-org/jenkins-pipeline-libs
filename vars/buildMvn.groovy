@@ -5,7 +5,6 @@
  *
  * Configurable parameters: 
  *
- * sqBranch:  List of additional branches to perform SonarQube Analysis (Default: none)
  * doDocker:  Build, test, and publish Docker image via 'buildJavaDocker' (Default: 'no')
  * mvnDeploy: Deploy built artifacts to Maven repository (Default: 'no')
  * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no')
@@ -24,6 +23,12 @@ def call(body) {
   def foliociLib = new org.folio.foliociCommands()
 
   def buildNode = config.buildNode ?: 'jenkins-slave-all'
+
+  properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '',
+                                          artifactNumToKeepStr: '30',
+                                          daysToKeepStr: '',
+                                          numToKeepStr: '30'))])
+
 
   node(buildNode) {
     timeout(60) {
@@ -77,6 +82,12 @@ def call(body) {
           echo "Project Name: $env.projectName"
         }
 
+        if (config.runLintRamlCop ==~ /(?i)(Y|YES|T|TRUE)/) {
+          stage('Lint raml-cop') {
+            runLintRamlCop()
+          }
+        }
+
         stage('Maven Build') {
           echo "Building Maven artifact: ${env.name} Version: ${env.version}"
           withMaven(jdk: 'openjdk-8-jenkins-slave-all',  
@@ -97,15 +108,8 @@ def call(body) {
           }
         } 
 
-        // Run Sonarqube stage
-        if (config.sqBranch) {
-          for (branch in config.sqBranch) {
-            if (branch == env.BRANCH_NAME) {
-              sonarqubeMvn(branch) 
-            }
-          }
-        }
-        else {
+        // Run Sonarqube
+        stage('SonarQube Analysis') {
           sonarqubeMvn() 
         }
 
@@ -145,8 +149,8 @@ def call(body) {
         }
 
         if (config.runLintRamlCop ==~ /(?i)(Y|YES|T|TRUE)/) {
-          stage('Lint raml-cop') {
-            runLintRamlCop()
+          stage('Lint raml schema') {
+            runLintRamlSchema()
           }
         }
       } // end try
