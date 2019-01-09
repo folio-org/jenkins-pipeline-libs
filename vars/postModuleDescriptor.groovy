@@ -14,8 +14,8 @@ def call(String modDescriptor) {
   echo "Module Descriptor:"
   echo "$request"
 
-  httpRequest acceptType: 'APPLICATION_JSON', 
-              contentType: 'APPLICATION_JSON', 
+  httpRequest acceptType: 'APPLICATION_JSON_UTF8', 
+              contentType: 'APPLICATION_JSON_UTF8', 
               httpMode: 'POST', 
               consoleLogResponseBody: true,
               requestBody: request, 
