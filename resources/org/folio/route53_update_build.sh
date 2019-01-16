@@ -20,7 +20,7 @@ private_zoneid="Z3JKLZ9JDZ7HCP"
 
 public_record=$(cat <<EOF
 {
-"Comment": "Update public zone record to reflect latest ${base_build}-${build}",
+"Comment": "Update public zone record to reflect latest ${hostname_base}-${build}",
   "Changes": [
     { 
       "Action": "UPSERT",
@@ -42,12 +42,12 @@ EOF
 
 private_record=$(cat <<EOF
 {
-"Comment": "Update internal zone record to reflect latest ${base_build}-${build}",
+"Comment": "Update internal zone record to reflect latest ${hostname_base}-${build}",
   "Changes": [
     { 
       "Action": "UPSERT",
       "ResourceRecordSet": {
-        "Name": "${base_build}-${build}.indexdata.internal.",
+        "Name": "${hostname_base}-${build}.indexdata.internal.",
         "Type": "CNAME",
         "TTL": 60,
         "ResourceRecords": [
