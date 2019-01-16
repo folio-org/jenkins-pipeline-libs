@@ -97,6 +97,10 @@ def call(body) {
           }
         }
 
+        // Run Sonarqube
+        stage('SonarQube Analysis') {
+          sonarqubeMvn() 
+        }
       
         // Docker stuff
         if (config.doDocker) {
@@ -107,11 +111,6 @@ def call(body) {
 	    config.doDocker.call()
           }
         } 
-
-        // Run Sonarqube
-        stage('SonarQube Analysis') {
-          sonarqubeMvn() 
-        }
 
         // master branch or tagged releases
         if (( env.BRANCH_NAME == 'master' ) || ( env.isRelease )) {
