@@ -21,7 +21,6 @@ def call(String lcovPath = 'artifacts/coverage') {
           "-Dsonar.organization=folio-org " +
           "-Dsonar.sources=. " +
           "-Dsonar.language=js " +
-          "-Dsonar.verbose=true " +
           "-Dsonar.exclusions=${excludeFiles} " +
      
           "-Dsonar.pullrequest.base=master " +
