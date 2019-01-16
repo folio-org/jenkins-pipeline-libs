@@ -289,17 +289,17 @@ def call(body) {
         throw err
       }
       finally {
-        // publish junit tests if available
-        junit allowEmptyResults: true, testResults: "${env.WORKSPACE}/project/artifacts/runTest/*.xml"
+        dir("${env.WORKSPACE}") {
+          // publish junit tests if available
+          junit allowEmptyResults: true, testResults: 'project/artifacts/runTest/*.xml'
 
-        // publish lcov coverage html reports if available
-        publishHTML([allowMissing: true, alwaysLinkToLastBuild: false,
-                    keepAll: true, reportDir: "${env.WORKSPACE}/project/artifacts/coverage/lcov-report",
-                    reportFiles: 'index.html',
-                    reportName: 'LCov Coverage Report',
-                    reportTitles: 'LCov Coverage Report'])
-
-
+          // publish lcov coverage html reports if available
+          publishHTML([allowMissing: true, alwaysLinkToLastBuild: false,
+                       keepAll: true, reportDir: 'project/artifacts/coverage/lcov-report',
+                       reportFiles: 'index.html',
+                       reportName: 'LCov Coverage Report',
+                       reportTitles: 'LCov Coverage Report'])
+        }
         sendNotifications currentBuild.result
       }
     } // end timeout
