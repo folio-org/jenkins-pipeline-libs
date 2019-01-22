@@ -93,6 +93,16 @@ def call(body) {
           withMaven(jdk: 'openjdk-8-jenkins-slave-all',  
                     maven: 'maven3-jenkins-slave-all',  
                     mavenSettingsConfig: 'folioci-maven-settings') {
+    
+            // Check to see if we have snapshot deps in release
+            if (env.isRelease) {
+              def snapshotDeps = checkMvnReleaseDeps() 
+              if (snapshotDeps) { 
+                echo "$snapshotDeps"
+                error('Snapshot dependencies found in release')
+              }
+            }
+              
             sh 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install'
           }
         }

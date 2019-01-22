@@ -153,6 +153,14 @@ def gradleProperty(String property) {
                  script: "grep \'^${property}=\' gradle.properties | awk -F \'=\' \'{ print \$2 }\'").trim()
   return value
 }
+
+// check for snapshot deps in Maven release
+def checkMvnReleaseDeps() {
+  def deps = sh(returnStdOut: true,
+                  script: 'mvn dependency:list | grep -i snapshot')
+  return deps
+}
+
   
 @NonCPS
 def currentDateTime() {
