@@ -5,11 +5,11 @@
  *
  * Configurable parameters: 
  *
- * doDocker:  Build, test, and publish Docker image via 'buildJavaDocker' (Default: 'no')
- * mvnDeploy: Deploy built artifacts to Maven repository (Default: 'no')
- * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no')
- * publishAPI: Publish API RAML documentation.  (Default: 'no')
- * runLintRamlCop: Run 'raml-cop' on back-end modules that have declared RAML in api.yml (Default: 'no')
+ * doDocker:  Build, test, and publish Docker image via 'buildJavaDocker' (Default: 'no'/false)
+ * mvnDeploy: Deploy built artifacts to Maven repository (Default: 'no'/false)
+ * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no'/false)
+ * publishAPI: Publish API RAML documentation.  (Default: 'no'/false)
+ * runLintRamlCop: Run 'raml-cop' on back-end modules that have declared RAML in api.yml (Default: 'no'/false)
 */
  
 
@@ -21,6 +21,28 @@ def call(body) {
   body()
 
   def foliociLib = new org.folio.foliociCommands()
+
+  // Lint RAML for RAMLCop.  default is false
+  def runLintRamlCop = config.runLintRamlCop ?: false
+  if (runLintRamlCop ==~ /(?i)(Y|YES|T|TRUE)/) { runLintRamlCop = true } 
+  if (runLintRamlCop ==~ /(?i)(N|NO|F|FALSE)/) { runLintRamlCop = false} 
+
+  // publish maven artifacts to Maven repo.  Default is false
+  def mvnDeploy = config.mvnDeploy ? false
+  if (mvnDeploy ==~ /(?i)(Y|YES|T|TRUE)/) { mvnDeploy = true }
+  if (mvnDeploy ==~ /(?i)(N|NO|F|FALSE/) { mvnDeploy = false }
+
+  // publish mod descriptor to folio-registry. Default is false
+  def publishModDescriptor = config.publishModDescriptor ?: false
+  if (publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) { publishModDescriptor = true }
+  if (publishModDescriptor ==~ /(?i)(N|NO|F|FALSE)/) { publishModDescriptor = false }
+
+  // publish API documentation to foliodocs. Default is false
+  def publishAPI = config.publishAPI ?: false
+  if (publishAPI ==~ /(?i)(Y|YES|T|TRUE)/) { publishAPI = true }
+  if (publishAPI ==~ /(?i)(N|NO|F|FALSE)/) { publishAPI = false }
+
+
 
   def buildNode = config.buildNode ?: 'jenkins-slave-all'
 
@@ -54,35 +76,11 @@ def call(body) {
           echo "Checked out branch: $env.BRANCH_NAME"
         }
 
-        stage('Setup') {
-          def mvn_artifact = readMavenPom().getArtifactId()
-          def mvn_version =  readMavenPom().getVersion()
-          env.name = mvn_artifact
-
-          // if release
-          if ( foliociLib.isRelease() )  {
-            // make sure git tag and maven version match
-            if ( foliociLib.tagMatch(mvn_version) ) {
-              env.version = mvn_version
-              env.isRelease = true
-              env.dockerRepo = 'folioorg'
-            }
-            else { 
-              error('Git release tag and Maven version mismatch')
-            }
-          } 
-          // else snapshot
-          else {
-            env.version = "${mvn_version}.${env.BUILD_NUMBER}"
-            env.snapshot = true
-            env.dockerRepo = 'folioci'
-          }
-            
-          env.projectName = foliociLib.getProjName()
-          echo "Project Name: $env.projectName"
+        stage('Set Environment') {
+          setEnvMvn()
         }
 
-        if (config.runLintRamlCop ==~ /(?i)(Y|YES|T|TRUE)/) {
+        if (runLintRamlCop) {
           stage('Lint raml-cop') {
             runLintRamlCop()
           }
@@ -102,7 +100,6 @@ def call(body) {
                 error('Snapshot dependencies found in release')
               }
             }
-              
             sh 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install'
           }
         }
@@ -125,7 +122,7 @@ def call(body) {
         // master branch or tagged releases
         if (( env.BRANCH_NAME == 'master' ) || ( env.isRelease )) {
 
-          if ( config.mvnDeploy ==~ /(?i)(Y|YES|T|TRUE)/ ) {
+          if (mvnDeploy) {
             stage('Maven Deploy') {
               echo "Deploying artifacts to Maven repository"
               withMaven(jdk: 'openjdk-8-jenkins-slave-all', 
@@ -135,7 +132,7 @@ def call(body) {
               }
             }
           }
-          if (config.publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) {
+          if (publishModDescriptor) {
             stage('Publish Module Descriptor') {
               echo "Publishing Module Descriptor to FOLIO registry"
               def modDescriptor = 'target/ModuleDescriptor.json'
@@ -143,7 +140,7 @@ def call(body) {
               postModuleDescriptor(modDescriptor) 
             }
           }
-          if (config.publishAPI ==~ /(?i)(Y|YES|T|TRUE)/) {
+          if (publishAPI) {
             stage('Publish API Docs') {
               echo "Publishing API docs"
               sh "python3 /usr/local/bin/generate_api_docs.py -r $env.projectName -l info -o folio-api-docs"
@@ -157,7 +154,7 @@ def call(body) {
           }
         }
 
-        if (config.runLintRamlCop ==~ /(?i)(Y|YES|T|TRUE)/) {
+        if (runLintRamlCop) {
           stage('Lint raml schema') {
             runLintRamlSchema()
           }
