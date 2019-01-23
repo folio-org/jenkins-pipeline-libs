@@ -35,7 +35,7 @@ def call(String md) {
                 contentType: 'APPLICATION_JSON', 
                 consoleLogResponseBody: true,
                 httpMode: 'POST',
-                requestBody: prModDesc, 
+                requestBody: md, 
                 url: mdUrl
 
   } // destroy okapi container
