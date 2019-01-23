@@ -23,16 +23,16 @@ def call(String md) {
     sleep 5
 
     // pull all MDs
-    httpRequest acceptType: 'APPLICATION_JSON', 
-                contentType: 'APPLICATION_JSON', 
+    httpRequest acceptType: 'APPLICATION_JSON_UTF8', 
+                contentType: 'APPLICATION_JSON_UTF8', 
                 consoleLogResponseBody: false,
                 httpMode: 'POST',
                 requestBody: okapiPull, 
                 url: "http://${okapiIp}:9130/_/proxy/pull/modules"
 
     // POST our MD
-    httpRequest acceptType: 'APPLICATION_JSON', 
-                contentType: 'APPLICATION_JSON', 
+    httpRequest acceptType: 'APPLICATION_JSON_UTF8', 
+                contentType: 'APPLICATION_JSON_UTF8', 
                 consoleLogResponseBody: true,
                 httpMode: 'POST',
                 requestBody: md, 
