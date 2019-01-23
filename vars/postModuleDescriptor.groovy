@@ -7,8 +7,17 @@
  */
 
 def call(String modDescriptor) {
- 
-  def folioRegistry = 'http://folio-registry.aws.indexdata.com/_/proxy/modules'
+
+  def folioRegistryUrl
+
+  // if this is a release, verify dep resolution against releases only.
+  if (env.isRelease) {
+    folioRegistryUrl = 'http://folio-registry.aws.indexdata.com/_/proxy/modules?preRelease=false'
+  }
+  else {
+    folioRegistryUrl = 'http://folio-registry.aws.indexdata.com/_/proxy/modules'
+  }
+    
 
   def request = readFile(modDescriptor)
   echo "Module Descriptor:"
