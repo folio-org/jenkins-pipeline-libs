@@ -119,6 +119,14 @@ def call(body) {
           }
         } 
 
+        if (env.isRelease) {
+          stage('Dependency Check') {
+            def modDescriptor = 'target/ModuleDescriptor.json'
+            foliociLib.updateModDescriptor(modDescriptor)
+            okapiModDepCheck(modDescriptor)
+          }
+        }
+
         // master branch or tagged releases
         if (( env.BRANCH_NAME == 'master' ) || ( env.isRelease )) {
 
@@ -135,8 +143,6 @@ def call(body) {
           if (publishModDescriptor) {
             stage('Publish Module Descriptor') {
               echo "Publishing Module Descriptor to FOLIO registry"
-              def modDescriptor = 'target/ModuleDescriptor.json'
-              foliociLib.updateModDescriptor(modDescriptor)
               postModuleDescriptor(modDescriptor) 
             }
           }
