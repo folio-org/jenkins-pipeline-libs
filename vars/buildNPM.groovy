@@ -175,6 +175,12 @@ def call(body) {
                 }
               } 
 
+              if (env.isRelease) {
+                stage('Dependency Check') {
+                  okapiModDepCheck(modDescriptor)
+                }
+              }
+
               if (( env.BRANCH_NAME == 'master' ) ||  ( env.isRelease )) {
                 if (npmDeploy) {
                   stage('NPM Publish') {
