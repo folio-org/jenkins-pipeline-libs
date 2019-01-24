@@ -4,10 +4,12 @@
  * Test module dependency resolution
  */
 
-def call(String md) {
+def call(String mdFile) {
  
   def okapiPull = "{ \"urls\" : [ \"${env.folioRegistry}\" ]}"
   def mdUrl 
+  def md = readFile(mdFile)
+  
 
   docker.image('folioorg/okapi:latest').withRun('', 'dev') { container ->
     def okapiIp = sh(returnStdout:true, script: "docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${container.id}").trim()
