@@ -7,7 +7,10 @@
  * Example:
  *
  * buildNPM { 
- *   runScripts ['script name':'script args']
+ *   runScripts [
+ *      ['script1':'script1 args'],
+ *      ['script2':'script2 args']
+ *   ]
  * }
  * 
  */
