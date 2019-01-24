@@ -30,7 +30,7 @@ def call(body) {
   // publish maven artifacts to Maven repo.  Default is false
   def mvnDeploy = config.mvnDeploy ? false
   if (mvnDeploy ==~ /(?i)(Y|YES|T|TRUE)/) { mvnDeploy = true }
-  if (mvnDeploy ==~ /(?i)(N|NO|F|FALSE/) { mvnDeploy = false }
+  if (mvnDeploy ==~ /(?i)(N|NO|F|FALSE)/) { mvnDeploy = false }
 
   // publish mod descriptor to folio-registry. Default is false
   def publishModDescriptor = config.publishModDescriptor ?: false
