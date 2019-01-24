@@ -94,7 +94,7 @@ def call(body) {
     
             // Check to see if we have snapshot deps in release
             if (env.isRelease) {
-              def snapshotDeps = checkMvnReleaseDeps() 
+              def snapshotDeps = foliociLib.checkMvnReleaseDeps() 
               if (snapshotDeps) { 
                 echo "$snapshotDeps"
                 error('Snapshot dependencies found in release')
