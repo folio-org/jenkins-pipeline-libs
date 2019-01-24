@@ -28,7 +28,7 @@ def call(body) {
   if (runLintRamlCop ==~ /(?i)(N|NO|F|FALSE)/) { runLintRamlCop = false} 
 
   // publish maven artifacts to Maven repo.  Default is false
-  def mvnDeploy = config.mvnDeploy ? false
+  def mvnDeploy = config.mvnDeploy ?: false
   if (mvnDeploy ==~ /(?i)(Y|YES|T|TRUE)/) { mvnDeploy = true }
   if (mvnDeploy ==~ /(?i)(N|NO|F|FALSE)/) { mvnDeploy = false }
 
