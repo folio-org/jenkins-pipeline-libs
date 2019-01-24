@@ -25,7 +25,7 @@ def call(body) {
   // Lint RAML for RAMLCop.  default is false
   def runLintRamlCop = config.runLintRamlCop ?: false
   if (runLintRamlCop ==~ /(?i)(Y|YES|T|TRUE)/) { runLintRamlCop = true } 
-  if (runLintRamlCop ==~ /(?i)(N|NO|F|FALSE)/) { runLintRamlCop = false} 
+  if (runLintRamlCop ==~ /(?i)(N|NO|F|FALSE)/) { runLintRamlCop = false } 
 
   // publish maven artifacts to Maven repo.  Default is false
   def mvnDeploy = config.mvnDeploy ?: false
