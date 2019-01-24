@@ -31,24 +31,25 @@ def call() {
     else {
       error('Git release tag and Maven version mismatch')
     } 
-    // else snapshot
-    else {
-      env.version = "${mvn_version}.${env.BUILD_NUMBER}"
-      env.snapshot = true
-      env.dockerRepo = 'folioci'
-    } 
+  }
+  // else snapshot
+  else {
+    env.version = "${mvn_version}.${env.BUILD_NUMBER}"
+    env.snapshot = true
+    env.dockerRepo = 'folioci'
+  } 
 
-    // project name is the GitHub repo name
-    env.projectName = foliociLib.getProjName()
+  // project name is the GitHub repo name
+  env.projectName = foliociLib.getProjName()
 
-    //git commit sha1
-    env.gitCommit = foliociLib.gitCommit()
-    env.projUrl = foliociLib.getProjUrl()
+  //git commit sha1
+  env.gitCommit = foliociLib.gitCommit()
+  env.projUrl = foliociLib.getProjUrl()
 
-    echo "Maven Project Name: $env.namee"
-    echo "Maven Project Version: $env.version"
-    echo "Git Project Name: $env.projectName"
-    echo "Git Project Url: $env.projUrl"
-    echo "Git Commit SHA1: $env.gitCommit"
+  echo "Maven Project Name: $env.namee"
+  echo "Maven Project Version: $env.version"
+  echo "Git Project Name: $env.projectName"
+  echo "Git Project Url: $env.projUrl"
+  echo "Git Commit SHA1: $env.gitCommit"
 
 }
