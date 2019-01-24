@@ -170,13 +170,14 @@ def call(body) {
                   echo "Generating Stripes module descriptor from package.json"
                   sh "mkdir -p artifacts/md"
                   sh "stripes mod descriptor --full --strict | jq '.[]' " +
-                     "> artifacts/md/${env.simpleName}.json"
-                  modDescriptor = "${env.WORKSPACE}/project/artifacts/md/${env.simpleName}.json"
+                     "> artifacts/md/${env.folioName}.json"
+                  modDescriptor = "${env.WORKSPACE}/project/artifacts/md/${env.folioName}.json"
                 }
               } 
 
               if (env.isRelease) {
                 stage('Dependency Check') {
+                  echo "Checking mod descriptor dependencies"
                   okapiModDepCheck(modDescriptor)
                 }
               }
