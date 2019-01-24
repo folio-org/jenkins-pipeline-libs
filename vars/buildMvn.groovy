@@ -23,9 +23,9 @@ def call(body) {
   def foliociLib = new org.folio.foliociCommands()
 
   // Lint RAML for RAMLCop.  default is false
-  def runLintRamlCop = config.runLintRamlCop ?: false
-  if (runLintRamlCop ==~ /(?i)(Y|YES|T|TRUE)/) { runLintRamlCop = true } 
-  if (runLintRamlCop ==~ /(?i)(N|NO|F|FALSE)/) { runLintRamlCop = false } 
+  def doLintRamlCop = config.runLintRamlCop ?: false
+  if (doLintRamlCop ==~ /(?i)(Y|YES|T|TRUE)/) { doLintRamlCop = true } 
+  if (doLintRamlCop ==~ /(?i)(N|NO|F|FALSE)/) { doLintRamlCop = false } 
 
   // publish maven artifacts to Maven repo.  Default is false
   def mvnDeploy = config.mvnDeploy ?: false
@@ -80,7 +80,7 @@ def call(body) {
           setEnvMvn()
         }
 
-        if (runLintRamlCop) {
+        if (doLintRamlCop) {
           stage('Lint raml-cop') {
             runLintRamlCop()
           }
