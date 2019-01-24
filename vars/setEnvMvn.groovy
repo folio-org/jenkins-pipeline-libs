@@ -46,7 +46,7 @@ def call() {
   env.gitCommit = foliociLib.gitCommit()
   env.projUrl = foliociLib.getProjUrl()
 
-  echo "Maven Project Name: $env.namee"
+  echo "Maven Project Name: $env.name"
   echo "Maven Project Version: $env.version"
   echo "Git Project Name: $env.projectName"
   echo "Git Project Url: $env.projUrl"
