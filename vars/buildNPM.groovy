@@ -13,12 +13,12 @@
  * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no')
  * regressionDebugMode:  Enable extra debug logging in regression tests (Default: false)
  * runLint: Run ESLint via 'yarn lint' (Default: 'no')
- * runRegression: Run UI regression module tests for PRs - 'yes' or 'no' (Default: 'no') 
+ * runRegression (DISABLED) : Run UI regression module tests for PRs - 'yes' or 'no' (Default: 'no') 
  * runScripts: A "collection" of script commands and script arguments.  (Default: [:])
  * runSonarqube: Run the Sonarqube scanner and generate reports on sonarcloud.io (Default: 'no')
  * runTest: Run unit tests via 'yarn test' (Default: 'no')
  * runTestOptions:  Extra opts to pass to 'yarn test'
- * stripesPlatform: Map consisting of modules's stripes platform and branch (Default: []) 
+ * stripesPlatform (DISABLED): Map consisting of modules's stripes platform and branch (Default: []) 
 */
 
 
@@ -174,8 +174,8 @@ def call(body) {
                   modDescriptor = "${env.WORKSPACE}/project/artifacts/md/${env.folioName}.json"
                 }
               } 
-
-              if (env.isRelease) {
+               // interface dep check.  releases only for now.
+               if (env.isRelease) {
                 stage('Dependency Check') {
                   echo "Checking mod descriptor dependencies"
                   okapiModDepCheck(modDescriptor)
@@ -234,60 +234,52 @@ def call(body) {
         } // end dir
 
         // actions specific to PRs
-        if (env.CHANGE_ID) {
+        /*
+        *  Unused or disabled checks
+        *   
+        * if (env.CHANGE_ID) {
+        * 
+        *   // ensure tenant id is unique
+        *  // def tenant = "${env.BRANCH_NAME}_${env.BUILD_NUMBER}"
+        *  def tenant = "pr_${env.CHANGE_ID}_${env.BUILD_NUMBER}"
+        *  tenant = foliociLib.replaceHyphen(tenant)
+        *
+        *  if (stripesPlatform != null) { 
+        *    dir("${env.WORKSPACE}/$stripesPlatform.repo") {
+        *      stage('Build Stripes Platform') {
+        *        git branch: stripesPlatform.branch, 
+        *            url: "https://github.com/folio-org/${stripesPlatform.repo}"
+        *        buildStripesPlatformPr(env.okapiUrl,tenant) 
+        *      }
+        *    }             
+        *  }
+        *
+        *  if (runRegression) { 
+        *    stage('Bootstrap Tenant') { 
+        *      def tenantStatus = deployTenant("$okapiUrl","$tenant") 
+        *      env.tenantStatus = tenantStatus
+        *    }
+        * 
+        *    if (env.tenantStatus != '0') {
+        *      echo "Tenant Bootstrap Status: $env.tenantStatus"
+        *      echo "Problem deploying tenant. Skipping UI Regression testing."
+        *    }
+        *    else { 
+        *      dir("${env.WORKSPACE}") { 
+        *        stage('Run UI Integration Tests') { 
+        *          def testOpts = [ tenant: tenant,
+        *                           folioUser: tenant + '_admin',
+        *                           folioPassword: 'admin',
+        *                           okapiUrl: okapiUrl ]
+        *
+        *            runIntegrationTests(testOpts,regressionDebugMode)
+        *        }
+        *      }
+        *    }
+        *  }  
+        * }  // env CHANGE_ID
+        */
 
-          // ensure tenant id is unique
-          // def tenant = "${env.BRANCH_NAME}_${env.BUILD_NUMBER}"
-          def tenant = "pr_${env.CHANGE_ID}_${env.BUILD_NUMBER}"
-          tenant = foliociLib.replaceHyphen(tenant)
-
-          if (stripesPlatform != null) { 
-            dir("${env.WORKSPACE}/$stripesPlatform.repo") {
-              stage('Build Stripes Platform') {
-                git branch: stripesPlatform.branch, 
-                    url: "https://github.com/folio-org/${stripesPlatform.repo}"
-                buildStripesPlatformPr(env.okapiUrl,tenant) 
-              }
-              stage('Okapi Dependency Check') {
-                def myMD = readFile("artifacts/md/${env.folioName}-${env.version}.json")
-               
-                def md2Install = libraryResource('org/folio/md2install.sh')
-                writeFile file: 'md2install.sh', text: md2Install
-                sh 'chmod +x md2install.sh'
-
-                def stripesInstall = sh(returnStdout: true,
-                                        script: './md2install.sh artifacts/md')
-                sh 'rm -f ./md2install.sh'
-
-                okapiDepCheck(tenant,myMD,stripesInstall) 
-              }
-            }             
-          }
-
-          if (runRegression) { 
-            stage('Bootstrap Tenant') { 
-              def tenantStatus = deployTenant("$okapiUrl","$tenant") 
-              env.tenantStatus = tenantStatus
-            }
-     
-            if (env.tenantStatus != '0') {
-              echo "Tenant Bootstrap Status: $env.tenantStatus"
-              echo "Problem deploying tenant. Skipping UI Regression testing."
-            }
-            else { 
-              dir("${env.WORKSPACE}") { 
-                stage('Run UI Integration Tests') { 
-                  def testOpts = [ tenant: tenant,
-                                   folioUser: tenant + '_admin',
-                                   folioPassword: 'admin',
-                                   okapiUrl: okapiUrl ]
- 
-                    runIntegrationTests(testOpts,regressionDebugMode)
-                }
-              }
-            }
-          }  
-        }  // env CHANGE_ID
       }  // end try
       catch (Exception err) {
         currentBuild.result = 'FAILED'
