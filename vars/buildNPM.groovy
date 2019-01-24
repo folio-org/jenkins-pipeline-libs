@@ -14,7 +14,7 @@
  * regressionDebugMode:  Enable extra debug logging in regression tests (Default: false)
  * runLint: Run ESLint via 'yarn lint' (Default: 'no')
  * runRegression (DISABLED) : Run UI regression module tests for PRs - 'yes' or 'no' (Default: 'no') 
- * runScripts: A "collection" of script commands and script arguments.  (Default: [:])
+ * runScripts: A "collection" of script commands and script arguments.  (Default: [])
  * runSonarqube: Run the Sonarqube scanner and generate reports on sonarcloud.io (Default: 'no')
  * runTest: Run unit tests via 'yarn test' (Default: 'no')
  * runTestOptions:  Extra opts to pass to 'yarn test'
