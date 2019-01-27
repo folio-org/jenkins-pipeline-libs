@@ -101,6 +101,8 @@ def call(body) {
               }
             }
             sh 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install'
+            def modDescriptor = 'target/ModuleDescriptor.json'
+            foliociLib.updateModDescriptor(modDescriptor)
           }
         }
 
@@ -121,8 +123,6 @@ def call(body) {
 
         if (env.isRelease) {
           stage('Dependency Check') {
-            def modDescriptor = 'target/ModuleDescriptor.json'
-            foliociLib.updateModDescriptor(modDescriptor)
             okapiModDepCheck(modDescriptor)
           }
         }
