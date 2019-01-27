@@ -12,10 +12,10 @@ def call(String modDescriptor) {
 
   // if this is a release, verify dep resolution against releases only.
   if (env.isRelease) {
-    folioRegistryUrl = 'http://folio-registry.aws.indexdata.com/_/proxy/modules?preRelease=false'
+    folioRegistryUrl = "${folioRegistry}/_/proxy/modules?preRelease=false"
   }
   else {
-    folioRegistryUrl = 'http://folio-registry.aws.indexdata.com/_/proxy/modules'
+    folioRegistryUrl = "${folioRegistry}/_/proxy/modules"
   }
     
 
@@ -28,6 +28,6 @@ def call(String modDescriptor) {
               httpMode: 'POST', 
               consoleLogResponseBody: true,
               requestBody: request, 
-              url: folioRegistry
+              url: folioRegistryUrl
       
 }
