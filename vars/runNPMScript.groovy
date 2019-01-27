@@ -7,14 +7,17 @@
  * Example:
  *
  * buildNPM { 
- *   runScripts ['script name':'script args']
+ *   runScripts [
+ *      ['script1':'script1 args'],
+ *      ['script2':'script2 args']
+ *   ]
  * }
  * 
  */
 
 def call(String scriptName, String scriptArgs) {
 
-  def XVFB = 'xvfb-run --server-args="-screen 0 1024x768x24"'
+  def XVFB = 'xvfb-run -a --server-args="-screen 0 1024x768x24"'
   def scriptStatus
   def errorMessage
 

@@ -26,19 +26,28 @@ def call(body) {
   // Defaults if not defined. 
   def dockerfile = config.dockerfile ?: 'Dockerfile'
   def buildContext = config.dockerDir ?: env.WORKSPACE
-  def overrideConfig = config.overrideConfig ?: 'no'
-  def publishMaster = config.publishMaster ?: 'yes'
+
+  def overrideConfig = config.overrideConfig ?: false
+  if (overrideConfig ==~ /(?i)(Y|YES|T|TRUE)/) { overrideConfig = true } 
+  if (overrideConfig ==~ /(?i)(N|NO|F|FALSE)/) { overrideConfig = false} 
+  
+  def publishMaster = config.publishMaster ?: true
+  if (publishMaster ==~ /(?i)(Y|YES|T|TRUE)/) { publishMaster = true } 
+  if (publishMaster ==~ /(?i)(N|NO|F|FALSE)/) { publishMaster = false} 
+  
+  def healthChk = config.healthChk ?: false
+  if (healthChk ==~ /(?i)(Y|YES|T|TRUE)/) { healthChk = true } 
+  if (healthChk ==~ /(?i)(N|NO|F|FALSE)/) { healthChk = false} 
 
   // default
-  def buildArg = 'no'
+  def Boolean buildArg = false
 
   try { 
     dir("$buildContext") {
    
-      // if 'override' is 'yes', create our own Dockerfile, otherwise
+      // if 'overrideConfig' is true, create our own Dockerfile, otherwise
       // use project's Dockerfile
-
-      if (overrideConfig ==~ /(?i)(Y|YES|T|TRUE)/) {
+      if (overrideConfig) {
         def fatJar = "${env.name}-fat.jar"
 
         if (fileExists("target/$fatJar")) {
@@ -47,7 +56,7 @@ def call(body) {
           // use dockerfile template
           dockerFile = libraryResource 'org/folio/Dockerfile.javaModule'
           writeFile file: 'Dockerfile', text: "$dockerFile"
-          buildArg = 'yes'
+          buildArg = true
         }
         else {
           echo "Unable to locate Jar file for this project."
@@ -81,8 +90,7 @@ EOF
       }
       
       // build docker image
-
-      if (buildArg == 'yes') {
+      if (buildArg) {
         sh "docker build --pull=true --no-cache=true -t ${env.name}:${env.version} --build-arg='VERTICLE_FILE=${fatJar}' . "
       }
       else {
@@ -90,7 +98,7 @@ EOF
       }
 
       // Test container using container healthcheck
-      if ((config.healthChk ==~ /(?i)(Y|YES|T|TRUE)/) && (config.healthChkCmd)) {
+      if ( healthChk && config.healthChkCmd ) {
 
         def runArgs = config.runArgs ?: ' ' 
         def healthChkCmd = config.healthChkCmd
@@ -111,9 +119,7 @@ EOF
 
       // publish image if master branch
 
-      if ((env.BRANCH_NAME == 'master') ||
-          (env.isRelease) && 
-          (publishMaster ==~ /(?i)(Y|YES|T|TRUE)/)) {
+      if ( (env.BRANCH_NAME == 'master' && publishMaster) || env.isRelease ) {
         // publish images to ci docker repo
         echo "Publishing Docker images"
         docker.withRegistry('https://index.docker.io/v1/', 'DockerHubIDJenkins') {
@@ -121,7 +127,7 @@ EOF
           sh "docker tag ${env.name}:${env.version} ${env.dockerRepo}/${env.name}:latest"
           sh "docker push ${env.dockerRepo}/${env.name}:${env.version}"
           sh "docker push ${env.dockerRepo}/${env.name}:latest"
-      }
+        }
       }
 
     } // end dir()
