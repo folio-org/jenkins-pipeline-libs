@@ -43,6 +43,10 @@ def call(body) {
   if (publishAPI ==~ /(?i)(N|NO|F|FALSE)/) { publishAPI = false }
 
 
+  // location of Maven MD
+  def modDescriptor = 'target/ModuleDescriptor.json'
+
+
 
   def buildNode = config.buildNode ?: 'jenkins-slave-all'
 
@@ -101,7 +105,6 @@ def call(body) {
               }
             }
             sh 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install'
-            def modDescriptor = 'target/ModuleDescriptor.json'
             foliociLib.updateModDescriptor(modDescriptor)
           }
         }
