@@ -183,6 +183,13 @@ def call(body) {
               }
 
               if (( env.BRANCH_NAME == 'master' ) ||  ( env.isRelease )) {
+                if (publishModDescriptor) {
+                  // We assume that MDs are included in package.json
+                  stage('Publish Module Descriptor') {
+                    echo "Publishing Module Descriptor to FOLIO registry"
+                    postModuleDescriptor(modDescriptor)
+                  }
+                }
                 if (npmDeploy) {
                   stage('NPM Publish') {
                     // do some clean up before publishing package
@@ -210,13 +217,6 @@ def call(body) {
           } 
 
           if (( env.BRANCH_NAME == 'master' ) || ( env.isRelease )) {
-            if (publishModDescriptor) {
-              // We assume that MDs are included in package.json
-              stage('Publish Module Descriptor') {
-                echo "Publishing Module Descriptor to FOLIO registry"
-                postModuleDescriptor(modDescriptor) 
-              }
-            }
 
             if (publishAPI) {
               stage('Publish API Docs') {
