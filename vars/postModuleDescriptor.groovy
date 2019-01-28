@@ -10,6 +10,10 @@ def call(String modDescriptor) {
 
   def folioRegistryUrl
 
+  if (!folioRegistry) { 
+    def folioRegistry = 'http://folio-registry.aws.indexdata.com'
+  }
+   
   // if this is a release, verify dep resolution against releases only.
   if (env.isRelease) {
     folioRegistryUrl = "${folioRegistry}/_/proxy/modules?preRelease=false"
