@@ -44,7 +44,7 @@ def call(body) {
 
 
   // location of Maven MD
-  def modDescriptor =  fileExists 'target/ModuleDescriptor.json'
+  def modDescriptor =  'target/ModuleDescriptor.json'
 
 
 
@@ -105,7 +105,7 @@ def call(body) {
               }
             }
             sh 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install'
-            if (modDescriptor) { 
+            if ( fileExists(modDescriptor) ){ 
               foliociLib.updateModDescriptor(modDescriptor)
             }
           }
@@ -127,7 +127,7 @@ def call(body) {
         } 
 
     
-        if (env.isRelease && modDescriptor) {
+        if ( env.isRelease && fileExists(modDescriptor) ) {
           stage('Dependency Check') {
             okapiModDepCheck(modDescriptor)
           }
