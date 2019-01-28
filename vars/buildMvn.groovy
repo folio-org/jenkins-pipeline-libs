@@ -166,7 +166,7 @@ def call(body) {
           }
         }
 
-        if (runLintRamlCop) {
+        if (doLintRamlCop) {
           stage('Lint raml schema') {
             runLintRamlSchema()
           }
