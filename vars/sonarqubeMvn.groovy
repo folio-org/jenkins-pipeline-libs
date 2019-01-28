@@ -8,8 +8,8 @@
 
 def call() {
 
-  def sonarMvnPluginVer = '3.5.0.1254' 
-  // def sonarMvnPluginVer = '3.3.0.603'
+  //def sonarMvnPluginVer = '3.5.0.1254' 
+  def sonarMvnPluginVer = '3.6.0.1398' 
 
   if (env.CHANGE_ID) {
     echo "PR request: $env.CHANGE_ID"
