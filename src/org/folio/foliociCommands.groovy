@@ -157,7 +157,7 @@ def gradleProperty(String property) {
 // check for snapshot deps in Maven release
 def checkMvnReleaseDeps() {
   def deps = sh(returnStdOut: true,
-                  script: 'mvn dependency:list | grep -i snapshot')
+                  script: 'mvn dependency:list | { grep -i snapshot || true; }')
   return deps
 }
 
