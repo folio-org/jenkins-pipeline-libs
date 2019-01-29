@@ -116,11 +116,13 @@ def call(body) {
           sonarqubeMvn() 
         }
 
-        if ( env.isRelease && fileExists(modDescriptor) ) {
-          stage('Dependency Check') {
-            okapiModDepCheck(modDescriptor)
-          }
-        }
+        /* disabled
+        *if ( env.isRelease && fileExists(modDescriptor) ) {
+        *  stage('Dependency Check') {
+        *    okapiModDepCheck(modDescriptor)
+        *  }
+        *}
+        */
         
       
         // Docker stuff
