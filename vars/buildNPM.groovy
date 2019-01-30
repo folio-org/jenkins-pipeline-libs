@@ -175,12 +175,15 @@ def call(body) {
                 }
               } 
                // interface dep check.  releases only for now.
-               if (env.isRelease) {
-                stage('Dependency Check') {
-                  echo "Checking mod descriptor dependencies"
-                  okapiModDepCheck(modDescriptor)
-                }
-              }
+               /* 
+               *if (env.isRelease) {
+               * stage('Dependency Check') {
+               *   echo "Checking mod descriptor dependencies"
+               *   okapiModDepCheck(modDescriptor)
+               * }
+               *}
+               */
+
 
               if (( env.BRANCH_NAME == 'master' ) ||  ( env.isRelease )) {
                 if (publishModDescriptor) {
