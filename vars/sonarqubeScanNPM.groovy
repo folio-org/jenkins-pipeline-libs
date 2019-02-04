@@ -22,13 +22,12 @@ def call(String lcovPath = 'artifacts/coverage') {
           "-Dsonar.sources=. " +
           "-Dsonar.language=js " +
           "-Dsonar.exclusions=${excludeFiles} " +
-     
           "-Dsonar.pullrequest.base=master " +
           "-Dsonar.pullrequest.key=${env.CHANGE_ID} " +
           "-Dsonar.pullrequest.branch=${env.BRANCH_NAME} " +
           "-Dsonar.pullrequest.provider=GitHub " + 
-          "-Dsonar.pullrequest.github.repository=folio-org/${env.projectName} " + 
-          "-Dsonar.pullrequest.github.endpoint=https://api.github.com"
+          "-Dsonar.pullrequest.github.repository=folio-org/${env.projectName} " 
+          // "-Dsonar.pullrequest.github.endpoint=https://api.github.com"
       }
       else {  
         if (env.BRANCH_NAME != 'master' ) { 
