@@ -22,9 +22,9 @@ def call() {
                 "-Dsonar.pullrequest.base=master " +
                 "-Dsonar.pullrequest.branch=${env.BRANCH_NAME} " +
                 "-Dsonar.pullrequest.key=${env.CHANGE_ID} " +
-                "-Dsonar.pullrequest.provider=github " + 
-                "-Dsonar.pullrequest.github.repository=folio-org/${env.projectName} " +
-                "-Dsonar.pullrequest.github.endpoint=https://api.github.com"
+                "-Dsonar.pullrequest.provider=GitHub " + 
+                "-Dsonar.pullrequest.github.repository=folio-org/${env.projectName}"
+                // "-Dsonar.pullrequest.github.endpoint=https://api.github.com"
       }
     }  
   }
