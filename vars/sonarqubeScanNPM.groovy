@@ -25,7 +25,7 @@ def call(String lcovPath = 'artifacts/coverage') {
           "-Dsonar.pullrequest.base=master " +
           "-Dsonar.pullrequest.key=${env.CHANGE_ID} " +
           "-Dsonar.pullrequest.branch=${env.BRANCH_NAME} " +
-          "-Dsonar.pullrequest.provider=GitHub " + 
+          "-Dsonar.pullrequest.provider=github " + 
           "-Dsonar.pullrequest.github.repository=folio-org/${env.projectName} " 
           // "-Dsonar.pullrequest.github.endpoint=https://api.github.com"
       }
