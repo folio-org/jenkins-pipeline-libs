@@ -175,15 +175,14 @@ def call(body) {
                   modDescriptor = "${env.WORKSPACE}/project/artifacts/md/${env.folioName}.json"
                 }
               } 
-               // interface dep check.  releases only for now.
-               /* 
-               *if (env.isRelease) {
-               * stage('Dependency Check') {
-               *   echo "Checking mod descriptor dependencies"
-               *   okapiModDepCheck(modDescriptor)
-               * }
-               *}
-               */
+
+              // interface dep check.  releases only for now.
+              if (env.isRelease) {
+                stage('Dependency Check') {
+                  echo "Checking mod descriptor dependencies"
+                  okapiModDepCheck(modDescriptor)
+                }
+              }
 
 
               if (( env.BRANCH_NAME == 'master' ) ||  ( env.isRelease )) {
