@@ -15,7 +15,7 @@ def call(String tenant,String installJson) {
   docker.image('folioorg/okapi:latest').withRun('', 'dev') { container ->
     def okapiIp = sh(returnStdout:true, script: "docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${container.id}").trim()
 
-    if (env.isRelease) {
+    if (env.releaseOnly == 'true') {
       installUrl = "http://${okapiIp}:9130/_/proxy/tenants/${tenant}/install?simulate=true&preRelease=false"
     }
     else {
