@@ -196,7 +196,9 @@ def call(body) {
                 if (npmDeploy) {
                   stage('NPM Publish') {
                     // do some clean up before publishing package
-                    sh 'rm -rf node_modules artifacts ci'
+                    // .gitignore should cover 'artifacts'
+                    // sh 'rm -rf node_modules artifacts ci'
+                    sh 'rm -rf node_modules ci'
                
                     // npm is more flexible than yarn for this stage. 
                     echo "Deploying NPM packages to Nexus repository"
