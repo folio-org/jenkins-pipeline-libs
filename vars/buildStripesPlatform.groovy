@@ -14,6 +14,9 @@ def call(String okapiUrl, String tenant) {
 
   sh 'yarn install'
 
+  // list yarn FOLIO deps
+  sh 'yarn list --pattern @folio' 
+
   // generate platform mod descriptors
   // foliociLib.genStripesModDescriptors("${env.WORKSPACE}/artifacts/md")
   sh 'yarn build-module-descriptors'
