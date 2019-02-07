@@ -47,6 +47,7 @@ def call(String tenant,String installJson) {
                 consoleLogResponseBody: true,
                 httpMode: 'POST',
                 requestBody: installJson, 
+                outputFile: 'install.json',
                 url: installUrl
 
   } // destroy okapi container
