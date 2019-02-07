@@ -105,7 +105,7 @@ def call(body) {
               }
             }
             sh 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install'
-            if ( fileExists(modDescriptor) ){ 
+            if ( fileExists(modDescriptor) ) {
               foliociLib.updateModDescriptor(modDescriptor)
             }
           }
@@ -115,7 +115,13 @@ def call(body) {
         stage('SonarQube Analysis') {
           sonarqubeMvn() 
         }
-      
+
+        if ( env.isRelease && fileExists(modDescriptor) ) {
+          stage('Dependency Check') {
+            okapiModDepCheck(modDescriptor)
+          }
+        }
+        
         // Docker stuff
         if (config.doDocker) {
           stage('Docker Build') {
@@ -126,16 +132,16 @@ def call(body) {
           }
         } 
 
-    
-        if ( env.isRelease && fileExists(modDescriptor) ) {
-          stage('Dependency Check') {
-            okapiModDepCheck(modDescriptor)
-          }
-        }
-
         // master branch or tagged releases
         if (( env.BRANCH_NAME == 'master' ) || ( env.isRelease )) {
 
+          // publish MD must come before maven deploy
+          if (publishModDescriptor) {
+            stage('Publish Module Descriptor') {
+              echo "Publishing Module Descriptor to FOLIO registry"
+              postModuleDescriptor(modDescriptor) 
+            }
+          }
           if (mvnDeploy) {
             stage('Maven Deploy') {
               echo "Deploying artifacts to Maven repository"
@@ -144,12 +150,6 @@ def call(body) {
                       mavenSettingsConfig: 'folioci-maven-settings') {
                 sh 'mvn -DskipTests deploy'
               }
-            }
-          }
-          if (publishModDescriptor) {
-            stage('Publish Module Descriptor') {
-              echo "Publishing Module Descriptor to FOLIO registry"
-              postModuleDescriptor(modDescriptor) 
             }
           }
           if (publishAPI) {

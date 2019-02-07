@@ -13,7 +13,8 @@ def call(String modDescriptor) {
    
   // if this is a release, verify dep resolution against releases only.
   if (env.isRelease) {
-    folioRegistryUrl = "${folioRegistry}/_/proxy/modules?preRelease=false"
+    // folioRegistryUrl = "${folioRegistry}/_/proxy/modules?preRelease=false"
+    folioRegistryUrl = "${folioRegistry}/_/proxy/modules"
   }
   else {
     folioRegistryUrl = "${folioRegistry}/_/proxy/modules"

@@ -73,7 +73,8 @@ def call(body) {
   def modDescriptor = config.modDescriptor ?: ''
 
   // default Stripes platform.  Empty Map
-  def Map stripesPlatform = config.stripesPlatform ?: [:]
+  // disabled for now
+  // def Map stripesPlatform = config.stripesPlatform ?: [:]
 
   // run NPM script.  An empty Map
   def runScripts = config.runScripts ?: []
@@ -174,13 +175,15 @@ def call(body) {
                   modDescriptor = "${env.WORKSPACE}/project/artifacts/md/${env.folioName}.json"
                 }
               } 
-               // interface dep check.  releases only for now.
-               if (env.isRelease) {
+
+              // interface dep check.  releases only for now.
+              if (env.isRelease) {
                 stage('Dependency Check') {
                   echo "Checking mod descriptor dependencies"
                   okapiModDepCheck(modDescriptor)
                 }
               }
+
 
               if (( env.BRANCH_NAME == 'master' ) ||  ( env.isRelease )) {
                 if (publishModDescriptor) {
@@ -193,7 +196,9 @@ def call(body) {
                 if (npmDeploy) {
                   stage('NPM Publish') {
                     // do some clean up before publishing package
-                    sh 'rm -rf node_modules artifacts ci'
+                    // .gitignore should cover 'artifacts'
+                    // sh 'rm -rf node_modules artifacts ci'
+                    sh 'rm -rf node_modules ci'
                
                     // npm is more flexible than yarn for this stage. 
                     echo "Deploying NPM packages to Nexus repository"
