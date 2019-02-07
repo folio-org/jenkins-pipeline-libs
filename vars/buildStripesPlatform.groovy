@@ -29,12 +29,14 @@ def call(String okapiUrl, String tenant) {
 
   // publish generated yarn.lock for possible debugging
   sh 'mkdir -p ci'
-  sh 'cp yarn.lock ci/yarnLock.html'
+  sh 'cp yarn.lock ci/yarn.lock'
+  sh 'bzip2 ci/yarn.lock'
+
   publishHTML([allowMissing: false, alwaysLinkToLastBuild: false,
                keepAll: true, reportDir: 'ci',
-               reportFiles: 'yarnLock.html',
-               reportName: "YarnLock",
-               reportTitles: "YarnLock"])
+               reportFiles: 'yarn.lock.bz2',
+               reportName: "Yarn Lock",
+               reportTitles: "Yarn Lock"])
 
   // publish stripes bundle for debugging
   // archiveWebpack('./bundle')
