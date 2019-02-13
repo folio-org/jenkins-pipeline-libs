@@ -22,7 +22,7 @@ def call(String okapiUrl, String tenant) {
   sh 'yarn build-module-descriptors'
 
   // build webpack with stripes-cli. See STCLI-66 re: PREFIX env
-  sh "yarn build --okapi $okapiUrl --tenant $tenant ./bundle" 
+  sh "yarn build --okapi $okapiUrl --tenant $tenant ./output" 
 
   // generate tenant stripes module list
   writeFile file: 'md2install.sh', text: libraryResource('org/folio/md2install.sh')
@@ -42,6 +42,6 @@ def call(String okapiUrl, String tenant) {
                reportTitles: "Yarn Lock"])
 
   // publish stripes bundle for debugging
-  // archiveWebpack('./bundle')
+  // archiveWebpack('./output')
   // end stage
 } 
