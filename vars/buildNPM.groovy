@@ -152,7 +152,6 @@ def call(body) {
               // Run Sonarqube scanner       
               if (runSonarqube) {
                 stage('Run Sonarqube') {
-                  sh 'git fetch origin master'
                   sonarqubeScanNPM() 
                 }
               }
