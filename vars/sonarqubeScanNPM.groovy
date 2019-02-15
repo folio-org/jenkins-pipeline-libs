@@ -56,5 +56,7 @@ def call(String lcovPath = 'artifacts/coverage') {
 
     } // end withSonarQubeenv
   } // end withCredentials
+  // remove Sonar Scannor artifacts
+  sh 'rm -rf .scannerwork'
 }
 
