@@ -31,12 +31,12 @@ def call(String lcovPath = 'artifacts/coverage') {
       }
       else {  
         if (env.BRANCH_NAME != 'master' ) { 
+          sh "git fetch --no-tags ${env.projUrl} +refs/heads/master:refs/remotes/origin/master"
           sh "${scannerHome}/bin/sonar-scanner " +
             "-Dsonar.organization=folio-org " +
             "-Dsonar.projectKey=org.folio:${env.projectName} " +
             "-Dsonar.projectName=${env.projectName} " +
             "-Dsonar.branch.name=${env.BRANCH_NAME} " +
-	    "-Dsonar.branch.target=master " +
             "-Dsonar.sources=. " +
             "-Dsonar.language=js " +
             "-Dsonar.exclusions=${excludeFiles} " +
@@ -56,5 +56,7 @@ def call(String lcovPath = 'artifacts/coverage') {
 
     } // end withSonarQubeenv
   } // end withCredentials
+  // remove Sonar Scannor artifacts
+  sh 'rm -rf .scannerwork'
 }
 

@@ -12,14 +12,14 @@ def npmSnapshotVersion() {
   def folioci_npmver = libraryResource('org/folio/folioci_npmver.sh')
   writeFile file: 'folioci_npmver.sh', text: folioci_npmver
   sh 'chmod +x folioci_npmver.sh'
-  sh 'npm version `./folioci_npmver.sh`'
+  sh 'npm --no-git-tag-version version `./folioci_npmver.sh`'
   sh 'rm -f folioci_npmver.sh'
 }
 
 // set an unique npm package version for PR testing
 def npmPrVersion() {
   def version = sh(returnStdout: true, script: "jq -r \".version\" package.json").trim()
-  sh "npm version ${version}-pr.${env.CHANGE_ID}.${env.BUILD_NUMBER}"
+  sh "npm --no-git-tag-version version ${version}-pr.${env.CHANGE_ID}.${env.BUILD_NUMBER}"
 }
 
 // get the NPM package name and scope

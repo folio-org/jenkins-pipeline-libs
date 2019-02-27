@@ -31,10 +31,10 @@ def call() {
   else {  
     withSonarQubeEnv('SonarCloud') {
       if (env.BRANCH_NAME != 'master') {
+        sh "git fetch --no-tags ${env.projUrl} +refs/heads/master:refs/remotes/origin/master"
         sh "mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:${sonarMvnPluginVer}:sonar " +
              "-Dsonar.organization=folio-org -Dsonar.verbose=true " +
-             "-Dsonar.branch.name=${env.BRANCH_NAME} " +
-             "-Dsonar.branch.target=master"
+             "-Dsonar.branch.name=${env.BRANCH_NAME} "
       }
       else {
         sh "mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:${sonarMvnPluginVer}:sonar " +
