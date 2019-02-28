@@ -38,7 +38,36 @@ def call(String ec2Group, String folioHostname, String tenant) {
                           extraVars: [ ec2_group: "$ec2Group", 
                                        folio_hostname: "$folioHostname",
                                        tenant: "$tenant" ]
-    
     }
-  }    // end dir
+  }
+
+  dir("${env.WORKSPACE}") { 
+    // copy stripes bundle to folio instance
+    sh "tar cf ${env.WORKSPACE}/stripes-platform.tar output install.json yarn.lock"
+    sh "bzip2 ${env.WORKSPACE}/stripes-platform.tar"
+
+    sshagent (credentials: [env.sshKeyId]) {
+      sh "scp -o StrictHostKeyChecking=no ${env.WORKSPACE}/stripes-platform.tar.bz2" +
+         "ubuntu@${folioHostname}/etc/folio/stripes"
+    }
+  }  
+
+  dir("${env.WORKSPACE}/folio-infrastructure/CI/ansible") {
+
+    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
+                           accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                           credentialsId: 'jenkins-aws',
+                           secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+
+          ansiblePlaybook credentialsId: '11657186-f4d4-4099-ab72-2a32e023cced',
+                          installation: 'Ansible',
+                          inventory: 'inventory',
+                          playbook: 'stripes-docker.yml',
+                          sudoUser: null,
+                          vaultCredentialsId: 'ansible-vault-pass',
+                          extraVars: [ ec2_group: "$ec2Group",
+                                       folio_hostname: "$folioHostname" ]
+    }
+  }
+
 } 
