@@ -2,11 +2,11 @@
 
 
 /*
- *  Build platform-core FOLIO instance
+ *  Build platform FOLIO instance
  */
 
 
-def call(String ec2Group, String folioHostname, String tenant) {
+def call(String playbook, String ec2Group, String folioHostname, String tenant) {
 
   dir("${env.WORKSPACE}/folio-infrastructure") {
     checkout([$class: 'GitSCM', branches: [[name: '*/master']],
@@ -32,7 +32,7 @@ def call(String ec2Group, String folioHostname, String tenant) {
           ansiblePlaybook credentialsId: '11657186-f4d4-4099-ab72-2a32e023cced',
                           installation: 'Ansible',
                           inventory: 'inventory',
-                          playbook: 'platform-core.yml',
+                          playbook: "$playbook"',
                           sudoUser: null, 
                           vaultCredentialsId: 'ansible-vault-pass',
                           extraVars: [ ec2_group: "$ec2Group", 
