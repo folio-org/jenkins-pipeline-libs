@@ -14,6 +14,17 @@ def call(String okapiUrl, String tenant) {
 
   sh 'yarn install'
 
+  // publish generated yarn.lock for possible debugging
+  sh 'mkdir -p ci'
+  sh 'cp yarn.lock ci/yarn.lock'
+  sh 'bzip2 ci/yarn.lock'
+
+  publishHTML([allowMissing: false, alwaysLinkToLastBuild: false,
+               keepAll: true, reportDir: 'ci',
+               reportFiles: 'yarn.lock.bz2',
+               reportName: "Yarn Lock",
+               reportTitles: "Yarn Lock"])
+
   // list yarn FOLIO deps
   sh 'yarn list --pattern @folio' 
 
@@ -29,17 +40,6 @@ def call(String okapiUrl, String tenant) {
   sh 'chmod +x md2install.sh'
   sh './md2install.sh --outputfile stripes-install.json ./ModuleDescriptors' 
   sh 'rm -f md2install.sh'
-
-  // publish generated yarn.lock for possible debugging
-  sh 'mkdir -p ci'
-  sh 'cp yarn.lock ci/yarn.lock'
-  sh 'bzip2 ci/yarn.lock'
-
-  publishHTML([allowMissing: false, alwaysLinkToLastBuild: false,
-               keepAll: true, reportDir: 'ci',
-               reportFiles: 'yarn.lock.bz2',
-               reportName: "Yarn Lock",
-               reportTitles: "Yarn Lock"])
 
   // publish stripes bundle for debugging
   // archiveWebpack('./output')

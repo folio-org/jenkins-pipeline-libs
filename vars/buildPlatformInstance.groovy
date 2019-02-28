@@ -50,6 +50,7 @@ def call(String playbook, String ec2Group, String folioHostname, String tenant) 
       sh "scp -o StrictHostKeyChecking=no ${env.WORKSPACE}/stripes-platform.tar.bz2" +
          "ubuntu@${folioHostname}/etc/folio/stripes"
     }
+    sh "rm -f ${env.WORKSPACE}/stripes-platform.tar"
   }  
 
   dir("${env.WORKSPACE}/folio-infrastructure/CI/ansible") {
