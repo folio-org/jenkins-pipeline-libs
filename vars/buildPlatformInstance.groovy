@@ -32,7 +32,7 @@ def call(String playbook, String ec2Group, String folioHostname, String tenant) 
           ansiblePlaybook credentialsId: '11657186-f4d4-4099-ab72-2a32e023cced',
                           installation: 'Ansible',
                           inventory: 'inventory',
-                          playbook: "$playbook"',
+                          playbook: "$playbook",
                           sudoUser: null, 
                           vaultCredentialsId: 'ansible-vault-pass',
                           extraVars: [ ec2_group: "$ec2Group", 
