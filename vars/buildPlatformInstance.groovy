@@ -30,6 +30,7 @@ def call(String playbook, String ec2Group, String folioHostname, String tenant) 
                            secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
 
           ansiblePlaybook credentialsId: '11657186-f4d4-4099-ab72-2a32e023cced',
+                          disableHostKeyChecking: true,
                           installation: 'Ansible',
                           inventory: 'inventory',
                           playbook: "$playbook",
@@ -61,6 +62,7 @@ def call(String playbook, String ec2Group, String folioHostname, String tenant) 
                            secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
 
           ansiblePlaybook credentialsId: '11657186-f4d4-4099-ab72-2a32e023cced',
+                          disableHostKeyChecking: true,
                           installation: 'Ansible',
                           inventory: 'inventory',
                           playbook: 'stripes-docker.yml',
@@ -70,5 +72,4 @@ def call(String playbook, String ec2Group, String folioHostname, String tenant) 
                                        folio_hostname: "$folioHostname" ]
     }
   }
-
 } 
