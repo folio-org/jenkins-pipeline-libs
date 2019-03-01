@@ -9,7 +9,7 @@
 def call(String playbook, String ec2Group, String folioHostname, String tenant) {
 
   dir("${env.WORKSPACE}/folio-infrastructure") {
-    checkout([$class: 'GitSCM', branches: [[name: '*/master']],
+    checkout([$class: 'GitSCM', branches: [[name: '*/FOLIO-1738']],
               doGenerateSubmoduleConfigurations: false,
               extensions: [[$class: 'SubmoduleOption',
                                      disableSubmodules: false,
@@ -38,7 +38,8 @@ def call(String playbook, String ec2Group, String folioHostname, String tenant) 
                           vaultCredentialsId: 'ansible-vault-pass',
                           extraVars: [ ec2_group: "$ec2Group", 
                                        folio_hostname: "$folioHostname",
-                                       tenant: "$tenant" ]
+                                       tenant: "$tenant",
+                                       build_module_list_files: "${env.WORKSPACE}" ]
     }
   }
 
