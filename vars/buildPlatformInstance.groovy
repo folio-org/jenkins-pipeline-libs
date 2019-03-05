@@ -51,6 +51,11 @@ def call(String playbook, String ec2Group, String folioHostname, String tenant) 
     sshagent (credentials: [env.sshKeyId]) {
       sh "scp -o StrictHostKeyChecking=no ${env.WORKSPACE}/stripes-platform.tar.bz2 " +
          "ubuntu@${folioHostname}.indexdata.internal:/etc/folio/stripes"
+  
+      sh """
+        ssh -o StrictHostKeyChecking=no ubuntu@${folioHostname}.indexdata.internal \
+        'cd /etc/folio/stripes; bunzip2 stripes-platform.tar.bz2; tar xf stripes-platform.tar'
+      """
     }
     sh "rm -f ${env.WORKSPACE}/stripes-platform.tar"
   }  
