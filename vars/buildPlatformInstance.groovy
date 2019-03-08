@@ -6,7 +6,7 @@
  */
 
 
-def call(String playbook, String ec2Group, String folioHostname, String tenant) {
+def call(String ec2Group, String folioHostname, String tenant) {
 
   dir("${env.WORKSPACE}/folio-infrastructure") {
     checkout([$class: 'GitSCM', branches: [[name: '*/FOLIO-1738']],
@@ -33,13 +33,15 @@ def call(String playbook, String ec2Group, String folioHostname, String tenant) 
                           disableHostKeyChecking: true,
                           installation: 'Ansible',
                           inventory: 'inventory',
-                          playbook: "$playbook",
+                          playbook: 'platform-pr.yml',
                           sudoUser: null, 
                           vaultCredentialsId: 'ansible-vault-pass',
                           extraVars: [ ec2_group: "$ec2Group", 
                                        folio_hostname: "$folioHostname",
                                        tenant: "$tenant",
-                                       build_module_list_files: "${env.WORKSPACE}" ]
+                                       build_module_list_files: "${env.WORKSPACE}",
+                                       platform: "${env.folioPlatform}",
+                                       pr: "${env.CHANGE_ID}" ]
     }
   }
 
