@@ -9,7 +9,7 @@
 def call(String ec2Group, String folioHostname, String tenant) {
 
   dir("${env.WORKSPACE}/folio-infrastructure") {
-    checkout([$class: 'GitSCM', branches: [[name: '*/FOLIO-1738']],
+    checkout([$class: 'GitSCM', branches: [[name: '*/master']],
               doGenerateSubmoduleConfigurations: false,
               extensions: [[$class: 'SubmoduleOption',
                                      disableSubmodules: false,
