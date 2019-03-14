@@ -15,7 +15,7 @@ def call(String mdFile) {
     def okapiIp = sh(returnStdout:true, script: "docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${container.id}").trim()
 
     if (env.isRelease) {
-      mdUrl = "http://${okapiIp}:9130/_/proxy/modules?preRelease=false"
+      mdUrl = "http://${okapiIp}:9130/_/proxy/modules?preRelease=false&npmSnapshot=false"
     }
     else {
       mdUrl = "http://${okapiIp}:9130/_/proxy/modules"
