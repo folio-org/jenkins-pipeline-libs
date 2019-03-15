@@ -22,6 +22,7 @@ def call(String lcovPath = 'artifacts/coverage') {
           "-Dsonar.sources=. " +
           "-Dsonar.language=js " +
           "-Dsonar.exclusions=${excludeFiles} " +
+          "-Dsonar.javascript.lcov.reportPaths=${lcovPath}/lcov.info " +
           "-Dsonar.pullrequest.base=master " +
           "-Dsonar.pullrequest.key=${env.CHANGE_ID} " +
           "-Dsonar.pullrequest.branch=${env.BRANCH_NAME} " +
