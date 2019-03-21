@@ -35,7 +35,7 @@ def call(String okapiUrl, String tenant) {
 
   // generate platform mod descriptors
   // foliociLib.genStripesModDescriptors("${env.WORKSPACE}/artifacts/md")
-  sh 'yarn build-module-descriptors'
+  sh 'yarn build-module-descriptors --strict'
 
   // build webpack with stripes-cli. See STCLI-66 re: PREFIX env
   sh "yarn build --okapi $okapiUrl --tenant $tenant ./output" 
