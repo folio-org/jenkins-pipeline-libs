@@ -10,7 +10,12 @@ def call(String okapiUrl, String tenant) {
   def foliociLib = new org.folio.foliociCommands()
 
   // remove existing yarn.lock
-  sh 'rm -f yarn.lock'
+  if ( env.CHANGE_ID ) { 
+    echo "Using existing yarn.lock"
+  }
+  else (
+    sh 'rm -f yarn.lock'
+  }
 
   sh 'yarn install'
 
