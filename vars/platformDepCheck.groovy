@@ -6,7 +6,7 @@
  * TODO: Move to src/org/folio
  */
 
-def call(String tenant,String prModDesc,String installJson) {
+def call(String tenant,String installJson) {
 
  
   def okapiPull = "{ \"urls\" : [ \"${env.folioRegistry}\" ]}"
@@ -14,6 +14,13 @@ def call(String tenant,String prModDesc,String installJson) {
 
   docker.image('folioorg/okapi:latest').withRun('', 'dev') { container ->
     def okapiIp = sh(returnStdout:true, script: "docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${container.id}").trim()
+
+    if (env.releaseOnly == 'true') {
+      installUrl = "http://${okapiIp}:9130/_/proxy/tenants/${tenant}/install?simulate=true&preRelease=false"
+    }
+    else {
+      installUrl = "http://${okapiIp}:9130/_/proxy/tenants/${tenant}/install?simulate=true"
+    }
 
     // make sure okapi is fully started
     sleep 5
@@ -25,14 +32,6 @@ def call(String tenant,String prModDesc,String installJson) {
                 httpMode: 'POST',
                 requestBody: okapiPull, 
                 url: "http://${okapiIp}:9130/_/proxy/pull/modules"
-
-    // POST our MD
-    httpRequest acceptType: 'APPLICATION_JSON_UTF8', 
-                contentType: 'APPLICATION_JSON_UTF8', 
-                consoleLogResponseBody: true,
-                httpMode: 'POST',
-                requestBody: prModDesc, 
-                url: "http://${okapiIp}:9130/_/proxy/modules"
 
     // create tenant
     httpRequest acceptType: 'APPLICATION_JSON_UTF8', 
@@ -48,7 +47,8 @@ def call(String tenant,String prModDesc,String installJson) {
                 consoleLogResponseBody: true,
                 httpMode: 'POST',
                 requestBody: installJson, 
-                url: "http://${okapiIp}:9130/_/proxy/tenants/${tenant}/install?simulate=true"
+                outputFile: 'install.json',
+                url: installUrl
 
   } // destroy okapi container
 }
