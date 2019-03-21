@@ -13,7 +13,7 @@ def call(String okapiUrl, String tenant) {
   if ( env.CHANGE_ID ) { 
     echo "Using existing yarn.lock"
   }
-  else (
+  else {
     sh 'rm -f yarn.lock'
   }
 
