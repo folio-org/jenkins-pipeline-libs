@@ -34,7 +34,7 @@ done
 # path to MDs
 modDescriptorList=$(ls $mdPath/*.json)
 # list of stripes modules to exclude 
-stripes_exclude_list="stripes-erm-components"
+stripes_exclude_list="folio_stripes-erm-components"
 
 stripes_install_list="/tmp/stripes_install_list.$$"
 
