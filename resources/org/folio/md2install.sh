@@ -31,7 +31,11 @@ do
 done
 
 
+# path to MDs
 modDescriptorList=$(ls $mdPath/*.json)
+# list of stripes modules to exclude 
+stripes_exclude_list="stripes-erm-components"
+
 stripes_install_list="/tmp/stripes_install_list.$$"
 
 # Initialize tenant module list
@@ -40,7 +44,14 @@ echo "[" > $stripes_install_list
 for modDescriptor in $modDescriptorList 
 do
    id=$(jq -r .id $modDescriptor)
-   echo "{ \"id\":\"${id}\",\"action\":\"enable\"}," >> $stripes_install_list
+   for x in $stripes_exclude_list
+   do
+     if [[ "$id" =~ ^${x}-* ]]; then
+       echo "Excluding $id"
+     else
+       echo "{ \"id\":\"${id}\",\"action\":\"enable\"}," >> $stripes_install_list
+     fi
+   done
 done
 
 # end stripes install list
