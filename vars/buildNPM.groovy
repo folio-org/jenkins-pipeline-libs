@@ -6,6 +6,7 @@
  * Configurable parameters: 
  *
  * buildNode: label of jenkin's slave build node to use
+ * checkStripesDupes: check stripes framework for duplicate stripes-* dependencies. (Default: false)
  * doDocker:  Build, test, and publish Docker image via 'buildDocker' (Default: 'no')
  * modDescriptor: path to standalone Module Descriptor file (Optional)
  * npmDeploy: Publish NPM artifacts to NPM repository (Default: 'yes')
@@ -68,6 +69,9 @@ def call(body) {
 
   // default runSonarqube 
   def runSonarqube = config.runSonarqube ?: false
+
+  // default checkStripesDupes
+  def checkStripesDupes = config.checkStripesDupes ?: false
 
   // default mod descriptor
   def modDescriptor = config.modDescriptor ?: ''
@@ -134,6 +138,10 @@ def call(body) {
 
               if (runTest) {
                 runTestNPM(runTestOptions)
+              }
+
+              if (checkStripesDupes) {
+                checkStripesDupes('yarn.lock')
               }
 
               // Stage 'Run NPM scripts' - as parallel jobs
