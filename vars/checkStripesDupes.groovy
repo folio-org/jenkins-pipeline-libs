@@ -5,11 +5,11 @@
  * 
  * Example:
  *
- * checkYarnLockDups('yarn.lock')
+ * checkYarnLockDupes('yarn.lock')
  * 
  */
 
-def checkStripesDups(String yarnLockFile) {
+def checkStripesDupes(String yarnLockFile) {
   stage('Check yarn.lock for stripes-* duplicates') {
     def yarnLock = new File(yarnLockFile)
     def lines = yarnLock.readLines()
