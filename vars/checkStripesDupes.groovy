@@ -16,7 +16,7 @@ def call(String yarnLockFile) {
     def status = 1
     sh "mkdir -p dupes" 
 
-    sh "grep -oP '^\"\K@folio\/stripes-[^@]*' yarn.lock > dupes/stripes_deps.txt"
+    sh "grep -oP '^\\"\\K@folio\\/stripes-[^@]*' yarn.lock > dupes/stripes_deps.txt"
     sh "cat dupes/stripes_deps.txt | sort | uniq -d > dupes/stripes_duplicates.txt"
     
     status = sh(script:'''
