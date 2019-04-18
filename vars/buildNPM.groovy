@@ -71,7 +71,7 @@ def call(body) {
   def runSonarqube = config.runSonarqube ?: false
 
   // default checkStripesDupes
-  def checkStripesDupes = config.checkStripesDupes ?: false
+  def runDupeCheck = config.runDupeCheck ?: false
 
   // default mod descriptor
   def modDescriptor = config.modDescriptor ?: ''
@@ -140,7 +140,7 @@ def call(body) {
                 runTestNPM(runTestOptions)
               }
 
-              if (checkStripesDupes) {
+              if (runDupeCheck) {
                 checkStripesDupes('yarn.lock')
               }
 
