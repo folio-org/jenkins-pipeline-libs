@@ -17,18 +17,18 @@ def call(String yarnLockFile) {
     sh "mkdir -p dupes" 
 
     sh "grep -oP '^\"\K@folio\/stripes-[^@]*' yarn.lock > dupes/stripes_deps.txt"
-    sh "cat stripes_deps | sort | uniq -d > dupes/stripes_duplicates.txt"
+    sh "cat dupes/stripes_deps.txt | sort | uniq -d > dupes/stripes_duplicates.txt"
     
     status = sh(script:'''
     if [ -s dupes/stripes_duplicates.txt ]
     then
-      echo "duplicates found"
+      echo "Duplicates found..."
       while read dep; do
         yarn why $dep
       done < dupes/stripes_duplicates.txt
       exit 1
     else
-      echo "No duplicates found"
+      echo "No duplicates found."
       exit 0
     fi
     ''', returnStatus: true)
