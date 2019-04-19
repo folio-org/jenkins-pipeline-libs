@@ -14,10 +14,10 @@ def call(String yarnLockFile) {
 
     // set default condition to failed
     def status = 1
-    sh "mkdir -p dupes" 
+    sh 'mkdir -p dupes'
 
-    sh "grep -oP '^\\"\\K@folio\\/stripes-[^@]*' yarn.lock > dupes/stripes_deps.txt"
-    sh "cat dupes/stripes_deps.txt | sort | uniq -d > dupes/stripes_duplicates.txt"
+    sh 'grep -oP "^\\"\\K@folio\\/stripes-[^@]*" yarn.lock > dupes/stripes_deps.txt'
+    sh 'cat dupes/stripes_deps.txt | sort | uniq -d > dupes/stripes_duplicates.txt'
     
     status = sh(script:'''
     if [ -s dupes/stripes_duplicates.txt ]
@@ -33,10 +33,10 @@ def call(String yarnLockFile) {
     fi
     ''', returnStatus: true)
     
-    sh "rm -rf dupes"
+    sh 'rm -rf dupes'
   
     if (status != 0) {
-      def message = "Duplicate stripes-* dependencies found. See ${env.BUILD_URL}"
+      def message = "Duplicate stripes-* check failed. See ${env.BUILD_URL}"
       // PR
       if (env.CHANGE_ID) {
         // Requires https://github.com/jenkinsci/pipeline-github-plugin
