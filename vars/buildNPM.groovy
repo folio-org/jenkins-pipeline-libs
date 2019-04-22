@@ -6,13 +6,13 @@
  * Configurable parameters: 
  *
  * buildNode: label of jenkin's slave build node to use
- * checkStripesDupes: check stripes framework for duplicate stripes-* dependencies. (Default: false)
  * doDocker:  Build, test, and publish Docker image via 'buildDocker' (Default: 'no')
  * modDescriptor: path to standalone Module Descriptor file (Optional)
  * npmDeploy: Publish NPM artifacts to NPM repository (Default: 'yes')
  * publishApi: Publish API/RAML documentation.  (Default: 'no')
  * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no')
  * regressionDebugMode:  Enable extra debug logging in regression tests (Default: false)
+ * runDupeCheck: check stripes framework for duplicate stripes-* dependencies. (Default: false)
  * runLint: Run ESLint via 'yarn lint' (Default: 'no')
  * runRegression (DISABLED) : Run UI regression module tests for PRs - 'yes' or 'no' (Default: 'no') 
  * runScripts: A "collection" of script commands and script arguments.  (Default: [])
@@ -70,7 +70,7 @@ def call(body) {
   // default runSonarqube 
   def runSonarqube = config.runSonarqube ?: false
 
-  // default checkStripesDupes
+  // default runDupeCheck
   def runDupeCheck = config.runDupeCheck ?: false
 
   // default mod descriptor
