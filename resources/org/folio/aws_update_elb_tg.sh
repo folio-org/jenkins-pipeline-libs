@@ -1,9 +1,30 @@
 #!/bin/bash
 
+# Update AWS elb target group based on tag:Build
+
 region=us-east-1
 vpc_id=vpc-f9c16d9d
 
-build=$1
+while [[ $# -gt 0 ]]
+do
+   arg="$1"
+
+   case $arg in
+      --include-edge)
+         include_edge=true
+         shift # past argument
+        ;;
+      *) 
+         build="$arg"
+         shift
+        ;;
+   esac
+done
+
+if [ -z "$build" ]; then
+  echo "Value of tag:Build required"
+  exit 1
+fi
 
 export PATH=/usr/local/bin:$PATH
 
@@ -30,13 +51,18 @@ okapi_tg=$(aws --output text --region $region elbv2 create-target-group \
                  --health-check-enabled --target-type instance \
                  --query 'TargetGroups[*].[TargetGroupArn]' ) 
 
-edge_tg=$(aws --output text --region $region elbv2 create-target-group \
+all_tg=("$stripes_tg" "$okapi_tg")
+
+
+if [ "$include_edge" ]; then 
+  edge_tg=$(aws --output text --region $region elbv2 create-target-group \
                  --name ${tg_basename}-edge --protocol HTTP --port 8000 --vpc-id $vpc_id \
                  --health-check-protocol HTTP --health-check-path / \
                  --health-check-enabled --target-type instance \
                  --query 'TargetGroups[*].[TargetGroupArn]' ) 
+  all_tg+=("$edge_tg")
+fi
 
-all_tg=("$stripes_tg" "$okapi_tg" "$edge_tg")
 for tg in "${all_tg[@]}"
 do
   echo "ARN of target group: $tg"
