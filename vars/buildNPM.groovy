@@ -12,6 +12,7 @@
  * publishApi: Publish API/RAML documentation.  (Default: 'no')
  * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no')
  * regressionDebugMode:  Enable extra debug logging in regression tests (Default: false)
+ * runDupeCheck: check stripes framework for duplicate stripes-* dependencies. (Default: false)
  * runLint: Run ESLint via 'yarn lint' (Default: 'no')
  * runRegression (DISABLED) : Run UI regression module tests for PRs - 'yes' or 'no' (Default: 'no') 
  * runScripts: A "collection" of script commands and script arguments.  (Default: [])
@@ -68,6 +69,9 @@ def call(body) {
 
   // default runSonarqube 
   def runSonarqube = config.runSonarqube ?: false
+
+  // default runDupeCheck
+  def runDupeCheck = config.runDupeCheck ?: false
 
   // default mod descriptor
   def modDescriptor = config.modDescriptor ?: ''
@@ -134,6 +138,10 @@ def call(body) {
 
               if (runTest) {
                 runTestNPM(runTestOptions)
+              }
+
+              if (runDupeCheck) {
+                checkStripesDupes('yarn.lock')
               }
 
               // Stage 'Run NPM scripts' - as parallel jobs
