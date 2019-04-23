@@ -40,13 +40,13 @@ tg_basename=$(sed -e 's/_/-/g' <<< $build)
 
 # create stripes 'stable' target group
 stripes_tg=$(aws --output text --region $region elbv2 create-target-group \
-                 --name ${tg_basename}-stripes --protocol HTTP --port 80 --vpc-id $vpc_id \
+                 --name ${tg_basename}-s --protocol HTTP --port 80 --vpc-id $vpc_id \
                  --health-check-protocol HTTP --health-check-path / \
                  --health-check-enabled --target-type instance \
                  --query 'TargetGroups[*].[TargetGroupArn]' ) 
 
 okapi_tg=$(aws --output text --region $region elbv2 create-target-group \
-                 --name ${tg_basename}-okapi --protocol HTTP --port 9130 --vpc-id $vpc_id \
+                 --name ${tg_basename}-o --protocol HTTP --port 9130 --vpc-id $vpc_id \
                  --health-check-protocol HTTP --health-check-path /_/proxy/health \
                  --health-check-enabled --target-type instance \
                  --query 'TargetGroups[*].[TargetGroupArn]' ) 
@@ -56,7 +56,7 @@ all_tg=("$stripes_tg" "$okapi_tg")
 
 if [ "$include_edge" ]; then 
   edge_tg=$(aws --output text --region $region elbv2 create-target-group \
-                 --name ${tg_basename}-edge --protocol HTTP --port 8000 --vpc-id $vpc_id \
+                 --name ${tg_basename}-e --protocol HTTP --port 8000 --vpc-id $vpc_id \
                  --health-check-protocol HTTP --health-check-path / \
                  --health-check-enabled --target-type instance \
                  --query 'TargetGroups[*].[TargetGroupArn]' ) 
