@@ -19,6 +19,7 @@ def call() {
       withSonarQubeEnv('SonarCloud') {
         sh "mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:${sonarMvnPluginVer}:sonar " +
                 "-Dsonar.organization=folio-org -Dsonar.verbose=true " +
+                "-Dsonar.coverage.jacoco.xmlReportPaths " +
                 "-Dsonar.pullrequest.base=master " +
                 "-Dsonar.pullrequest.branch=${env.BRANCH_NAME} " +
                 "-Dsonar.pullrequest.key=${env.CHANGE_ID} " +
@@ -33,11 +34,13 @@ def call() {
       if (env.BRANCH_NAME != 'master') {
         sh "git fetch --no-tags ${env.projUrl} +refs/heads/master:refs/remotes/origin/master"
         sh "mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:${sonarMvnPluginVer}:sonar " +
+             "-Dsonar.coverage.jacoco.xmlReportPaths " +
              "-Dsonar.organization=folio-org -Dsonar.verbose=true " +
              "-Dsonar.branch.name=${env.BRANCH_NAME} "
       }
       else {
         sh "mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:${sonarMvnPluginVer}:sonar " +
+             "-Dsonar.coverage.jacoco.xmlReportPaths " +
              "-Dsonar.organization=folio-org -Dsonar.verbose=true" 
       }
     }
