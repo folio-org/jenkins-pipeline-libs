@@ -249,24 +249,34 @@ def call(body) {
         // actions specific to PRs
         /*
         *  Unused or disabled checks
-        *   
-        * if (env.CHANGE_ID) {
-        * 
-        *   // ensure tenant id is unique
-        *  // def tenant = "${env.BRANCH_NAME}_${env.BUILD_NUMBER}"
-        *  def tenant = "pr_${env.CHANGE_ID}_${env.BUILD_NUMBER}"
-        *  tenant = foliociLib.replaceHyphen(tenant)
-        *
-        *  if (stripesPlatform != null) { 
-        *    dir("${env.WORKSPACE}/$stripesPlatform.repo") {
-        *      stage('Build Stripes Platform') {
-        *        git branch: stripesPlatform.branch, 
-        *            url: "https://github.com/folio-org/${stripesPlatform.repo}"
-        *        buildStripesPlatformPr(env.okapiUrl,tenant) 
-        *      }
-        *    }             
-        *  }
-        *
+        */   
+        if (env.CHANGE_ID) {
+         
+          // ensure tenant id is unique
+          // def tenant = "${env.BRANCH_NAME}_${env.BUILD_NUMBER}"
+          def tenant = "pr_${env.CHANGE_ID}_${env.BUILD_NUMBER}"
+          tenant = foliociLib.replaceHyphen(tenant)
+        
+          if (stripesPlatform != null) { 
+            dir("${env.WORKSPACE}/$stripesPlatform.repo") {
+              stage('Build Stripes Platform') {
+                git branch: stripesPlatform.branch, 
+                    url: "https://github.com/folio-org/${stripesPlatform.repo}"
+                buildStripesPlatformPr(env.okapiUrl,tenant) 
+              }
+            }             
+          }
+ 
+          // do an okapi dep check
+          echo "Adding additional modules to stripes-install.json"
+          sh 'mv stripes-install.json stripes-install-pre.json'
+          sh 'jq -s \'.[0]=([.[]]|flatten)|.[0]\' stripes-install-pre.json install-extras.json > stripes-install.json'
+          def stripesInstallJson = readFile('./stripes-install.json')
+          platformDepCheck(env.tenant,stripesInstallJson)
+          echo 'Generating backend dependency list to okapi-install.json'
+          sh 'jq \'map(select(.id | test(\"mod-\"; \"i\")))\' install.json > okapi-install.json'
+          sh 'cat okapi-install.json'
+       /* 
         *  if (runRegression) { 
         *    stage('Bootstrap Tenant') { 
         *      def tenantStatus = deployTenant("$okapiUrl","$tenant") 
@@ -290,8 +300,9 @@ def call(body) {
         *      }
         *    }
         *  }  
-        * }  // env CHANGE_ID
         */
+
+        }  // env CHANGE_ID
 
       }  // end try
       catch (Exception err) {
