@@ -78,7 +78,7 @@ def call(body) {
 
   // default Stripes platform.  Empty Map
   // disabled for now
-  // def Map stripesPlatform = config.stripesPlatform ?: [:]
+  def Map stripesPlatform = config.stripesPlatform ?: [:]
 
   // run NPM script.  An empty Map
   def runScripts = config.runScripts ?: []
