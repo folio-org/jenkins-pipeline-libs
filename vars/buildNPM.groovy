@@ -262,20 +262,19 @@ def call(body) {
               stage('Build Stripes Platform') {
                 git branch: stripesPlatform.branch, 
                     url: "https://github.com/folio-org/${stripesPlatform.repo}"
-                buildStripesPlatformPr(env.okapiUrl,tenant) 
+                buildStripesPlatformPr(env.okapiUrl,tenant)  
+                // do an okapi dep check
+                echo "Adding additional modules to stripes-install.json"
+                sh "jq -s '.[0]=([.[]]|flatten)|.[0]' stripes-install-${env.CHANGE_ID}.json " +
+                   "install-extras.json > stripes-install.json"
+                def stripesInstallJson = readFile('./stripes-install.json')
+                platformDepCheck(env.tenant,stripesInstallJson)
+                echo 'Generating backend dependency list to okapi-install.json'
+                sh 'jq \'map(select(.id | test(\"mod-\"; \"i\")))\' install.json > okapi-install.json'
+                sh 'cat okapi-install.json'
               }
             }             
           }
- 
-          // do an okapi dep check
-          echo "Adding additional modules to stripes-install.json"
-          sh 'mv stripes-install.json stripes-install-pre.json'
-          sh 'jq -s \'.[0]=([.[]]|flatten)|.[0]\' stripes-install-pre.json install-extras.json > stripes-install.json'
-          def stripesInstallJson = readFile('./stripes-install.json')
-          platformDepCheck(env.tenant,stripesInstallJson)
-          echo 'Generating backend dependency list to okapi-install.json'
-          sh 'jq \'map(select(.id | test(\"mod-\"; \"i\")))\' install.json > okapi-install.json'
-          sh 'cat okapi-install.json'
        /* 
         *  if (runRegression) { 
         *    stage('Bootstrap Tenant') { 
