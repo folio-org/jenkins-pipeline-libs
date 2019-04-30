@@ -252,7 +252,7 @@ def call(body) {
             def okapiToken = sh(returnStdout: true,
                  script: "./getOkapiToken.sh -o $env.okapiUrl -t supertentant -u super_admin -p admin")
 
-            def modDescriptorVar = readFile: modDescriptor
+            def modDescriptorVar = readFile modDescriptor
              
             httpRequest acceptType: 'APPLICATION_JSON_UTF8', 
                         contentType: 'APPLICATION_JSON_UTF8', 
