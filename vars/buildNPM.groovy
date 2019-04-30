@@ -247,8 +247,24 @@ def call(body) {
           // post MD to okapiUrl if PR. FOLIO-1948
           if (env.CHANGE_ID) { 
             // get okapi token. Post MD to okapiUrl
-            sh "stripes okapi login super_admin admin --okapi $okapiUrl --tenant supertenant"
-            sh "stripes mod add --okapi $okapiUrl"
+            writeFile file: 'getOkapiToken.sh', text: libraryResource('org/folio/getOkapiToken.sh')
+            sh 'chmod +x getOkapiToken.sh'
+            def okapiToken = sh(returnStdout: true,
+                 script: "./getOkapiToken.sh -o $env.okapiUrl -t supertentant -u super_admin -p admin")
+
+            def modDescriptorVar = readFile: modDescriptor
+             
+            httpRequest acceptType: 'APPLICATION_JSON_UTF8', 
+                        contentType: 'APPLICATION_JSON_UTF8', 
+                        customHeaders: [[maskValue: true, name: 'X-Okapi-Token', value: okapiToken], 
+                                 [maskValue: false, name: 'X-Okapi-Tenant', value: 'supertenant']], 
+                        httpMode: 'POST', 
+                        url: env.okapiUrl + '/_/proxy/modules',
+                        consoleLogResponseBody: true,
+                        requestBody: modDescriptorVar
+             
+            //sh "stripes okapi login super_admin admin --okapi $okapiUrl --tenant supertenant"
+            //sh "stripes mod add --okapi $okapiUrl"
           }
           
         } // end dir
@@ -275,11 +291,11 @@ def call(body) {
               }
               // create tenant
               stage('Deploy Tenant') {
-                writeFile file: 'getOkapiToken.sh', text: libraryResource('org/folio/getOkapiToken.sh') 
                 writeFile file: 'createTenant.sh', text: libraryResource('org/folio/createTenant.sh') 
-                sh 'chmod +x getOkapiToken.sh createTenant.sh'
-                env.OKAPI_TOKEN = sh(returnStdout: true,
-                                     script: "./getOkapiToken.sh -o $okapiUrl -t supertentant -u super_admin -p admin")
+                sh 'chmod +x createTenant.sh'
+                env.OKAPI_TOKEN = okapiToken
+                sh (returnStdout: true,
+                    script: "./getOkapiToken.sh -o $okapiUrl -t supertentant -u super_admin -p admin")
                 sh "./createTenant.sh $okapiUrl $tenant"
                 // generate list of MD ids.  
                 sh "jq -r '.[].id' install.json > install.txt"
