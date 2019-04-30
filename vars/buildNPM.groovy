@@ -244,6 +244,13 @@ def call(body) {
               }
             }
           } 
+          // post MD to okapiUrl if PR. FOLIO-1948
+          if (env.CHANGE_ID) { 
+            // get okapi token. Post MD to okapiUrl
+            sh "stripes okapi login super_admin admin --okapi $okapiUrl --tenant supertenant"
+            sh "stripes mod add --okapi $okapiUrl"
+          }
+          
         } // end dir
 
         // actions specific to PRs
@@ -263,15 +270,21 @@ def call(body) {
                 git branch: stripesPlatform.branch, 
                     url: "https://github.com/folio-org/${stripesPlatform.repo}"
                 buildStripesPlatformPr(env.okapiUrl,tenant)  
-                // do an okapi dep check
-                echo "Adding additional modules to stripes-install.json"
-                sh "jq -s '.[0]=([.[]]|flatten)|.[0]' stripes-install-${env.CHANGE_ID}.json " +
-                   "install-extras.json > stripes-install.json"
-                def stripesInstallJson = readFile('./stripes-install.json')
-                platformDepCheck(tenant,stripesInstallJson)
-                echo 'Generating backend dependency list to okapi-install.json'
-                sh 'jq \'map(select(.id | test(\"mod-\"; \"i\")))\' install.json > okapi-install.json'
-                sh 'cat okapi-install.json'
+                // update install.json 
+                sh "sed -i 's/${env.folioName}-[0-9.]\+/${env.folioName}-${env.version}/' install.json"
+              }
+              // create tenant
+              stage('Deploy Tenant') {
+                writeFile file: 'getOkapiToken.sh', text: libraryResource('org/folio/getOkapiToken.sh') 
+                writeFile file: 'createTenant.sh', text: libraryResource('org/folio/createTenant.sh') 
+                sh 'chmod +x getOkapiToken.sh createTenant.sh'
+                env.OKAPI_TOKEN = sh(returnStdout: true,
+                                     script: "./getOkapiToken.sh -o $okapiUrl -t supertentant -u super_admin -p admin")
+                sh "./createTenant.sh $okapiUrl $tenant"
+                // generate list of MD ids.  
+                sh "jq -r '.[].id' install.json > install.txt"
+                // enable modules for tenant
+                sh "cat install.txt | stripes mod enable --tenant $tenant --okapi $okapiUrl"
               }
             }             
           }
