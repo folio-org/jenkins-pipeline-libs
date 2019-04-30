@@ -271,7 +271,7 @@ def call(body) {
                     url: "https://github.com/folio-org/${stripesPlatform.repo}"
                 buildStripesPlatformPr(env.okapiUrl,tenant)  
                 // update install.json 
-                sh "sed -i 's/${env.folioName}-[0-9.]\+/${env.folioName}-${env.version}/' install.json"
+                sh "sed -i 's/${env.folioName}-[0-9.]\\+/${env.folioName}-${env.version}/' install.json"
               }
               // create tenant
               stage('Deploy Tenant') {
