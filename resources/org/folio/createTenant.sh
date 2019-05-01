@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# debugging
+set -x 
+
 if [ $# != 2 ]; then
     echo "Usage: $0 okapi_URL tenant"
     exit 1
