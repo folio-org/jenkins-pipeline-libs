@@ -289,7 +289,9 @@ def call(body) {
                 // update install.json 
                 sh "sed -i 's/${env.folioName}-[0-9.]\\+/${env.folioName}-${env.version}/' install.json"
               }
-              stage('Deploy Tenant') {
+            }
+            stage('Deploy Tenant') {
+              dir("${env.WORKSPACE}/$stripesPlatform.repo") {
                 // create tenant
                 def tenantJson = "{\"id\":\"${tenant}\"}"
                 httpRequest acceptType: 'APPLICATION_JSON_UTF8', 
@@ -308,13 +310,41 @@ def call(body) {
                             customHeaders: [[maskValue: true, name: 'X-Okapi-Token', value: env.OKAPI_TOKEN],
                                             [maskValue: false, name: 'X-Okapi-Tenant', value: 'supertenant']],
                             httpMode: 'POST',
-                            url: env.okapiUrl + '/_/proxy/tenants/' + tenant + '/install?',
+                            url: env.okapiUrl + '/_/proxy/tenants/' + tenant + '/install',
                             consoleLogResponseBody: true,
                             requestBody: installJson
                 
               }
-            }             
-          }
+              dir("${env.WORKSPACE}/folio-infrastructure") { 
+                checkout([$class: 'GitSCM', branches: [[name: '*/FOLIO-1948']],
+                          doGenerateSubmoduleConfigurations: false,
+                          extensions: [[$class: 'SubmoduleOption',
+                                     disableSubmodules: false,
+                                     parentCredentials: false,
+                                     recursiveSubmodules: true,
+                                     reference: '',
+                                     trackingSubmodules: true]],
+                          submoduleCfg: [],
+                          userRemoteConfigs: [[credentialsId: 'folio-jenkins-github-token',
+                                             url: 'https://github.com/folio-org/folio-infrastructure']]])
+
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
+                                  accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                                  credentialsId: 'jenkins-aws',
+                                  secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+
+                  ansiblePlaybook (credentialsId: '11657186-f4d4-4099-ab72-2a32e023cced',
+                                   installation: 'Ansible',
+                                   inventory: 'inventory',
+                                   playbook: 'folioci-pr.yml',
+                                   sudoUser: null, 
+                                   vaultCredentialsId: 'ansible-vault-pass',
+                                   extraVars: [okapi_url: "$env.okapiUrl", 
+                                               tenant: "$tenant"])
+
+                }
+              } 
+            } // end 'deploy tenant'
        /* 
         *  if (runRegression) { 
         *    stage('Bootstrap Tenant') { 
@@ -340,7 +370,7 @@ def call(body) {
         *    }
         *  }  
         */
-
+          } // end if 
         }  // env CHANGE_ID
 
       }  // end try
