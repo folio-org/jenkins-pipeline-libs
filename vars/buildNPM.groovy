@@ -310,7 +310,7 @@ def call(body) {
                             customHeaders: [[maskValue: true, name: 'X-Okapi-Token', value: env.OKAPI_TOKEN],
                                             [maskValue: false, name: 'X-Okapi-Tenant', value: 'supertenant']],
                             httpMode: 'POST',
-                            url: env.okapiUrl + '/_/proxy/tenants/' + tenant + '/install',
+                            url: env.okapiUrl + '/_/proxy/tenants/' + tenant + '/install?tenantParameters=loadReference%3Dtrue%2CloadSample%3Dtrue',
                             consoleLogResponseBody: true,
                             requestBody: installJson
                 
