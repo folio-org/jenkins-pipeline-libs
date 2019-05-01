@@ -249,14 +249,14 @@ def call(body) {
             // get okapi token. Post MD to okapiUrl
             writeFile file: 'getOkapiToken.sh', text: libraryResource('org/folio/getOkapiToken.sh')
             sh 'chmod +x getOkapiToken.sh'
-            def okapiToken = sh(returnStdout: true,
+            env.OKAPI_TOKEN = sh(returnStdout: true,
                  script: "./getOkapiToken.sh -o $env.okapiUrl -t supertenant -u super_admin -p admin")
 
             def modDescriptorVar = readFile modDescriptor
              
             httpRequest acceptType: 'APPLICATION_JSON_UTF8', 
                         contentType: 'APPLICATION_JSON_UTF8', 
-                        customHeaders: [[maskValue: true, name: 'X-Okapi-Token', value: okapiToken], 
+                        customHeaders: [[maskValue: true, name: 'X-Okapi-Token', value: env.OKAPI_TOKEN], 
                                  [maskValue: false, name: 'X-Okapi-Tenant', value: 'supertenant']], 
                         httpMode: 'POST', 
                         url: env.okapiUrl + '/_/proxy/modules',
@@ -293,14 +293,12 @@ def call(body) {
               stage('Deploy Tenant') {
                 writeFile file: 'createTenant.sh', text: libraryResource('org/folio/createTenant.sh') 
                 sh 'chmod +x createTenant.sh'
-                env.OKAPI_TOKEN = okapiToken
-                sh (returnStdout: true,
-                    script: "./getOkapiToken.sh -o $okapiUrl -t supertentant -u super_admin -p admin")
                 sh "./createTenant.sh $okapiUrl $tenant"
                 // generate list of MD ids.  
                 sh "jq -r '.[].id' install.json > install.txt"
                 // enable modules for tenant
-                sh "cat install.txt | stripes mod enable --tenant $tenant --okapi $okapiUrl"
+                sh "stripes okapi login super_admin admin --okapi $env.okapiUrl --tenant supertenant"
+                sh "cat install.txt | stripes mod enable --tenant $tenant --okapi $env.okapiUrl"
               }
             }             
           }
