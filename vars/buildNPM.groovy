@@ -327,7 +327,8 @@ def call(body) {
                           submoduleCfg: [],
                           userRemoteConfigs: [[credentialsId: 'folio-jenkins-github-token',
                                              url: 'https://github.com/folio-org/folio-infrastructure']]])
-
+              }
+              dir("${env.WORKSPACE}/folio-infrastructure/CI/ansible") { 
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
                                   accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                                   credentialsId: 'jenkins-aws',
