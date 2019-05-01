@@ -363,17 +363,19 @@ def call(body) {
                     sh "bzip2 stripes-platform.tar"
  
                     // copy stripes bundle to folio instance
-                    sshagent (credentials: [env.sshKeyId]) {
-                      sh "ssh ubuntu@${stripesHost} 'sudo rm -rf /etc/folio/stripes/*'"
+                    sshagent (credentials: ['11657186-f4d4-4099-ab72-2a32e023cced']) {
+                      sh """
+                         ssh -o StrictHostKeyChecking=no ubuntu@${stripesHost} 'sudo rm -rf /etc/folio/stripes/*'
+                         """
                       sh "scp -o StrictHostKeyChecking=no ./stripes-platform.tar.bz2 " +
                          "ubuntu@${stripesHost}:/etc/folio/stripes"
  
                       sh """
-                         ssh -o StrictHostKeyChecking=no ubuntu@${folioHostname}.indexdata.internal \
+                         ssh -o StrictHostKeyChecking=no ubuntu@${stripesHost} \
                          'cd /etc/folio/stripes; bunzip2 stripes-platform.tar.bz2; tar xf stripes-platform.tar'
                          """
                     }
-                    sh "rm -f ${env.WORKSPACE}/stripes-platform.tar"
+                    sh "rm -f ./stripes-platform.tar"
                   }
                 } 
                 dir("${env.WORKSPACE}/folio-infrastructure/CI/ansible") {
