@@ -360,7 +360,7 @@ def call(body) {
  
                   // copy stripes bundle to folio instance
                   sshagent (credentials: [env.sshKeyId]) {
-                    ssh ubuntu@${stripesHost} 'sudo rm -rf /etc/folio/stripes/*'
+                    sh "ssh ubuntu@${stripesHost} 'sudo rm -rf /etc/folio/stripes/*'"
                     sh "scp -o StrictHostKeyChecking=no ./stripes-platform.tar.bz2 " +
                        "ubuntu@${stripesHost}:/etc/folio/stripes"
  
