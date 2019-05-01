@@ -288,6 +288,7 @@ def call(body) {
                 buildStripesPlatformPr(env.okapiUrl,tenant)  
                 // update install.json 
                 sh "sed -i 's/${env.folioName}-[0-9.]\\+/${env.folioName}-${env.version}/' install.json"
+
               }
             }
             stage('Deploy Tenant') {
@@ -346,18 +347,52 @@ def call(body) {
                 }
               } 
             } // end 'deploy tenant'
+
+
+            stage('Deploy Stripes Bundle') { 
+              // get host where stripes is running
+              def stripesHost = sh(returnStdout: true, script: "aws --output text --region us-east-1 ec2 describe-instances --filters 'Name=tag:Group,Values=folio_release_pr' 'Name=instance-state-name,Values=running' --query 'Reservations[*].Instances[*].[PrivateDnsName]'").trim()
+
+              dir("${env.WORKSPACE}/$stripesPlatform.repo") {
+                if(stripesHost) {
+                  sh "tar cf stripes-platform.tar output install.json yarn.lock"
+                  sh "bzip2 stripes-platform.tar"
+ 
+                  // copy stripes bundle to folio instance
+                  sshagent (credentials: [env.sshKeyId]) {
+                    ssh ubuntu@${stripesHost} 'sudo rm -rf /etc/folio/stripes/*'
+                    sh "scp -o StrictHostKeyChecking=no ./stripes-platform.tar.bz2 " +
+                       "ubuntu@${stripesHost}:/etc/folio/stripes"
+ 
+                    sh """
+                       ssh -o StrictHostKeyChecking=no ubuntu@${folioHostname}.indexdata.internal \
+                       'cd /etc/folio/stripes; bunzip2 stripes-platform.tar.bz2; tar xf stripes-platform.tar'
+                       """
+                  }
+                  sh "rm -f ${env.WORKSPACE}/stripes-platform.tar"
+                }
+              } 
+              dir("${env.WORKSPACE}/folio-infrastructure/CI/ansible") {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
+                                  accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                                  credentialsId: 'jenkins-aws',
+                                  secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+
+                  ansiblePlaybook (credentialsId: '11657186-f4d4-4099-ab72-2a32e023cced',
+                                   disableHostKeyChecking: true,
+                                   installation: 'Ansible',
+                                   inventory: 'inventory',
+                                   playbook: 'stripes-docker.yml',
+                                   sudoUser: null,
+                                   vaultCredentialsId: 'ansible-vault-pass',
+                                   extraVars: [ ec2_group: 'folio_release_pr',
+                                                folio_hostname: 'folio-release-pr' ])
+                }
+              }
+            } // end stage
+
        /* 
         *  if (runRegression) { 
-        *    stage('Bootstrap Tenant') { 
-        *      def tenantStatus = deployTenant("$okapiUrl","$tenant") 
-        *      env.tenantStatus = tenantStatus
-        *    }
-        * 
-        *    if (env.tenantStatus != '0') {
-        *      echo "Tenant Bootstrap Status: $env.tenantStatus"
-        *      echo "Problem deploying tenant. Skipping UI Regression testing."
-        *    }
-        *    else { 
         *      dir("${env.WORKSPACE}") { 
         *        stage('Run UI Integration Tests') { 
         *          def testOpts = [ tenant: tenant,
