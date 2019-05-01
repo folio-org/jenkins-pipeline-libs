@@ -250,7 +250,7 @@ def call(body) {
             writeFile file: 'getOkapiToken.sh', text: libraryResource('org/folio/getOkapiToken.sh')
             sh 'chmod +x getOkapiToken.sh'
             env.OKAPI_TOKEN = sh(returnStdout: true,
-                 script: "./getOkapiToken.sh -o $env.okapiUrl -t supertenant -u super_admin -p admin")
+                 script: "./getOkapiToken.sh -o $env.okapiUrl -t supertenant -u super_admin -p admin").trim()
 
             def modDescriptorVar = readFile modDescriptor
              
@@ -289,16 +289,29 @@ def call(body) {
                 // update install.json 
                 sh "sed -i 's/${env.folioName}-[0-9.]\\+/${env.folioName}-${env.version}/' install.json"
               }
-              // create tenant
               stage('Deploy Tenant') {
-                writeFile file: 'createTenant.sh', text: libraryResource('org/folio/createTenant.sh') 
-                sh 'chmod +x createTenant.sh'
-                sh "./createTenant.sh $okapiUrl $tenant"
-                // generate list of MD ids.  
-                sh "jq -r '.[].id' install.json > install.txt"
+                // create tenant
+                def tenantJson = "{\"id\":\"${tenant}\"}"
+                httpRequest acceptType: 'APPLICATION_JSON_UTF8', 
+                            contentType: 'APPLICATION_JSON_UTF8', 
+                            customHeaders: [[maskValue: true, name: 'X-Okapi-Token', value: env.OKAPI_TOKEN],
+                                            [maskValue: false, name: 'X-Okapi-Tenant', value: 'supertenant']],
+                            consoleLogResponseBody: true,
+                            httpMode: 'POST',
+                            requestBody: tenantJson, 
+                            url: env.okapiUrl + '/_/proxy/tenants'
+
                 // enable modules for tenant
-                sh "stripes okapi login super_admin admin --okapi $env.okapiUrl --tenant supertenant"
-                sh "cat install.txt | stripes mod enable --tenant $tenant --okapi $env.okapiUrl"
+                def installJson = readFile './install.json'
+                httpRequest acceptType: 'APPLICATION_JSON_UTF8',
+                            contentType: 'APPLICATION_JSON_UTF8',
+                            customHeaders: [[maskValue: true, name: 'X-Okapi-Token', value: env.OKAPI_TOKEN],
+                                            [maskValue: false, name: 'X-Okapi-Tenant', value: 'supertenant']],
+                            httpMode: 'POST',
+                            url: env.okapiUrl + '/_/proxy/tenants/' + tenant + '/install?',
+                            consoleLogResponseBody: true,
+                            requestBody: installJson
+                
               }
             }             
           }
