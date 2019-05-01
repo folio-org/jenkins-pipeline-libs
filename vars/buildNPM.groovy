@@ -250,7 +250,7 @@ def call(body) {
             writeFile file: 'getOkapiToken.sh', text: libraryResource('org/folio/getOkapiToken.sh')
             sh 'chmod +x getOkapiToken.sh'
             def okapiToken = sh(returnStdout: true,
-                 script: "./getOkapiToken.sh -o $env.okapiUrl -t supertentant -u super_admin -p admin")
+                 script: "./getOkapiToken.sh -o $env.okapiUrl -t supertenant -u super_admin -p admin")
 
             def modDescriptorVar = readFile modDescriptor
              
