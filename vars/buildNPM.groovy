@@ -362,6 +362,10 @@ def call(body) {
             if (runRegression) {
               dir("${env.WORKSPACE}/project") {
                 stage('Run UI Integration Tests') {
+ 
+                  // need to run 'yarn install' again
+                  sh 'yarn install'
+
                   def testOpts = [ tenant: tenant,
                                    folioUser: tenant + '_admin',
                                    folioPassword: 'admin',
