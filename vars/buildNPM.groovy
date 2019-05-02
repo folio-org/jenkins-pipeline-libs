@@ -304,6 +304,16 @@ def call(body) {
                             requestBody: tenantJson, 
                             url: env.okapiUrl + '/_/proxy/tenants'
 
+                // enable okapi module for tenant
+                httpRequest acceptType: 'APPLICATION_JSON_UTF8', 
+                            contentType: 'APPLICATION_JSON_UTF8', 
+                            customHeaders: [[maskValue: true, name: 'X-Okapi-Token', value: env.OKAPI_TOKEN],
+                                            [maskValue: false, name: 'X-Okapi-Tenant', value: 'supertenant']],
+                            consoleLogResponseBody: true,
+                            httpMode: 'POST',
+                            requestBody: '{"id":"okapi"}', 
+                            url: env.okapiUrl + '/_/proxy/tenants/' + tenant + '/modules
+
                 // enable modules for tenant
                 def installJson = readFile './install.json'
                 httpRequest acceptType: 'APPLICATION_JSON_UTF8',
@@ -348,6 +358,23 @@ def call(body) {
               } 
             } // end 'deploy tenant'
 
+            // run UI module integration tests
+            if (runRegression) {
+              dir("${env.WORKSPACE}/project") {
+                stage('Run UI Integration Tests') {
+                  def testOpts = [ tenant: tenant,
+                                   folioUser: tenant + '_admin',
+                                   folioPassword: 'admin',
+                                   okapiUrl: env.okapiUrl ]
+
+                  def testStatus = runIntegrationTests(testOpts,regressionDebugMode)
+                  if (testStatus == 'FAILED') {
+                    // don't fail. just report for now. 
+                    echo "There are UI integration test failures" 
+                  }
+                }
+              }
+            }
 
             stage('Deploy Stripes Bundle') { 
               // get host where stripes is running
@@ -390,23 +417,11 @@ def call(body) {
                                                 folio_hostname: 'folio-release-pr' ])
                 }
               } // end withCredentials
+              def githubSummary = "Bundle deployed for tenant, ${tenant}, to https://folio-release-pr.aws.indexdata.com" 
+              @NonCPS
+              def comment = pullRequest.comment(githubSummary)
             } // end stage
 
-       /* 
-        *  if (runRegression) { 
-        *      dir("${env.WORKSPACE}") { 
-        *        stage('Run UI Integration Tests') { 
-        *          def testOpts = [ tenant: tenant,
-        *                           folioUser: tenant + '_admin',
-        *                           folioPassword: 'admin',
-        *                           okapiUrl: okapiUrl ]
-        *
-        *            runIntegrationTests(testOpts,regressionDebugMode)
-        *        }
-        *      }
-        *    }
-        *  }  
-        */
           } // end if 
         }  // env CHANGE_ID
 
