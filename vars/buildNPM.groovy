@@ -312,7 +312,7 @@ def call(body) {
                             consoleLogResponseBody: true,
                             httpMode: 'POST',
                             requestBody: '{"id":"okapi"}', 
-                            url: env.okapiUrl + '/_/proxy/tenants/' + tenant + '/modules
+                            url: env.okapiUrl + '/_/proxy/tenants/' + tenant + '/modules'
 
                 // enable modules for tenant
                 def installJson = readFile './install.json'
