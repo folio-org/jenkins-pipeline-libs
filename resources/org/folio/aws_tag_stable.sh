@@ -36,7 +36,7 @@ if [ -n "$new_stable" ]; then
   do
     $aws ec2 create-tags --resources $i --tags Key=Build,Value=${base_build}_stable
     $aws ec2 create-tags --resources $i --tags Key=Group,Value=${group_tag}_stable
-    $aws ec2 create-tags --resources $i --tags Key=Hostname,Value=${group_tag}_stable
+    #$aws ec2 create-tags --resources $i --tags Key=Hostname,Value=${group_tag}_stable
   done
 else
   echo "No matching tags for Group:'${group_tag}' found."
