@@ -104,7 +104,8 @@ def call(body) {
                 error('Snapshot dependencies found in release')
               }
             }
-            sh 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install'
+            sh 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install ' \
+                + 'org.jacoco:jacoco-maven-plugin:report'
             if ( fileExists(modDescriptor) ) {
               foliociLib.updateModDescriptor(modDescriptor)
             }
