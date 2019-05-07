@@ -327,7 +327,7 @@ def call(body) {
                 
               }
               dir("${env.WORKSPACE}/folio-infrastructure") { 
-                checkout([$class: 'GitSCM', branches: [[name: '*/FOLIO-1948']],
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']],
                           doGenerateSubmoduleConfigurations: false,
                           extensions: [[$class: 'SubmoduleOption',
                                      disableSubmodules: false,
