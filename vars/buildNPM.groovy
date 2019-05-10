@@ -32,6 +32,9 @@ def call(body) {
   def foliociLib = new org.folio.foliociCommands()
   
   // default is to deploy to npm repo when branch is master
+  // Note: this doesn't really work.  If set to boolean false, 
+  // then the default boolean true will be set.  Set as string
+  // 'false' or 'no'
   def npmDeploy = config.npmDeploy ?: true
   if (npmDeploy ==~ /(?i)(Y|YES|T|TRUE)/) { npmDeploy = true }
   if (npmDeploy ==~ /(?i)(N|NO|F|FALSE)/) { npmDeploy = false }
@@ -122,7 +125,11 @@ def call(body) {
 
         dir("${env.WORKSPACE}/project") {
           stage('Set Environment') {
+            if (npmDeploy) {
+              echo "npmDeploy is true"
+            }
             setEnvNPM()
+             
           }
 
           withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
