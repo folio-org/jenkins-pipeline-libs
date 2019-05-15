@@ -286,7 +286,7 @@ def call(body) {
           // def tenant = "${env.BRANCH_NAME}_${env.BUILD_NUMBER}"
           def tenant = "${env.projectName}_${env.CHANGE_ID}_${env.BUILD_NUMBER}"
           tenant = foliociLib.replaceHyphen(tenant)
-          def stripesHost = "${env.projectName}${env.CHANGE_ID}"
+          def stripesHost = "${env.projectName}-${env.CHANGE_ID}"
         
           if (stripesPlatform != null) { 
             dir("${env.WORKSPACE}/$stripesPlatform.repo") {
