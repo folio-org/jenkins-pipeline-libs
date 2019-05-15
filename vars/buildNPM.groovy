@@ -284,8 +284,9 @@ def call(body) {
          
           // ensure tenant id is unique
           // def tenant = "${env.BRANCH_NAME}_${env.BUILD_NUMBER}"
-          def tenant = "pr_${env.CHANGE_ID}_${env.BUILD_NUMBER}"
+          def tenant = "${env.projectName}_${env.CHANGE_ID}_${env.BUILD_NUMBER}"
           tenant = foliociLib.replaceHyphen(tenant)
+          def stripesHost = "${env.projectName}${env.CHANGE_ID}"
         
           if (stripesPlatform != null) { 
             dir("${env.WORKSPACE}/$stripesPlatform.repo") {
@@ -393,42 +394,20 @@ def call(body) {
                                   accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                                   credentialsId: 'jenkins-aws',
                                   secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                def stripesHost = sh(returnStdout: true, script: "aws --output text --region us-east-1 ec2 describe-instances --filters 'Name=tag:Group,Values=folio_release_pr' 'Name=instance-state-name,Values=running' --query 'Reservations[*].Instances[*].[PrivateDnsName]'").trim()
 
-                dir("${env.WORKSPACE}/$stripesPlatform.repo") {
-                  if(stripesHost) {
-                    sh "tar cf stripes-platform.tar output install.json yarn.lock"
-                    sh "bzip2 stripes-platform.tar"
- 
-                    // copy stripes bundle to folio instance
-                    sshagent (credentials: ['11657186-f4d4-4099-ab72-2a32e023cced']) {
-                      sh """
-                         ssh -o StrictHostKeyChecking=no ubuntu@${stripesHost} 'sudo rm -rf /etc/folio/stripes/*'
-                         """
-                      sh "scp -o StrictHostKeyChecking=no ./stripes-platform.tar.bz2 " +
-                         "ubuntu@${stripesHost}:/etc/folio/stripes"
- 
-                      sh """
-                         ssh -o StrictHostKeyChecking=no ubuntu@${stripesHost} \
-                         'cd /etc/folio/stripes; bunzip2 stripes-platform.tar.bz2; tar xf stripes-platform.tar'
-                         """
-                    }
-                    sh "rm -f ./stripes-platform.tar"
-                  }
-                } 
                 dir("${env.WORKSPACE}/folio-infrastructure/CI/ansible") {
                   ansiblePlaybook (credentialsId: '11657186-f4d4-4099-ab72-2a32e023cced',
                                    disableHostKeyChecking: true,
                                    installation: 'Ansible',
                                    inventory: 'inventory',
-                                   playbook: 'stripes-docker.yml',
+                                   playbook: 'stripes-s3.yml',
                                    sudoUser: null,
                                    vaultCredentialsId: 'ansible-vault-pass',
-                                   extraVars: [ ec2_group: 'folio_release_pr',
-                                                folio_hostname: 'folio-release-pr' ])
+                                   extraVars: [ s3_bucket: "$stripesHost",
+                                                stripes_path: "${env.WORKSPACE}/${stripesPlatform.repo}/output" ])
                 }
               } // end withCredentials
-              def githubSummary = "Bundle deployed for tenant, ${tenant}, to https://folio-release-pr.aws.indexdata.com" 
+              def githubSummary = "Bundle deployed for tenant, ${tenant}, to https://${stripesHost}.s3.amazonaws.com/index.html" 
               @NonCPS
               def comment = pullRequest.comment(githubSummary)
             } // end stage
