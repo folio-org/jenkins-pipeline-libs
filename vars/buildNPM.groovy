@@ -404,6 +404,7 @@ def call(body) {
                                    sudoUser: null,
                                    vaultCredentialsId: 'ansible-vault-pass',
                                    extraVars: [ s3_bucket: "$stripesHost",
+                                                s3_tags: "{\"Pr\":\"${env.projectName}-${env.CHANGE_ID}\"}",
                                                 stripes_path: "${env.WORKSPACE}/${stripesPlatform.repo}/output" ])
                 }
               } // end withCredentials
