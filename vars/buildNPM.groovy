@@ -92,7 +92,7 @@ def call(body) {
 
 
   properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '', 
-                                          artifactNumToKeepStr: '30', 
+                                          artifactNumToKeepStr: '15', 
                                           daysToKeepStr: '', 
                                           numToKeepStr: '30'))]) 
  
