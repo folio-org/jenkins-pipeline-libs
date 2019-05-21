@@ -403,7 +403,9 @@ def call(body) {
                                                 stripes_path: "${env.WORKSPACE}/${stripesPlatform.repo}/output" ])
                 }
               } // end withCredentials
-              def githubSummary = "Bundle deployed for tenant, ${tenant}, to https://${stripesHost}.s3.amazonaws.com/index.html" 
+              def githubSummary = "Bundle deployed for tenant, ${tenant}," + 
+                                  "to https://${stripesHost}.s3.amazonaws.com/index.html." + 
+                                  "Additional information at https://dev.folio.org/guides/branch-preview/"
               @NonCPS
               def comment = pullRequest.comment(githubSummary)
             } // end stage
