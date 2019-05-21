@@ -252,7 +252,7 @@ def call(body) {
             }
           } 
           // post MD to okapiUrl if PR. FOLIO-1948
-          if (env.CHANGE_ID) { 
+          if ((env.CHANGE_ID) && (stripesPlatform != null)) { 
             // get okapi token. Post MD to okapiUrl
             writeFile file: 'getOkapiToken.sh', text: libraryResource('org/folio/getOkapiToken.sh')
             sh 'chmod +x getOkapiToken.sh'
@@ -270,16 +270,11 @@ def call(body) {
                         consoleLogResponseBody: true,
                         requestBody: modDescriptorVar
              
-            //sh "stripes okapi login super_admin admin --okapi $okapiUrl --tenant supertenant"
-            //sh "stripes mod add --okapi $okapiUrl"
           }
           
         } // end dir
 
         // actions specific to PRs
-        /*
-        *  Unused or disabled checks
-        */   
         if (env.CHANGE_ID) {
          
           // ensure tenant id is unique
