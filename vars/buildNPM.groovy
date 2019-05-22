@@ -289,8 +289,8 @@ def call(body) {
                 git branch: stripesPlatform.branch, 
                     url: "https://github.com/folio-org/${stripesPlatform.repo}"
                 buildStripesPlatformPr(env.okapiUrl,tenant)  
-                // update install.json 
-                sh "sed -i 's/${env.folioName}-[0-9.]\\+/${env.folioName}-${env.version}/' install.json"
+                // update stripes-install.json 
+                sh "sed -i 's/${env.folioName}-[0-9.]\\+/${env.folioName}-${env.version}/' stripes-install.json"
 
               }
             }
@@ -317,8 +317,8 @@ def call(body) {
                             requestBody: '{"id":"okapi"}', 
                             url: env.okapiUrl + '/_/proxy/tenants/' + tenant + '/modules'
 
-                // enable modules for tenant
-                def installJson = readFile './install.json'
+                // enable backend modules for tenant.  deploy if needed 
+                def okapiInstallJson = readFile './okapi-install.json'
                 httpRequest acceptType: 'APPLICATION_JSON_UTF8',
                             contentType: 'APPLICATION_JSON_UTF8',
                             customHeaders: [[maskValue: true, name: 'X-Okapi-Token', value: env.OKAPI_TOKEN],
@@ -326,7 +326,18 @@ def call(body) {
                             httpMode: 'POST',
                             url: env.okapiUrl + '/_/proxy/tenants/' + tenant + '/install?deploy=true&tenantParameters=loadReference%3Dtrue%2CloadSample%3Dtrue',
                             consoleLogResponseBody: true,
-                            requestBody: installJson
+                            requestBody: okapInstallJson
+
+                // enable frontend modules for tenant.  deploy if needed 
+                def stripesInstallJson = readFile './stripes-install.json'
+                httpRequest acceptType: 'APPLICATION_JSON_UTF8',
+                            contentType: 'APPLICATION_JSON_UTF8',
+                            customHeaders: [[maskValue: true, name: 'X-Okapi-Token', value: env.OKAPI_TOKEN],
+                                            [maskValue: false, name: 'X-Okapi-Tenant', value: 'supertenant']],
+                            httpMode: 'POST',
+                            url: env.okapiUrl + '/_/proxy/tenants/' + tenant + '/install?tenantParameters=loadReference%3Dtrue%2CloadSample%3Dtrue',
+                            consoleLogResponseBody: true,
+                            requestBody: okapInstallJson
                 
               }
               dir("${env.WORKSPACE}/folio-infrastructure") { 
