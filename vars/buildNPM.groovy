@@ -326,7 +326,7 @@ def call(body) {
                             httpMode: 'POST',
                             url: env.okapiUrl + '/_/proxy/tenants/' + tenant + '/install?deploy=true&tenantParameters=loadReference%3Dtrue%2CloadSample%3Dtrue',
                             consoleLogResponseBody: true,
-                            requestBody: okapInstallJson
+                            requestBody: okapiInstallJson
 
                 // enable frontend modules for tenant.  deploy if needed 
                 def stripesInstallJson = readFile './stripes-install.json'
@@ -337,7 +337,7 @@ def call(body) {
                             httpMode: 'POST',
                             url: env.okapiUrl + '/_/proxy/tenants/' + tenant + '/install?tenantParameters=loadReference%3Dtrue%2CloadSample%3Dtrue',
                             consoleLogResponseBody: true,
-                            requestBody: okapInstallJson
+                            requestBody: stripesInstallJson
                 
               }
               dir("${env.WORKSPACE}/folio-infrastructure") { 
