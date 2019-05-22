@@ -415,7 +415,7 @@ def call(body) {
                 }
               } // end withCredentials
               def githubSummary = "Bundle deployed for tenant, ${tenant}," + 
-                                  "to https://${stripesHost}.s3.amazonaws.com/index.html." + 
+                                  "to https://${stripesHost}.s3.amazonaws.com/index.html - " + 
                                   "Additional information at https://dev.folio.org/guides/branch-preview/"
               @NonCPS
               def comment = pullRequest.comment(githubSummary)
