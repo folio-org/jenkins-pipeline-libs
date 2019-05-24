@@ -291,7 +291,12 @@ def call(body) {
                 buildStripesPlatformPr(env.okapiUrl,tenant)  
                 // update stripes-install.json 
                 sh "sed -i 's/${env.folioName}-[0-9.]\\+/${env.folioName}-${env.version}/' stripes-install.json"
-
+                // update backend mods with custom mods from .ci-custom-deps.json
+                def subModList = readJSON file: 'custom-deps.json'
+                def okapiTenantModList = readJSON file: 'okapi-install.json'
+                okapiTenantModList = foliociLib.subTenantMods(subModList,okapiTenantModList)
+                writeJSON file: 'okapi-install.json', json: okapiTenantModList, pretty: 2
+                sh 'cat okapi-install.json'
               }
             }
             stage('Deploy Tenant') {
