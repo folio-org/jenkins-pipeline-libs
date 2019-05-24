@@ -172,8 +172,8 @@ def currentDateTime() {
 
 // substitute tenant modules
 @NonCPS
-def subTenantMods(String subTenantModList, String TenantModList) {
-  subTenantModList.each {
+def subTenantMods(List subTenantMods, List TenantMods) {
+  subTenantMods.each {
     def subMod = it.id
     def subModAction = it.action
     def matches = (it.id =~ /^(.*?)\-(\d+.*)/)
@@ -182,13 +182,13 @@ def subTenantMods(String subTenantModList, String TenantModList) {
     echo "Substituting: " + subModName + "-->" subMod
     echo "Action: " + subModAction
 
-    TenantModList.each {
+    TenantMods.each {
       if (it.id ==~ /^${subModName}-\d+.*/) {
         it.id = subMod
         it.action = subModAction
        }
     }
   }
-  return TenantModList
+  return TenantMods
 }
 
