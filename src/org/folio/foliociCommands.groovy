@@ -179,7 +179,7 @@ def subTenantMods(List subTenantMods, List TenantMods) {
     def matches = (it.id =~ /^(.*?)\-(\d+.*)/)
     def subModName = matches[0][1]
 
-    echo "Substituting: " + subModName + "-->" subMod
+    echo "Substituting: " + subModName + "-->" + subMod
     echo "Action: " + subModAction
 
     TenantMods.each {
