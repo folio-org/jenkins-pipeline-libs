@@ -170,4 +170,25 @@ def currentDateTime() {
   return dateFormat.format(date)
 }
 
+// substitute tenant modules
+@NonCPS
+def subTenantMods(String subTenantModList, String TenantModList) {
+  subTenantModList.each {
+    def subMod = it.id
+    def subModAction = it.action
+    def matches = (it.id =~ /^(.*?)\-(\d+.*)/)
+    def subModName = matches[0][1]
+
+    echo "Substituting: " + subModName + "-->" subMod
+    echo "Action: " + subModAction
+
+    TenantModList.each {
+      if (it.id ==~ /^${subModName}-\d+.*/) {
+        it.id = subMod
+        it.action = subModAction
+       }
+    }
+  }
+  return TenantModList
+}
 
