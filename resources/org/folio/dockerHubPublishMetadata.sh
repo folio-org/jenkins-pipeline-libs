@@ -1,32 +1,35 @@
 #!/bin/bash
 
-#function setDockerHubInfo() {
-#Need to set working directory where git repo is pulled down
-WORKSPACE=/Users/mast4541/github/folio/mod-notify
+#Need to set WORKSPACE testing on Local  directory where git repo is pulled down
+#WORKSPACE=/Users/mast4541/github/folio/mod-notify
+#WORKSPACE set within Jenkins bash ENVs (Double Check)
+
+# SET VARIABLES
 ORG=$(cd $WORKSPACE && dirname `git config --get remote.origin.url`)
 ORG=${ORG#"git@github.com:"}
 ORG=${ORG#"https://github.com/"}
 REPO=$(cd $WORKSPACE && basename -s .git `git config --get remote.origin.url`)
 GITHUB_URL="https://github.com/$ORG/$REPO"
-#REPO_TITLE=$(echo $REPO | sed -e 's/-/ /g')
-#REPO_TITLE=$(titleCaseConverter $REPO_TITLE)
-#titleCaseConverter
 REPO_TITLE=$(echo $REPO | sed -e 's/-/ /g' -e 's/\b\(.\)/\u\1/g')
 DOCKER_HUB_TOKEN=$(curl -s -X POST \
     -H "Content-Type: application/json" \
     -d '{"username": "'"$DOCKER_USERNAME"'", "password": "'"$DOCKER_PASSWORD"'"}' \
     https://hub.docker.com/v2/users/login/ | jq -r .token)
 
+# IMAGE PASSED in as COMMAND Line ARG
 IMAGE=$1
-echo $IMAGE
-#MetaData
+
+#PULL MetaData from Mod Descriptor
 MD_FILE="$WORKSPACE/descriptors/ModuleDescriptor-template.json"
 if test -f "$MD_FILE"; then
     CONTAINER_MEMORY=$(cat $MD_FILE | jq '.metadata.containerMemory' | cut -d "\"" -f 2)
     DB_CONNECTION=$(cat $MD_FILE | jq '.metadata.databaseConnection' | cut -d "\"" -f 2)
-
+else
+    printf "Unable to find push ModuleDescriptor-template.json file"
+    exit 1
 fi
 
+# SET Docker Hub Markdown Snippet
 read -r -d '' DH_MD_SNIPPIT <<- EOM
 # FOLIO $REPO_TITLE 
 
