@@ -1,23 +1,13 @@
 #!/bin/bash
 
-#Need to set WORKSPACE testing on Local  directory where git repo is pulled down
-#WORKSPACE=/Users/mast4541/github/folio/mod-notify
-#WORKSPACE set within Jenkins bash ENVs (Double Check)
-
 # SET VARIABLES
-ORG=$(cd $WORKSPACE && dirname `git config --get remote.origin.url`)
-ORG=${ORG#"git@github.com:"}
-ORG=${ORG#"https://github.com/"}
-REPO=$(cd $WORKSPACE && basename -s .git `git config --get remote.origin.url`)
-GITHUB_URL="https://github.com/$ORG/$REPO"
-REPO_TITLE=$(echo $REPO | sed -e 's/-/ /g' -e 's/\b\(.\)/\u\1/g')
+IMAGE=$1
+REPO_TITLE=$(echo $2 | sed -e 's/-/ /g' -e 's/\b\(.\)/\u\1/g')
+GITHUB_URL=$3
 DOCKER_HUB_TOKEN=$(curl -s -X POST \
     -H "Content-Type: application/json" \
     -d '{"username": "'"$DOCKER_USERNAME"'", "password": "'"$DOCKER_PASSWORD"'"}' \
     https://hub.docker.com/v2/users/login/ | jq -r .token)
-
-# IMAGE PASSED in as COMMAND Line ARG
-IMAGE=$1
 
 #PULL MetaData from Mod Descriptor
 MD_FILE="$WORKSPACE/descriptors/ModuleDescriptor-template.json"
