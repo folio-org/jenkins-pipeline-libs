@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script Args: IMAGE VARIABLES
+# Script Args: Docker Hub IMAGE, Module name,Github url
 IMAGE=$1
 REPO_TITLE=$(echo $2 | sed -e 's/-/ /g' -e 's/\b\(.\)/\u\1/g')
 GITHUB_URL=$3
@@ -25,7 +25,7 @@ if test -f "$MD_FILE"; then
     CONTAINER_MEMORY=$(cat $MD_FILE | jq '.metadata.containerMemory' | cut -d "\"" -f 2)
     [ "$CONTAINER_MEMORY" == null ] && : || METADATA="${METADATA}1. Minimum Memory (MiB): $CONTAINER_MEMORY\n"
 
-    #Set Markdown Metadata Header if needed
+    #Set Metadata Header If Needed
     [ "$METADATA" == "" ] && : || METADATA="### Metadata\n\n${METADATA}"
     METADATA=$(echo -e $METADATA)
 fi
