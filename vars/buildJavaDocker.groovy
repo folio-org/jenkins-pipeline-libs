@@ -118,8 +118,7 @@ EOF
       }
       
       // publish image if master branch
-      //Modified for testing push to docker repo
-      if ( (env.BRANCH_NAME == 'master' && publishMaster) || env.isRelease || env.BRANCH_NAME == 'FOLIO-2008' ) {
+      if ( (env.BRANCH_NAME == 'master' && publishMaster) || env.isRelease ) {
         // publish images to ci docker repo
         echo "Publishing Docker images"
         docker.withRegistry('https://index.docker.io/v1/', 'DockerHubIDJenkins') {
@@ -128,12 +127,14 @@ EOF
           sh "docker push ${env.dockerRepo}/${env.name}:${env.version}"
           sh "docker push ${env.dockerRepo}/${env.name}:latest"
         }
-        echo "Publish Readme Docker Hub"
-        withCredentials([usernamePassword(credentialsId: 'DockerHubIDJenkins', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-          writeFile file: 'dockerHubPublishMetadata.sh', text: libraryResource('org/folio/dockerHubPublishMetadata.sh')
-          sh 'chmod +x dockerHubPublishMetadata.sh'
-          sh "./dockerHubPublishMetadata.sh ${env.dockerRepo}/${env.name} ${env.projectName} ${env.projUrl}"
-        }
+        //Publish Readme code location after testing
+      }
+      //Will move code up within block after testing
+      echo "Publish Readme Docker Hub"
+      withCredentials([usernamePassword(credentialsId: 'DockerHubIDJenkins', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+        writeFile file: 'dockerHubPublishMetadata.sh', text: libraryResource('org/folio/dockerHubPublishMetadata.sh')
+        sh 'chmod +x dockerHubPublishMetadata.sh'
+        sh "./dockerHubPublishMetadata.sh ${env.dockerRepo}/${env.name} ${env.projectName} ${env.projUrl}"
       }
     } // end dir()
 
