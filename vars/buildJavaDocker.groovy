@@ -127,14 +127,13 @@ EOF
           sh "docker push ${env.dockerRepo}/${env.name}:${env.version}"
           sh "docker push ${env.dockerRepo}/${env.name}:latest"
         }
-        //Publish Readme code location after testing
-      }
-      //Will move code up within block after testing
-      echo "Publish Readme Docker Hub"
-      withCredentials([usernamePassword(credentialsId: 'DockerHubIDJenkins', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-        writeFile file: 'dockerHubPublishMetadata.sh', text: libraryResource('org/folio/dockerHubPublishMetadata.sh')
-        sh 'chmod +x dockerHubPublishMetadata.sh'
-        sh "./dockerHubPublishMetadata.sh ${env.dockerRepo}/${env.name} ${env.projectName} ${env.projUrl}"
+        // publish readme
+        echo "Publish Readme Docker Hub"
+        withCredentials([usernamePassword(credentialsId: 'DockerHubIDJenkins', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+          writeFile file: 'dockerHubPublishMetadata.sh', text: libraryResource('org/folio/dockerHubPublishMetadata.sh')
+          sh 'chmod +x dockerHubPublishMetadata.sh'
+          sh "./dockerHubPublishMetadata.sh ${env.dockerRepo}/${env.name} ${env.projectName} ${env.projUrl}"
+        }
       }
     } // end dir()
 
