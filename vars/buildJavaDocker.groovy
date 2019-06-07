@@ -116,9 +116,8 @@ EOF
       else {
         echo "No health check configured. Skipping container health check."
       }
-
+      
       // publish image if master branch
-
       if ( (env.BRANCH_NAME == 'master' && publishMaster) || env.isRelease ) {
         // publish images to ci docker repo
         echo "Publishing Docker images"
@@ -128,8 +127,14 @@ EOF
           sh "docker push ${env.dockerRepo}/${env.name}:${env.version}"
           sh "docker push ${env.dockerRepo}/${env.name}:latest"
         }
+        // publish readme
+        echo "Publish Readme Docker Hub"
+        withCredentials([usernamePassword(credentialsId: 'DockerHubIDJenkins', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+          writeFile file: 'dockerHubPublishMetadata.sh', text: libraryResource('org/folio/dockerHubPublishMetadata.sh')
+          sh 'chmod +x dockerHubPublishMetadata.sh'
+          sh "./dockerHubPublishMetadata.sh ${env.dockerRepo}/${env.name} ${env.projectName} ${env.projUrl}"
+        }
       }
-
     } // end dir()
 
   } // end try
