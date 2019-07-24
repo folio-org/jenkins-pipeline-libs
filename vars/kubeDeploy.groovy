@@ -25,8 +25,8 @@ def call() {
                                     url: 'https://github.com/folio-org/folio-infrastructure']]
               ])
         
-      }
-      
+
+
       dir("${env.WORKSPACE}/folio-infrastructure") {
         sh 'printf "[ci]\nlocalhost\tansible_connection=local" > CI/ansible/temp-inventory'
         sh 'cat CI/ansible/temp-inventory'
@@ -38,6 +38,4 @@ def call() {
                           sudoUser: null,
                           vaultCredentialsId: 'ansible-vault-pass')*/
       }
-    }
-  }
 }
