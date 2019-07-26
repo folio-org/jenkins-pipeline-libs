@@ -32,8 +32,8 @@ def call() {
       ansiblePlaybook(credentialsId: '11657186-f4d4-4099-ab72-2a32e023cced',
                       disableHostKeyChecking: true,
                       installation: 'Ansible',
-                      inventory: 'CI/ansible/temp-inventory',
-                      playbook: "CI/ansible/folio-kubernetes.yml",
+                      inventory: 'temp-inventory',
+                      playbook: 'folio-kubernetes.yml',
                       sudoUser: null,
                       vaultCredentialsId: 'ansible-vault-pass')
   }
