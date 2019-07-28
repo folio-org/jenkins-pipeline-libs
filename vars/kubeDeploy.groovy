@@ -4,9 +4,9 @@
  * deploy a module to kubernetes
  */
 
-def call() {
+def call(String moduleId) {
   echo "install ansible kubernetes deps"
-  sh "pip -q install openshift psycopg2-binary"
+  sh "pip -q install openshift"
   
   echo "clone folio-infrastructre"
   checkout([$class: 'GitSCM', 
@@ -35,6 +35,9 @@ def call() {
                       inventory: 'temp-inventory',
                       playbook: 'folio-kubernetes.yml',
                       sudoUser: null,
-                      vaultCredentialsId: 'ansible-vault-pass')
+                      vaultCredentialsId: 'ansible-vault-pass',
+                      extraVars: [
+                        module_id: moduleId,
+                      ])
   }
 }
