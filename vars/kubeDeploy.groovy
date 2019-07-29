@@ -33,7 +33,7 @@ def call(String moduleId) {
                       disableHostKeyChecking: true,
                       installation: 'Ansible',
                       inventory: 'temp-inventory',
-                      playbook: 'folio-kubernetes.yml',
+                      playbook: 'kube-module-deploy.yml',
                       sudoUser: null,
                       vaultCredentialsId: 'ansible-vault-pass',
                       extraVars: [
