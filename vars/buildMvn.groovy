@@ -42,6 +42,11 @@ def call(body) {
   if (publishAPI ==~ /(?i)(Y|YES|T|TRUE)/) { publishAPI = true }
   if (publishAPI ==~ /(?i)(N|NO|F|FALSE)/) { publishAPI = false }
 
+  // deploy module to Kubernetes. Default is false
+  def doKubeDeploy = config.doKubeDeploy ?: false
+  if (doKubeDeploy ==~ /(?i)(Y|YES|T|TRUE)/) { doLintRamlCop = true }
+  if (doKubeDeploy ==~ /(?i)(N|NO|F|FALSE)/) { doLintRamlCop = false }
+
 
   // location of Maven MD
   def modDescriptor =  'target/ModuleDescriptor.json'
@@ -133,6 +138,15 @@ def call(body) {
           }
         } 
 
+        // testing
+        if (doKubeDeploy) {
+          stage('Kubernetes Deploy') {
+            echo "Deploying to kubernetes cluster"
+            echo "would use version: ${env.name}-${env.version}"
+            kubeDeploy("mod-users-15.7.0-SNAPSHOT.89")
+          }
+        }
+
         // master branch or tagged releases
         if (( env.BRANCH_NAME == 'master' ) || ( env.isRelease )) {
 
@@ -163,6 +177,12 @@ def call(body) {
                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                 sh 'aws s3 sync folio-api-docs s3://foliodocs/api'
               }
+            }
+          }
+          if (doKubeDeploy) {
+            stage('Kubernetes Deploy') {
+              echo "Deploying to kubernetes cluster"
+              kubeDeploy("${env.name}-${env.version}")
             }
           }
         }
