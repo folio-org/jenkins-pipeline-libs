@@ -44,8 +44,8 @@ def call(body) {
 
   // deploy module to Kubernetes. Default is false
   def doKubeDeploy = config.doKubeDeploy ?: false
-  if (doKubeDeploy ==~ /(?i)(Y|YES|T|TRUE)/) { doLintRamlCop = true }
-  if (doKubeDeploy ==~ /(?i)(N|NO|F|FALSE)/) { doLintRamlCop = false }
+  if (doKubeDeploy ==~ /(?i)(Y|YES|T|TRUE)/) { doKubeDeploy = true }
+  if (doKubeDeploy ==~ /(?i)(N|NO|F|FALSE)/) { doKubeDeploy = false }
 
 
   // location of Maven MD
