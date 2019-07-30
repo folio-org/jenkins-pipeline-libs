@@ -138,15 +138,6 @@ def call(body) {
           }
         } 
 
-        // testing
-        if (doKubeDeploy) {
-          stage('Kubernetes Deploy') {
-            echo "Deploying to kubernetes cluster"
-            echo "would use version: ${env.name}-${env.version}"
-            kubeDeploy("mod-users-15.7.0-SNAPSHOT.89")
-          }
-        }
-
         // master branch or tagged releases
         if (( env.BRANCH_NAME == 'master' ) || ( env.isRelease )) {
 
