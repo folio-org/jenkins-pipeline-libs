@@ -4,7 +4,7 @@
  * deploy a module to kubernetes
  */
 
-def call(String moduleId) {
+def call(String folioModules) {
   echo "install ansible kubernetes deps"
   sh "pip -q install openshift"
   
@@ -36,7 +36,7 @@ def call(String moduleId) {
                       sudoUser: null,
                       vaultCredentialsId: 'ansible-vault-pass',
                       extraVars: [
-                        module_id: moduleId,
+                        folio_modules: folioModules,
                       ])
   }
 }
