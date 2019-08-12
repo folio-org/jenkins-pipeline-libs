@@ -11,7 +11,7 @@ def call() {
 
   // static vars
   //env.okapiUrl = 'http://folio-snapshot-stable.aws.indexdata.com:9130'
-  env.okapiUrl = 'https://folio-release-pr-okapi.aws.indexdata.com'
+  env.okapiUrl = 'https://okapi-default.ci.folio.org'
   env.folioRegistry = 'http://folio-registry.aws.indexdata.com'
 
   echo "Okapi URL: ${env.okapiUrl}"
