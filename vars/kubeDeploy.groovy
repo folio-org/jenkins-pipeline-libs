@@ -10,7 +10,7 @@ def call(String targetModule) {
   
   echo "clone folio-infrastructre"
   checkout([$class: 'GitSCM', 
-            branches: [[name: 'refs/heads/folio-2187']],
+            branches: [[name: 'refs/heads/kube-module-update']],
             doGenerateSubmoduleConfigurations: false, 
             extensions: [[$class: 'SubmoduleOption', 
             disableSubmodules: false, 
