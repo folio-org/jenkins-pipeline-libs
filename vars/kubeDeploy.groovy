@@ -4,7 +4,7 @@
  * deploy a module to kubernetes
  */
 
-def call(String, namespace, String targetModule) {
+def call(String namespace, String targetModule) {
   echo "install ansible kubernetes deps"
   sh "pip -q install openshift"
   

@@ -173,7 +173,7 @@ def call(body) {
           if (doKubeDeploy) {
             stage('Kubernetes Deploy') {
               echo "Deploying to kubernetes cluster"
-              kubeDeploy("${env.name}-${env.version}")
+              kubeDeploy("okapi-demo", "${env.name}-${env.version}")
             }
           }
         }
