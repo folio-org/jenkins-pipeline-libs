@@ -138,6 +138,19 @@ def call(body) {
           }
         } 
 
+        // test kube Deploy
+        if (doKubeDeploy) {
+          stage('Kubernetes Deploy') {
+            echo "Deploying to kubernetes cluster"
+            kubeDeploy('folio-default',
+                       "[{" +
+                          "\"name\" : \"${env.name}\"," +
+                          "\"version\" : \"${env.version}\"," +
+                          "\"deploy\":true" +
+                       "}]")
+          }
+        }
+
         // master branch or tagged releases
         if (( env.BRANCH_NAME == 'master' ) || ( env.isRelease )) {
 
@@ -173,7 +186,7 @@ def call(body) {
           if (doKubeDeploy) {
             stage('Kubernetes Deploy') {
               echo "Deploying to kubernetes cluster"
-              kubeDeploy('okapi-demo',
+              kubeDeploy('folio-default',
                          "[{" +
                             "\"name\" : \"${env.name}\"," +
                             "\"version\" : \"${env.version}\"," +
