@@ -38,6 +38,7 @@ def call(String namespace, String targetModule) {
                       extraVars: [
                         namespace: namespace,
                         target_module: targetModule,
+                        folio_install_type: kubernetes
                       ])
   }
 }
