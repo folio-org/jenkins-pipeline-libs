@@ -138,19 +138,6 @@ def call(body) {
           }
         } 
 
-        // test kube Deploy
-        if (doKubeDeploy) {
-          stage('Kubernetes Deploy') {
-            echo "Deploying to kubernetes cluster"
-            kubeDeploy('folio-default',
-                       "[{" +
-                          "\"name\" : \"${env.name}\"," +
-                          "\"version\" : \"${env.version}\"," +
-                          "\"deploy\":true" +
-                       "}]")
-          }
-        }
-
         // master branch or tagged releases
         if (( env.BRANCH_NAME == 'master' ) || ( env.isRelease )) {
 
