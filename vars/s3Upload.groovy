@@ -16,7 +16,7 @@
 def call(Map s3Opts = [:]) {
 
   def s3Region = 'us-east-1'
-  def cliOpts = '--region ' + s3region + ' --output text'
+  def cliOpts = '--region ' + s3Region + ' --output text'
   def s3Uri = 'https://' + s3Opts.s3Bucket + '.s3.amazonaws.com'
 
   sh "aws $cliOpts s3 mb s3://${s3Opts.s3Bucket} || true" 
