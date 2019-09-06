@@ -33,7 +33,7 @@ def call() {
                       disableHostKeyChecking: true,
                       installation: 'Ansible',
                       inventory: 'inventory',
-                      playbook: 'platform-pr-v2.yml',
+                      playbook: 'platform-pr-k8.yml',
                       sudoUser: null, 
                       vaultCredentialsId: 'ansible-vault-pass',
                       extraVars: [ okapi_url: "${env.okapiUrl}",
