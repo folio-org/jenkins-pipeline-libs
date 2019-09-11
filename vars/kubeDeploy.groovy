@@ -10,7 +10,8 @@ def call(String namespace, String targetModule) {
   
   echo "clone folio-infrastructre"
   checkout([$class: 'GitSCM', 
-            branches: [[name: '*/master']],
+            //branches: [[name: '*/master']],
+            branches: [[name: 'refs/heads/folio-2256']],
             doGenerateSubmoduleConfigurations: false, 
             extensions: [[$class: 'SubmoduleOption', 
             disableSubmodules: false, 
