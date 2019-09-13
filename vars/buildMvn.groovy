@@ -173,7 +173,12 @@ def call(body) {
           if (doKubeDeploy) {
             stage('Kubernetes Deploy') {
               echo "Deploying to kubernetes cluster"
-              kubeDeploy("${env.name}-${env.version}")
+              kubeDeploy('folio-default',
+                         "[{" +
+                            "\"name\" : \"${env.name}\"," +
+                            "\"version\" : \"${env.version}\"," +
+                            "\"deploy\":true" +
+                         "}]")
             }
           }
         }
