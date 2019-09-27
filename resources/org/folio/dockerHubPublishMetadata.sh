@@ -10,7 +10,7 @@ DOCKER_HUB_TOKEN=$(curl -s -X POST \
     https://hub.docker.com/v2/users/login/ | jq -r .token)
 
 #Pull Description from Github API
-GITHUB_API_URL=$(echo $GITHUB_URL | sed -e 's/github.com/api.github.com\/repos/g') 
+GITHUB_API_URL=$(echo $GITHUB_URL | sed -e 's/github.com/api.github.com\/repos/g')
 GITHUB_API_METADATA=$(curl -s "$GITHUB_API_URL")
 DESCRIPTION=$(echo $GITHUB_API_METADATA | jq '.description' | cut -d "\"" -f 2)
 
@@ -32,15 +32,15 @@ fi
 
 # SET Docker Hub Markdown Snippet
 read -r -d '' DH_MD_SNIPPIT <<- EOM
-# FOLIO - $REPO_TITLE 
+# FOLIO - $REPO_TITLE
 
 ### Description
 
-$DESCRIPTION 
+$DESCRIPTION
 
-Code Repository: [$GITHUB_URL]($GITHUB_URL) 
+Code Repository: [$GITHUB_URL]($GITHUB_URL)
 
-$METADATA 
+$METADATA
 
 EOM
 
