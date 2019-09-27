@@ -2,7 +2,8 @@
 
 # Script Args: Docker Hub IMAGE, Module name,Github url
 IMAGE=$1
-REPO_TITLE=$(echo $2 | sed -e 's/-/ /g' -e 's/\b\(.\)/\u\1/g')
+#REPO_TITLE=$(echo $2 | sed -e 's/-/ /g' -e 's/\b\(.\)/\u\1/g')
+REPO_TITLE=$2
 GITHUB_URL=$(echo $3 | sed -e "s/.git$//")
 DOCKER_HUB_TOKEN=$(curl -s -X POST \
     -H "Content-Type: application/json" \
