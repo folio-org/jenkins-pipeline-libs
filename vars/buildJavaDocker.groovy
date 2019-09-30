@@ -128,12 +128,21 @@ EOF
           sh "docker push ${env.dockerRepo}/${env.name}:latest"
         }
         // publish readme
+        /* FOLIO-2237 move code to enable test branch build
         echo "Publish Readme Docker Hub"
         withCredentials([usernamePassword(credentialsId: 'DockerHubIDJenkins', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
           writeFile file: 'dockerHubPublishMetadata.sh', text: libraryResource('org/folio/dockerHubPublishMetadata.sh')
           sh 'chmod +x dockerHubPublishMetadata.sh'
           sh "./dockerHubPublishMetadata.sh ${env.dockerRepo}/${env.name} ${env.projectName} ${env.projUrl}"
         }
+        */
+      }
+      echo "Publish Readme Docker Hub"
+      // FOLIO-2237 enable test branch build
+      withCredentials([usernamePassword(credentialsId: 'DockerHubIDJenkins', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+        writeFile file: 'dockerHubPublishMetadata.sh', text: libraryResource('org/folio/dockerHubPublishMetadata.sh')
+        sh 'chmod +x dockerHubPublishMetadata.sh'
+        sh "./dockerHubPublishMetadata.sh ${env.dockerRepo}/${env.name} ${env.projectName} ${env.projUrl}"
       }
     } // end dir()
 
