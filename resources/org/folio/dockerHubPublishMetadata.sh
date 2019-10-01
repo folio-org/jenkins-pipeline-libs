@@ -2,7 +2,7 @@
 
 # Script Args: Docker Hub IMAGE, Module name,Github url
 IMAGE=$1
-REPO_TITLE=$(echo $2 | sed -e 's/-/ /g' -e 's/\b\(.\)/\u\1/g')
+REPO_TITLE=$2
 GITHUB_URL=$(echo $3 | sed -e "s/.git$//")
 DOCKER_HUB_TOKEN=$(curl -s -X POST \
     -H "Content-Type: application/json" \
@@ -10,20 +10,25 @@ DOCKER_HUB_TOKEN=$(curl -s -X POST \
     https://hub.docker.com/v2/users/login/ | jq -r .token)
 
 #Pull Description from Github API
-GITHUB_API_URL=$(echo $GITHUB_URL | sed -e 's/github.com/api.github.com\/repos/g') 
+GITHUB_API_URL=$(echo $GITHUB_URL | sed -e 's/github.com/api.github.com\/repos/g')
 GITHUB_API_METADATA=$(curl -s "$GITHUB_API_URL")
 DESCRIPTION=$(echo $GITHUB_API_METADATA | jq '.description' | cut -d "\"" -f 2)
 
-#PULL Metadata from Module Descriptor
+# Gather metadata from launchDescriptor
 MD_FILE="$WORKSPACE/descriptors/ModuleDescriptor-template.json"
 METADATA=""
 if test -f "$MD_FILE"; then
-    CONTAINER_PORT=$(cat $MD_FILE | jq '.launchDescriptor.dockerArgs.HostConfig.PortBindings'| jq 'keys'[0] |  cut -c1-5 | cut -d "\"" -f 2)
-    [ "$CONTAINER_PORT" == null ] && : || METADATA="${METADATA}1. Module Port: $CONTAINER_PORT\n"
-    DB_CONNECTION=$(cat $MD_FILE | jq '.metadata.databaseConnection' | cut -d "\"" -f 2)
-    [ "$DB_CONNECTION" == null ] && : || METADATA="${METADATA}1. Database Connection: $DB_CONNECTION\n"
-    CONTAINER_MEMORY=$(cat $MD_FILE | jq '.metadata.containerMemory' | cut -d "\"" -f 2)
-    [ "$CONTAINER_MEMORY" == null ] && : || METADATA="${METADATA}1. Minimum Memory (MiB): $CONTAINER_MEMORY\n"
+    PB=$(cat $MD_FILE | jq '.launchDescriptor.dockerArgs.HostConfig.PortBindings')
+    [ "$PB" == null ] && MODULE_PORT=null || MODULE_PORT=$(echo $PB | jq 'keys'[0] |  cut -c1-5 | cut -d "\"" -f 2)
+    [ "$MODULE_PORT" == null ] && : || METADATA="${METADATA}1. Module port: $MODULE_PORT\n"
+    CONTAINER_MEMORY=$(cat $MD_FILE | jq '.launchDescriptor.dockerArgs.HostConfig.Memory')
+    [ "$CONTAINER_MEMORY" == null ] && : || METADATA="${METADATA}1. Container memory (bytes): $CONTAINER_MEMORY\n"
+    LD_ENV=$(cat $MD_FILE | jq '.launchDescriptor.env')
+    if [ "$LD_ENV" != null ]; then
+        DB=$(echo $LD_ENV | jq '.[] | select(.name == "DB_DATABASE") | .value')
+        [ "$DB" == null ] || [ "$DB" == "" ] && DB_CONNECTION="false" || DB_CONNECTION="true"
+        METADATA="${METADATA}1. Database connection: $DB_CONNECTION\n"
+    fi
 
     #Set Metadata Header If Needed
     [ "$METADATA" == "" ] && : || METADATA="### Metadata\n\n${METADATA}"
@@ -32,15 +37,15 @@ fi
 
 # SET Docker Hub Markdown Snippet
 read -r -d '' DH_MD_SNIPPIT <<- EOM
-# FOLIO - $REPO_TITLE 
+# FOLIO - $REPO_TITLE
 
 ### Description
 
-$DESCRIPTION 
+$DESCRIPTION
 
-Code Repository: [$GITHUB_URL]($GITHUB_URL) 
+Code Repository: [$GITHUB_URL]($GITHUB_URL)
 
-$METADATA 
+$METADATA
 
 EOM
 
