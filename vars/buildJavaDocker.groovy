@@ -139,9 +139,7 @@ EOF
           sh 'chmod +x dockerHubPublishMetadata.sh'
           sh "./dockerHubPublishMetadata.sh ${env.dockerRepo}/${env.name} ${env.projectName} ${env.projUrl}"
         }
-      //} else if (env.CHANGE_ID && publishPreview)
-      // for now build if publishPreview is true dont' worry about PR
-      } else if (publishPreview) {
+      } else if (env.CHANGE_ID && publishPreview) {
         docker.withRegistry('https://docker-registry.ci.folio.org/v2/', 'jenkins-nexus')  {
           sh "docker tag ${env.name}:${env.version} docker-registry.ci.folio.org/${env.name}:${env.version}"
           sh "docker tag ${env.name}:${env.version} docker-registry.ci.folio.org/${env.name}:latest"
