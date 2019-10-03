@@ -8,6 +8,7 @@
  * doDocker:  Build, test, and publish Docker image via 'buildJavaDocker' (Default: 'no'/false)
  * mvnDeploy: Deploy built artifacts to Maven repository (Default: 'no'/false)
  * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no'/false)
+ * publishPreviewMD:  POST generated module descriptor to Preview registry (Default: 'no'/false)
  * publishAPI: Publish API RAML documentation.  (Default: 'no'/false)
  * runLintRamlCop: Run 'raml-cop' on back-end modules that have declared RAML in api.yml (Default: 'no'/false)
 */
@@ -37,6 +38,11 @@ def call(body) {
   if (publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) { publishModDescriptor = true }
   if (publishModDescriptor ==~ /(?i)(N|NO|F|FALSE)/) { publishModDescriptor = false }
 
+  // publish preview mod descriptor to folio-registry. Default is false
+  def publishPreviewMD = config.publishPreview ?: false
+  if (publishPreviewMD ==~ /(?i)(Y|YES|T|TRUE)/) { publishPreviewMD = true }
+  if (publishPreviewMD ==~ /(?i)(N|NO|F|FALSE)/) { publishPreviewMD = false }
+
   // publish API documentation to foliodocs. Default is false
   def publishAPI = config.publishAPI ?: false
   if (publishAPI ==~ /(?i)(Y|YES|T|TRUE)/) { publishAPI = true }
@@ -47,6 +53,10 @@ def call(body) {
   if (doKubeDeploy ==~ /(?i)(Y|YES|T|TRUE)/) { doKubeDeploy = true }
   if (doKubeDeploy ==~ /(?i)(N|NO|F|FALSE)/) { doKubeDeploy = false }
 
+  // deploy module to Kubernetes. Default is false
+  def doKubeDeploy = config.doKubeDeploy ?: false
+  if (doKubeDeploy ==~ /(?i)(Y|YES|T|TRUE)/) { doKubeDeploy = true }
+  if (doKubeDeploy ==~ /(?i)(N|NO|F|FALSE)/) { doKubeDeploy = false }
 
   // location of Maven MD
   def modDescriptor =  'target/ModuleDescriptor.json'
@@ -183,7 +193,7 @@ def call(body) {
           }
         //} else if (env.CHANGE_ID && publishPreview) {
         // don't force PR for test
-        } else if (publishPreview) {
+        } else if (publishPreviewMD) {
           // publish MD to preview okapi
           stage('Publish Preview Module Descriptor') {
             echo "publish md goes here"
