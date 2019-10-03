@@ -19,7 +19,7 @@ MD_FILE="$WORKSPACE/descriptors/ModuleDescriptor-template.json"
 METADATA=""
 if test -f "$MD_FILE"; then
     PB=$(cat $MD_FILE | jq '.launchDescriptor.dockerArgs.HostConfig.PortBindings')
-    [ "$PB" == null ] && MODULE_PORT=null || MODULE_PORT=$(echo $PB | jq 'keys'[0] |  cut -c1-5 | cut -d "\"" -f 2)
+    [ "$PB" == null ] && MODULE_PORT=null || MODULE_PORT=$(echo $PB | jq -r 'keys'[0] | cut -c1-4)
     [ "$MODULE_PORT" == null ] && : || METADATA="${METADATA}1. Module port: $MODULE_PORT\n"
     CONTAINER_MEMORY=$(cat $MD_FILE | jq '.launchDescriptor.dockerArgs.HostConfig.Memory')
     [ "$CONTAINER_MEMORY" == null ] && : || METADATA="${METADATA}1. Container memory (bytes): $CONTAINER_MEMORY\n"
