@@ -190,7 +190,7 @@ def call(body) {
 
             def scriptPath="${env.WORKSPACE}/folio-infrastructure/CI/scripts"
             withCredentials([usernamePassword(credentialsId: 'okapi-preview-superuser', passwordVariable: 'pass', usernameVariable: 'user')]) {
-              sh "${scriptPath}/postMDpreiview.sh $modDescriptor $user $pass
+              sh "${scriptPath}/postMDpreiview.sh $modDescriptor $user $pass"
             }
           } 
           stage('Kubernetes Preview Deploy') {
