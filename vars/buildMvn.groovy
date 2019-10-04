@@ -53,11 +53,6 @@ def call(body) {
   if (doKubeDeploy ==~ /(?i)(Y|YES|T|TRUE)/) { doKubeDeploy = true }
   if (doKubeDeploy ==~ /(?i)(N|NO|F|FALSE)/) { doKubeDeploy = false }
 
-  // deploy module to Kubernetes. Default is false
-  def doKubeDeploy = config.doKubeDeploy ?: false
-  if (doKubeDeploy ==~ /(?i)(Y|YES|T|TRUE)/) { doKubeDeploy = true }
-  if (doKubeDeploy ==~ /(?i)(N|NO|F|FALSE)/) { doKubeDeploy = false }
-
   // location of Maven MD
   def modDescriptor =  'target/ModuleDescriptor.json'
 
