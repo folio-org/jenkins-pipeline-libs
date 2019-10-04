@@ -189,14 +189,9 @@ def call(body) {
         //} else if (env.CHANGE_ID && publishPreview) {
         // don't force PR for test
         } else if (publishPreviewMD) {
-          // publish MD to preview okapi
           stage('Publish Preview Module Descriptor') {
-            echo "publish md goes here"
-
-            def scriptPath="${env.WORKSPACE}/folio-infrastructure/CI/scripts"
-            withCredentials([usernamePassword(credentialsId: 'okapi-preview-superuser', passwordVariable: 'pass', usernameVariable: 'user')]) {
-              sh "${scriptPath}/postMDpreiview.sh $modDescriptor $user $pass"
-            }
+            echo "Publishing preview module descriptor to CI preview okapi"
+            postPreivewMD() 
           } 
           stage('Kubernetes Preview Deploy') {
             echo "kube deploy goes here"
