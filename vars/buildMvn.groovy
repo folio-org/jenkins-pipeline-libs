@@ -192,7 +192,7 @@ def call(body) {
             postPreviewMD()
           } 
           stage('Kubernetes Deploy') {
-            def previewId = "${mvn_version}-${env.CHANGE_ID}.${env.BUILD_NUMBER}"
+            def previewId = "${env.version}-${env.CHANGE_ID}.${env.BUILD_NUMBER}"
             echo "Deploying to kubernetes cluster"
             kubeDeploy('folio-preview',
                        "[{" +
