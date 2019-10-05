@@ -140,11 +140,10 @@ EOF
           sh "./dockerHubPublishMetadata.sh ${env.dockerRepo}/${env.name} ${env.projectName} ${env.projUrl}"
         }
       } else if (env.CHANGE_ID && publishPreview) {
+        def previewId = "${mvn_version}-${env.CHANGE_ID}.${env.BUILD_NUMBER}"
         docker.withRegistry('https://docker-registry.ci.folio.org/v2/', 'jenkins-nexus')  {
-          sh "docker tag ${env.name}:${env.version} docker-registry.ci.folio.org/${env.name}:${env.version}"
-          sh "docker tag ${env.name}:${env.version} docker-registry.ci.folio.org/${env.name}:latest"
-          sh "docker push docker-registry.ci.folio.org/${env.name}:${env.version}"
-          sh "docker push docker-registry.ci.folio.org/${env.name}:latest"
+          sh "docker tag ${env.name}:${env.version} docker-registry.ci.folio.org/${env.name}:${previewId}"
+          sh "docker push docker-registry.ci.folio.org/${env.name}:${previewId}"
         }
       }
     } // end dir()

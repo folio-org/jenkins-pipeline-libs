@@ -23,11 +23,12 @@ def call(String okapiUrl, String tenant) {
                             url: 'https://github.com/folio-org/folio-infrastructure']]
       ])
     dir("${env.WORKSPACE}/folio-infrastructure/CI/scripts") {
+      def previewId = "${mvn_version}-${env.CHANGE_ID}.${env.BUILD_NUMBER}"
       script {
         def scriptPath="${env.WORKSPACE}/folio-infrastructure/CI/scripts"
         def modDescriptor="${env.WORKSPACE}/target/ModuleDescriptor.json"
         withCredentials([usernamePassword(credentialsId: 'okapi-preview-superuser', passwordVariable: 'pass', usernameVariable: 'user')]) {
-          sh "${scriptPath}/postMDPreview.sh ${modDescriptor} $user $pass"
+          sh "${scriptPath}/postMDPreview.sh ${modDescriptor} ${previewId} $user $pass"
         }
       }
     }

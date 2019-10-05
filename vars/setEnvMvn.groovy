@@ -31,11 +31,9 @@ def call() {
     else {
       error('Git release tag and Maven version mismatch')
     } 
-  } else if (env.CHANGE_ID && publishPreview) { //preview
-    env.version = "${mvn_version}-${env.CHANGE_ID}.${env.BUILD_NUMBER}"
-    env.preview = true
-    env.dockerRepo = 'docker-registry.ci.folio.org'
-  } else { // else snapshot
+  }
+  // else snapshot
+  else {
     env.version = "${mvn_version}.${env.BUILD_NUMBER}"
     env.snapshot = true
     env.dockerRepo = 'folioci'
