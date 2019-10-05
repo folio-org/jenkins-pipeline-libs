@@ -5,7 +5,7 @@
  *  Deploy a tenant, enable modules, and load sample data on FOLIO backend 
  */
 
-def call(String okapiUrl, String tenant) {
+def call() {
 
   dir("${env.WORKSPACE}") {
     checkout([$class: 'GitSCM',
@@ -34,7 +34,7 @@ def call(String okapiUrl, String tenant) {
     }
     dir("${env.WORKSPACE}") {
       // change back to workspace and cleanup
-      sh "rm -rf ${env.WORKSPACE}/folio-infrastructure
+      sh "rm -rf ${env.WORKSPACE}/folio-infrastructure"
     }
   }
 }
