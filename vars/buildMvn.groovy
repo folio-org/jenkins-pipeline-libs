@@ -189,7 +189,7 @@ def call(body) {
         } else if (env.CHANGE_ID && publishPreview) {
           stage('Publish Preview Module Descriptor') {
             echo "Publishing preview module descriptor to CI preview okapi"
-            postPreivewMD() 
+            postPreviewMD()
           } 
           stage('Kubernetes Deploy') {
             def previewId = "${mvn_version}-${env.CHANGE_ID}.${env.BUILD_NUMBER}"
