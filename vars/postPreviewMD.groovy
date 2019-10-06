@@ -23,7 +23,7 @@ def call() {
                             url: 'https://github.com/folio-org/folio-infrastructure']]
       ])
     dir("${env.WORKSPACE}/folio-infrastructure/CI/scripts") {
-      def previewId = "${env.version}-${env.CHANGE_ID}.${env.BUILD_NUMBER}"
+      def previewId = "${env.name}-${env.version}-${env.CHANGE_ID}-${env.BUILD_NUMBER}"
       script {
         def scriptPath="${env.WORKSPACE}/folio-infrastructure/CI/scripts"
         def modDescriptor="${env.WORKSPACE}/target/ModuleDescriptor.json"
