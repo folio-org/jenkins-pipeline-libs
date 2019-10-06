@@ -23,12 +23,13 @@ def call() {
                             url: 'https://github.com/folio-org/folio-infrastructure']]
       ])
     dir("${env.WORKSPACE}/folio-infrastructure/CI/scripts") {
-      def previewId = "${env.name}-${env.version}-${env.CHANGE_ID}-${env.BUILD_NUMBER}"
+      def previewId = "${env.name}-${env.version}.${env.CHANGE_ID}"
+      def previewContainer = "${env.name}:${env.version}.${env.CHANGE_ID}"
       script {
         def scriptPath="${env.WORKSPACE}/folio-infrastructure/CI/scripts"
         def modDescriptor="${env.WORKSPACE}/target/ModuleDescriptor.json"
         withCredentials([usernamePassword(credentialsId: 'okapi-preview-superuser', passwordVariable: 'pass', usernameVariable: 'user')]) {
-          sh "${scriptPath}/postMDPreview.sh ${modDescriptor} ${previewId} $user $pass"
+          sh "${scriptPath}/postMDPreview.sh ${modDescriptor} ${previewId} ${previewContainer} $user $pass"
         }
       }
     }
