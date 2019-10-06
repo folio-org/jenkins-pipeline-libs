@@ -9,7 +9,7 @@ def call() {
 
   dir("${env.WORKSPACE}") {
     checkout([$class: 'GitSCM',
-        branches: [[name: 'refs/heads/FOLIO-2267']],
+        branches: [[name: '*/master']],
         doGenerateSubmoduleConfigurations: false,
         extensions: [[$class: 'SubmoduleOption',
         disableSubmodules: false,
