@@ -141,7 +141,7 @@ EOF
         }
       } else if (env.CHANGE_ID && publishPreview) {
         echo "Publishign Preview Docker images"
-        def previewId = "${env.version}.${env.CHANGE_ID}"
+        def previewId = "${env.bareVersion}.pr-${env.CHANGE_ID}.${env.BUILD_NUMBER}"
         docker.withRegistry('https://docker-registry.ci.folio.org/v2/', 'jenkins-nexus')  {
           sh "docker tag ${env.name}:${env.version} docker-registry.ci.folio.org/${env.name}:${previewId}"
           sh "docker push docker-registry.ci.folio.org/${env.name}:${previewId}"
