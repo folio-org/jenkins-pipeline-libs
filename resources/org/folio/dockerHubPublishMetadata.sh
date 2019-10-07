@@ -28,6 +28,8 @@ if test -f "$MD_FILE"; then
         DB=$(echo $LD_ENV | jq '.[] | select(.name == "DB_DATABASE") | .value')
         [ "$DB" == null ] || [ "$DB" == "" ] && DB_CONNECTION="false" || DB_CONNECTION="true"
         METADATA="${METADATA}1. Database connection: $DB_CONNECTION\n"
+        JO=$(echo $LD_ENV | jq -r '.[] | select(.name == "JAVA_OPTIONS") | .value')
+        [ "$JO" == null ] || [ "$JO" == "" ] && : || METADATA="${METADATA}1. JAVA_OPTIONS: $JO\n"
     fi
 
     #Set Metadata Header If Needed
