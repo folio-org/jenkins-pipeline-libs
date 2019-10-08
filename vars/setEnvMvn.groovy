@@ -19,6 +19,7 @@ def call() {
   def mvn_artifact = readMavenPom().getArtifactId()
   def mvn_version =  readMavenPom().getVersion()
   env.name = mvn_artifact
+  env.bareVersion = mvn_version
   
   // if release
   if ( foliociLib.isRelease() ) {
