@@ -140,7 +140,7 @@ EOF
           sh "./dockerHubPublishMetadata.sh ${env.dockerRepo}/${env.name} ${env.projectName} ${env.projUrl}"
         }
       } else if (env.CHANGE_ID && publishPreview) {
-        echo "Publishign Preview Docker images"
+        echo "Publishing Preview Docker images"
         def previewId = "${env.bareVersion}.${env.CHANGE_ID}.${env.BUILD_NUMBER}"
         docker.withRegistry('https://docker-registry.ci.folio.org/v2/', 'jenkins-nexus')  {
           sh "docker tag ${env.name}:${env.version} docker-registry.ci.folio.org/${env.name}:${previewId}"
