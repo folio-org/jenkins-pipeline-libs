@@ -19,15 +19,31 @@ MD_FILE="$WORKSPACE/descriptors/ModuleDescriptor-template.json"
 METADATA=""
 if test -f "$MD_FILE"; then
     PB=$(cat $MD_FILE | jq '.launchDescriptor.dockerArgs.HostConfig.PortBindings')
-    [ "$PB" == null ] && MODULE_PORT=null || MODULE_PORT=$(echo $PB | jq 'keys'[0] |  cut -c1-5 | cut -d "\"" -f 2)
-    [ "$MODULE_PORT" == null ] && : || METADATA="${METADATA}1. Module port: $MODULE_PORT\n"
+    [ "$PB" == null ] && MODULE_PORT=null || MODULE_PORT=$(echo $PB | jq -r 'keys'[0] | cut -c1-4)
+    [ "$MODULE_PORT" == null ] && : || METADATA="${METADATA}- Module port: $MODULE_PORT\n"
     CONTAINER_MEMORY=$(cat $MD_FILE | jq '.launchDescriptor.dockerArgs.HostConfig.Memory')
-    [ "$CONTAINER_MEMORY" == null ] && : || METADATA="${METADATA}1. Container memory (bytes): $CONTAINER_MEMORY\n"
+    [ "$CONTAINER_MEMORY" == null ] && : || METADATA="${METADATA}- Container memory (bytes): $CONTAINER_MEMORY\n"
     LD_ENV=$(cat $MD_FILE | jq '.launchDescriptor.env')
     if [ "$LD_ENV" != null ]; then
         DB=$(echo $LD_ENV | jq '.[] | select(.name == "DB_DATABASE") | .value')
         [ "$DB" == null ] || [ "$DB" == "" ] && DB_CONNECTION="false" || DB_CONNECTION="true"
-        METADATA="${METADATA}1. Database connection: $DB_CONNECTION\n"
+        METADATA="${METADATA}- Database connection: $DB_CONNECTION\n"
+        JO=$(echo $LD_ENV | jq -r '.[] | select(.name == "JAVA_OPTIONS") | .value')
+        [ "$JO" == null ] || [ "$JO" == "" ] && : || METADATA="${METADATA}- JAVA_OPTIONS: $JO\n"
+        env_entries=()
+        env_show=()
+        while IFS= read -r line; do
+          env_entries+=("$line")
+        done < <(echo $LD_ENV | jq -r '.[] | .name + "=" + .value')
+        for entry in "${env_entries[@]}"; do
+           if [[ ! ${entry} =~ ^DB_ ]] && [[ ! ${entry} =~ ^JAVA_OPTIONS= ]]; then
+              env_show+=("$entry")
+           fi
+        done
+        if (( ${#env_show[@]} )); then
+            env_extra=$(printf '  - %s\n' "${env_show[@]}")
+            METADATA="${METADATA}- Other environment variables:\n${env_extra}\n"
+        fi
     fi
 
     #Set Metadata Header If Needed
