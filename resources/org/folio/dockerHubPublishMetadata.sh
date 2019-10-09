@@ -30,6 +30,20 @@ if test -f "$MD_FILE"; then
         METADATA="${METADATA}1. Database connection: $DB_CONNECTION\n"
         JO=$(echo $LD_ENV | jq -r '.[] | select(.name == "JAVA_OPTIONS") | .value')
         [ "$JO" == null ] || [ "$JO" == "" ] && : || METADATA="${METADATA}1. JAVA_OPTIONS: $JO\n"
+        env_entries=()
+        env_show=()
+        while IFS= read -r line; do
+          env_entries+=("$line")
+        done < <(echo $LD_ENV | jq -r '.[] | .name + "=" + .value')
+        for entry in "${env_entries[@]}"; do
+           if [[ ! ${entry} =~ ^DB_ ]] && [[ ! ${entry} =~ ^JAVA_OPTIONS= ]]; then
+              env_show+=("$entry")
+           fi
+        done
+        if (( ${#env_show[@]} )); then
+            env_extra=$(printf '  - %s\n' "${env_show[@]}")
+            METADATA="${METADATA}1. Other environment variables:\n${env_extra}\n"
+        fi
     fi
 
     #Set Metadata Header If Needed
