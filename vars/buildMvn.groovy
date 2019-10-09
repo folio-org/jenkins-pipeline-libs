@@ -8,6 +8,7 @@
  * doDocker:  Build, test, and publish Docker image via 'buildJavaDocker' (Default: 'no'/false)
  * mvnDeploy: Deploy built artifacts to Maven repository (Default: 'no'/false)
  * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no'/false)
+ * publishPreview: publish preview image to preview CI environment (Default: 'no'/false)
  * publishAPI: Publish API RAML documentation.  (Default: 'no'/false)
  * runLintRamlCop: Run 'raml-cop' on back-end modules that have declared RAML in api.yml (Default: 'no'/false)
 */
@@ -37,6 +38,11 @@ def call(body) {
   if (publishModDescriptor ==~ /(?i)(Y|YES|T|TRUE)/) { publishModDescriptor = true }
   if (publishModDescriptor ==~ /(?i)(N|NO|F|FALSE)/) { publishModDescriptor = false }
 
+  // publish preview mod descriptor to folio-registry. Default is false
+  def publishPreview = config.publishPreview ?: false
+  if (publishPreview ==~ /(?i)(Y|YES|T|TRUE)/) { publishPreview = true }
+  if (publishPreview ==~ /(?i)(N|NO|F|FALSE)/) { publishPreview = false }
+
   // publish API documentation to foliodocs. Default is false
   def publishAPI = config.publishAPI ?: false
   if (publishAPI ==~ /(?i)(Y|YES|T|TRUE)/) { publishAPI = true }
@@ -46,7 +52,6 @@ def call(body) {
   def doKubeDeploy = config.doKubeDeploy ?: false
   if (doKubeDeploy ==~ /(?i)(Y|YES|T|TRUE)/) { doKubeDeploy = true }
   if (doKubeDeploy ==~ /(?i)(N|NO|F|FALSE)/) { doKubeDeploy = false }
-
 
   // location of Maven MD
   def modDescriptor =  'target/ModuleDescriptor.json'
@@ -181,7 +186,23 @@ def call(body) {
                          "}]")
             }
           }
+        } else if (env.CHANGE_ID && publishPreview) {
+          stage('Publish Preview Module Descriptor') {
+            echo "Publishing preview module descriptor to CI preview okapi"
+            postPreviewMD()
+          } 
+          stage('Kubernetes Deploy') {
+            def previewId = "${env.bareVersion}.${env.CHANGE_ID}.${env.BUILD_NUMBER}"
+            echo "Deploying to kubernetes cluster"
+            kubeDeploy('folio-preview',
+                       "[{" +
+                          "\"name\" : \"${env.name}\"," +
+                          "\"version\" : \"${previewId}\"," +
+                          "\"deploy\":true" +
+                       "}]")
+          }
         }
+
 
         if (doLintRamlCop) {
           stage('Lint raml schema') {

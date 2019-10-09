@@ -10,6 +10,7 @@
  *  buildContext:   Relative path to docker build context. Default: Jenkins $WORKSPACE
  *  overrideConfig: Override project Dockerfile and use template. Default: false
  *  publishMaster:  Publish image to Docker repo (master branch only): Default: true
+ *  publishPreview: Publish image to Preview Docker repo (Pull Request only): Default: false
  *  healthChk:      Perform container health check with 'healthChkCmd' Default: false
  *  healthChkCmd:   Specify health check command.  Default:  none
  *  runArgs:  	    Additional container runtime arguments.  Default: none
@@ -28,16 +29,20 @@ def call(body) {
   def buildContext = config.dockerDir ?: env.WORKSPACE
 
   def overrideConfig = config.overrideConfig ?: false
-  if (overrideConfig ==~ /(?i)(Y|YES|T|TRUE)/) { overrideConfig = true } 
-  if (overrideConfig ==~ /(?i)(N|NO|F|FALSE)/) { overrideConfig = false} 
+  if (overrideConfig ==~ /(?i)(Y|YES|T|TRUE)/) { overrideConfig = true }
+  if (overrideConfig ==~ /(?i)(N|NO|F|FALSE)/) { overrideConfig = false}
   
   def publishMaster = config.publishMaster ?: true
-  if (publishMaster ==~ /(?i)(Y|YES|T|TRUE)/) { publishMaster = true } 
-  if (publishMaster ==~ /(?i)(N|NO|F|FALSE)/) { publishMaster = false} 
+  if (publishMaster ==~ /(?i)(Y|YES|T|TRUE)/) { publishMaster = true }
+  if (publishMaster ==~ /(?i)(N|NO|F|FALSE)/) { publishMaster = false}
+
+  def publishPreview = config.publishPreview ?: false
+  if (publishPreview ==~ /(?i)(Y|YES|T|TRUE)/) { publishPreview = true }
+  if (publishPreview ==~ /(?i)(N|NO|F|FALSE)/) { publishPreview = false}
   
   def healthChk = config.healthChk ?: false
-  if (healthChk ==~ /(?i)(Y|YES|T|TRUE)/) { healthChk = true } 
-  if (healthChk ==~ /(?i)(N|NO|F|FALSE)/) { healthChk = false} 
+  if (healthChk ==~ /(?i)(Y|YES|T|TRUE)/) { healthChk = true }
+  if (healthChk ==~ /(?i)(N|NO|F|FALSE)/) { healthChk = false}
 
   // default
   def Boolean buildArg = false
@@ -133,6 +138,13 @@ EOF
           writeFile file: 'dockerHubPublishMetadata.sh', text: libraryResource('org/folio/dockerHubPublishMetadata.sh')
           sh 'chmod +x dockerHubPublishMetadata.sh'
           sh "./dockerHubPublishMetadata.sh ${env.dockerRepo}/${env.name} ${env.projectName} ${env.projUrl}"
+        }
+      } else if (env.CHANGE_ID && publishPreview) {
+        echo "Publishing Preview Docker images"
+        def previewId = "${env.bareVersion}.${env.CHANGE_ID}.${env.BUILD_NUMBER}"
+        docker.withRegistry('https://docker-registry.ci.folio.org/v2/', 'jenkins-nexus')  {
+          sh "docker tag ${env.name}:${env.version} docker-registry.ci.folio.org/${env.name}:${previewId}"
+          sh "docker push docker-registry.ci.folio.org/${env.name}:${previewId}"
         }
       }
     } // end dir()
