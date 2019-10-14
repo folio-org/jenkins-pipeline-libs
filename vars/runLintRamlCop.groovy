@@ -26,11 +26,12 @@ def call() {
   if (lintStatus != 0) {
     echo "Issues detected:"
     echo "$lintReport"
+    def message = "$lintReport\n\nNote: When those errors are fixed, then the INFO messages will be gone too. See Jenkins \"Artifacts\" tab."
     // PR
     if (env.CHANGE_ID) {
       // Requires https://github.com/jenkinsci/pipeline-github-plugin
       @NonCPS
-      def comment = pullRequest.comment(lintReport)
+      def comment = pullRequest.comment(message)
     }
   }
   else {
