@@ -47,7 +47,11 @@ def call(Map previewOpts = [:]) {
       sh "jq '.[0]' ${modId}-preview-tmp.json > ${modId}-preview.json"
       sh "cat ${modId}-preview.json"
 
-      def modPreviewExists = httpRequest "${previewOkapiUrl}/_/discovery/modules/${modId}"
+      def modPreviewExists = httpRequest contentType: 'APPLICATION_JSON_UTF8',
+                                         httpMode: 'GET',
+                                         validResponseCodes: '200,404',
+                                         url: "${previewOkapiUrl}/_/discovery/modules/${modId}"
+
       if (modPreviewExists.status != '200') { 
         // post module's DD to preview Okapi 
         httpRequest acceptType: 'APPLICATION_JSON_UTF8',
