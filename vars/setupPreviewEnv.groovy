@@ -23,9 +23,9 @@ def call(Map previewOpts = [:]) {
 
   okapiInstall.each {
     def mod = it.id
-    echo "Mod: ${mod}"
+    echo "Mod: ${modId}"
     if (mod ==~ /mod-.*-\d+\.\d+\.\d+-SNAPSHOT\.\d+\.\d+/) {
-      echo "$mod is a preview module"
+      echo "$modId is a preview module"
     }
     else {
       // post new DD to preview env.
@@ -35,19 +35,19 @@ def call(Map previewOpts = [:]) {
                   consoleLogResponseBody: false,
                   httpMode: 'GET',
                   validResponseCodes: '200',
-                  outputFile:  "${moduleId}-disc.json",
-                  url: "${defaultOkapiUrl}/_/discovery/modules/${moduleId}"
+                  outputFile:  "${modId}-disc.json",
+                  url: "${defaultOkapiUrl}/_/discovery/modules/${modId}"
 
 
       def previewModUrl = sh (returnStdout: true, 
-                              script: "jq -r '.[0].url' ${moduleId}-disc.json | " +
+                              script: "jq -r '.[0].url' ${modId}-disc.json | " +
                          "sed -r 's|^(http:\\/\\/)(mod-.*)(:[0-9]+)|\\1\\2.${defaultK8Domain}\\3|'")
 
-      sh "jq '.[0].url |= \"${previewModUrl}\"' ${moduleId}-disc.json > ${moduleId}-preview-tmp.json"
-      sh "jq '.[0]' ${moduleId}-preview-tmp.json > ${moduleId}-preview.json"
-      sh "cat ${moduleId}-preview.json"
+      sh "jq '.[0].url |= \"${previewModUrl}\"' ${modId}-disc.json > ${modId}-preview-tmp.json"
+      sh "jq '.[0]' ${modId}-preview-tmp.json > ${modId}-preview.json"
+      sh "cat ${modId}-preview.json"
 
-      def modPreviewExists = httpRequest "${previewOkapiUrl}/_/discovery/modules/${moduleId}"
+      def modPreviewExists = httpRequest "${previewOkapiUrl}/_/discovery/modules/${modId}"
       if (modPreviewExists.status != '200') { 
         // post module's DD to preview Okapi 
         httpRequest acceptType: 'APPLICATION_JSON_UTF8',
@@ -55,7 +55,7 @@ def call(Map previewOpts = [:]) {
                     consoleLogResponseBody: false,
                     httpMode: 'POST',
                     validResponseCodes: '200',
-                    requestBody: "${moduleId}-preview.json", 
+                    requestBody: "${modId}-preview.json", 
                     url: "${previewOkapiUrl}/_/discovery/modules"
       }
     }
