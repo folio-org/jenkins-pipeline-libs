@@ -41,7 +41,7 @@ def call(Map previewOpts = [:]) {
 
       def previewModUrl = sh (returnStdout: true, 
                               script: "jq -r '.[0].url' ${modId}-disc.json | " +
-                         "sed -r 's|^(http:\\/\\/)(mod-.*)(:[0-9]+)|\\1\\2.${defaultK8Domain}\\3|'")
+                         "sed -r 's|^(http:\\/\\/)(mod-.*)(:[0-9]+)|\\1\\2.${defaultK8Domain}\\3|'").trim()
 
       sh "jq '.[0].url |= \"${previewModUrl}\"' ${modId}-disc.json > ${modId}-preview-tmp.json"
       sh "jq '.[0]' ${modId}-preview-tmp.json > ${modId}-preview.json"
