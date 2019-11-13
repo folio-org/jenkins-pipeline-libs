@@ -54,12 +54,13 @@ def call(Map previewOpts = [:]) {
 
       if (modPreviewExists.status != '200') { 
         // post module's DD to preview Okapi 
+        def modDd = readJSON file: "${modId}-preview.json"
         httpRequest acceptType: 'APPLICATION_JSON_UTF8',
                     contentType: 'APPLICATION_JSON_UTF8',
                     consoleLogResponseBody: true,
                     httpMode: 'POST',
                     validResponseCodes: '200',
-                    requestBody: "${modId}-preview.json", 
+                    requestBody: modDd, 
                     url: "${previewOkapiUrl}/_/discovery/modules"
       }
     }
