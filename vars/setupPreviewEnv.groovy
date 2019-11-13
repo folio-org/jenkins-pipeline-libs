@@ -56,7 +56,7 @@ def call(Map previewOpts = [:]) {
         // post module's DD to preview Okapi 
         httpRequest acceptType: 'APPLICATION_JSON_UTF8',
                     contentType: 'APPLICATION_JSON_UTF8',
-                    consoleLogResponseBody: false,
+                    consoleLogResponseBody: true,
                     httpMode: 'POST',
                     validResponseCodes: '200',
                     requestBody: "${modId}-preview.json", 
