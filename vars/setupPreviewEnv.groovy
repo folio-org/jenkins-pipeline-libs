@@ -59,7 +59,7 @@ def call(Map previewOpts = [:]) {
                     contentType: 'APPLICATION_JSON_UTF8',
                     consoleLogResponseBody: true,
                     httpMode: 'POST',
-                    validResponseCodes: '200',
+                    validResponseCodes: '201',
                     requestBody: modDd, 
                     url: "${previewOkapiUrl}/_/discovery/modules"
       }
