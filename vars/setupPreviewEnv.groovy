@@ -13,7 +13,7 @@ def call(Map previewOpts = [:]) {
               consoleLogResponseBody: false,
               httpMode: 'POST',
               validResponseCodes: '200',
-              requestBody: "{ \"urls\" : [ \"${defaultOkapiUrl}\" ]}"
+              requestBody: "{ \"urls\" : [ \"${defaultOkapiUrl}\" ]}",
               url: "${previewOkapiUrl}/_/proxy/pull/modules"
        
 
