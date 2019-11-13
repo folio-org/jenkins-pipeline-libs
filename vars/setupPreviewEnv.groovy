@@ -22,7 +22,7 @@ def call(Map previewOpts = [:]) {
   // okapi tokens? 
 
   okapiInstall.each {
-    def mod = it.id
+    def modId = it.id
     echo "Mod: ${modId}"
     if (mod ==~ /mod-.*-\d+\.\d+\.\d+-SNAPSHOT\.\d+\.\d+/) {
       echo "$modId is a preview module"
