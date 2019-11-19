@@ -1,6 +1,6 @@
 #!/bin/bash 
 
-set -x
+#set -x
 
 type curl >/dev/null 2>&1 || { echo >&2 "$0: curl is required but it's not installed"; exit 1; }
 
