@@ -137,6 +137,9 @@ def call(body) {
               stage('NPM Install') {
                 sh 'yarn install' 
                 sh 'yarn list --pattern @folio'
+                // save generated yarn.lock for possible debugging
+                sh 'mkdir -p artifacts/yarn/'
+                sh 'cp yarn.lock artifacts/yarn/yarnLock.html'
               }
 
               if (runLint) {
@@ -309,6 +312,14 @@ def call(body) {
       }
       finally {
         dir("${env.WORKSPACE}") {
+                 
+          // publish yarn.lock
+          publishHTML([allowMissing: true, alwaysLinkToLastBuild: false,
+                       keepAll: true, reportDir: 'artifacts/yarn',
+                       reportFiles: 'yarnLock.html',
+                       reportName: "YarnLock",
+                       reportTitles: "YarnLock"])
+
           // publish junit tests if available
           junit allowEmptyResults: true, testResults: 'project/artifacts/runTest/*.xml'
 
