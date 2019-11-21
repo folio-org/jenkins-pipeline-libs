@@ -139,7 +139,8 @@ def call(body) {
                 sh 'yarn list --pattern @folio'
                 // save generated yarn.lock for possible debugging
                 sh 'mkdir -p artifacts/yarn/'
-                sh 'cp yarn.lock artifacts/yarn/yarnLock.html'
+                sh 'cp yarn.lock artifacts/yarn/yarn.lock'
+                sh 'bzip2 artifacts/yarn/yarn.lock'
               }
 
               if (runLint) {
@@ -313,12 +314,12 @@ def call(body) {
       finally {
         dir("${env.WORKSPACE}") {
                  
-          // publish yarn.lock
-          publishHTML([allowMissing: true, alwaysLinkToLastBuild: false,
-                       keepAll: true, reportDir: 'artifacts/yarn',
-                       reportFiles: 'yarnLock.html',
-                       reportName: "YarnLock",
-                       reportTitles: "YarnLock"])
+            // publish yarn.lock
+            publishHTML([allowMissing: true, alwaysLinkToLastBuild: false,
+                         keepAll: true, reportDir: 'artifacts/yarn',
+                         reportFiles: 'yarn.lock.bz2',
+                         reportName: "Yarn Lock",
+                         reportTitles: "Yarn Lock"])
 
           // publish junit tests if available
           junit allowEmptyResults: true, testResults: 'project/artifacts/runTest/*.xml'
