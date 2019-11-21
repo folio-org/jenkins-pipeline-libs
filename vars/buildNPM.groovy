@@ -316,7 +316,7 @@ def call(body) {
                  
             // publish yarn.lock
             publishHTML([allowMissing: true, alwaysLinkToLastBuild: false,
-                         keepAll: true, reportDir: 'artifacts/yarn',
+                         keepAll: true, reportDir: 'project/artifacts/yarn',
                          reportFiles: 'yarn.lock.bz2',
                          reportName: "Yarn Lock",
                          reportTitles: "Yarn Lock"])
