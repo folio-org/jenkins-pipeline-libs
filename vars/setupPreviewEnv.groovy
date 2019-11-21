@@ -20,6 +20,12 @@ def call(Map previewOpts = [:]) {
   def okapiInstall = readJSON file: 'okapi-install.json'
 
   // okapi tokens? 
+  withCredentials([usernamePassword(credentialsId: 'okapi-preview-superuser', passwordVariable: 'pass', usernameVariable: 'user')]) {
+    writeFile file: 'getOkapiToken.sh', text: libraryResource('org/folio/getOkapiToken.sh')
+    sh 'chmod +x getOkapiToken.sh' 
+    def okapiToken =  sh (returnStdout: true, script: "./getOkapiToken.sh -t supertenant -o $previewOkapiUrl -u $user -p $pass").trim()
+  }
+  
 
   okapiInstall.each {
     def modId = it.id
