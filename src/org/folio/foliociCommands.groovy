@@ -170,4 +170,26 @@ def currentDateTime() {
   return dateFormat.format(date)
 }
 
+// substitute tenant modules
+@NonCPS
+def subPreviewMods(List previewMods, List mods) {
+  previewMods.each {
+    def previewMod = it.id
+    def previewModAction = it.action
+    def matches = (it.id =~ /^(.*?)\-(\d+.*)/)
+    def previewModName = matches[0][1]
+
+    echo "Substituting: " + previewModName + "-->" + subMod
+    echo "Action: " + previewModAction
+
+    TenantMods.each {
+      if (it.id ==~ /^${previewModName}-\d+.*/) {
+        it.id = previewMod
+        it.action = previewModAction
+       }
+    }
+  }
+  return mods
+}
+
 
