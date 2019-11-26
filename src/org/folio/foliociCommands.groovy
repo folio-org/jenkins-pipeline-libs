@@ -179,7 +179,7 @@ def subPreviewMods(List previewMods, List mods) {
    def matches
    def previewModName
    def Boolean exists
-   def Map new = [:]
+   def new = [:]
 
   previewMods.each {
     exists = false
