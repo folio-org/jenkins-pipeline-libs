@@ -178,7 +178,8 @@ def subPreviewMods(List previewMods, List mods) {
    def previewModAction
    def matches
    def previewModName
-   def exists
+   def Boolean exists
+   def Map new
 
   previewMods.each {
     exists = false
@@ -198,7 +199,7 @@ def subPreviewMods(List previewMods, List mods) {
       }
     }
     if (!exists) { 
-      def new = [:]
+      new = [:]
       new.put('id', previewMod)
       new.put('action', previewModAction)
       mods << new
