@@ -201,7 +201,7 @@ def subPreviewMods(List previewMods, List mods) {
       def newMap = [:]
       newMap.put('id', previewMod)
       newMap.put('action', previewModAction)
-      mods << new
+      mods << newMap
     }
   }
   return mods
