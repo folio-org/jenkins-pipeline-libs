@@ -10,14 +10,14 @@ def call(Map previewOpts = [:]) {
   withCredentials([usernamePassword(credentialsId: 'okapi-preview-superuser', passwordVariable: 'pass', usernameVariable: 'user')]) {
     writeFile file: 'getOkapiToken.sh', text: libraryResource('org/folio/getOkapiToken.sh')
     sh 'chmod +x getOkapiToken.sh' 
-    def okapiToken =  sh (returnStdout: true, script: "./getOkapiToken.sh -t supertenant -o $previewOkapiUrl -u $user -p $pass").trim()
+    def okapiToken = sh(returnStdout: true, script: "./getOkapiToken.sh -t supertenant -o $previewOkapiUrl -u $user -p $pass").trim()
   }
 
   // sync MDs from okapi-default
   httpRequest acceptType: 'APPLICATION_JSON_UTF8',
               contentType: 'APPLICATION_JSON_UTF8',
               consoleLogResponseBody: false,
-              customHeaders: [[maskValue: true,name: 'X-Okapi-Token',value: "$okapiToken"], 
+              customHeaders: [[maskValue: true,name: 'X-Okapi-Token',value: okapiToken], 
                               [maskValue: false,name: 'X-Okapi-Tenant',value: 'supertenant']],
               httpMode: 'POST',
               validResponseCodes: '200',
