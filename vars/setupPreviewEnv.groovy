@@ -6,6 +6,12 @@ def call(Map previewOpts = [:]) {
   def defaultOkapiUrl = previewOpts.defaultOkapiUrl ?: 'https://okapi-default.ci.folio.org'
   def previewOkapiUrl = previewOpts.previewOkapiUrl ?: 'https://okapi-preview.ci.folio.org'
 
+  // okapi tokens
+  withCredentials([usernamePassword(credentialsId: 'okapi-preview-superuser', passwordVariable: 'pass', usernameVariable: 'user')]) {
+    writeFile file: 'getOkapiToken.sh', text: libraryResource('org/folio/getOkapiToken.sh')
+    sh 'chmod +x getOkapiToken.sh' 
+    def okapiToken =  sh (returnStdout: true, script: "./getOkapiToken.sh -t supertenant -o $previewOkapiUrl -u $user -p $pass").trim()
+  }
 
   // sync MDs from okapi-default
   httpRequest acceptType: 'APPLICATION_JSON_UTF8',
@@ -19,14 +25,6 @@ def call(Map previewOpts = [:]) {
 
   def okapiInstall = readJSON file: 'okapi-install.json'
 
-  // okapi tokens? 
-  withCredentials([usernamePassword(credentialsId: 'okapi-preview-superuser', passwordVariable: 'pass', usernameVariable: 'user')]) {
-    writeFile file: 'getOkapiToken.sh', text: libraryResource('org/folio/getOkapiToken.sh')
-    sh 'chmod +x getOkapiToken.sh' 
-    def okapiToken =  sh (returnStdout: true, script: "./getOkapiToken.sh -t supertenant -o $previewOkapiUrl -u $user -p $pass").trim()
-  }
-  
-
   okapiInstall.each {
     def modId = it.id
     echo "Mod: ${modId}"
@@ -39,6 +37,8 @@ def call(Map previewOpts = [:]) {
       httpRequest acceptType: 'APPLICATION_JSON_UTF8',
                   contentType: 'APPLICATION_JSON_UTF8',
                   consoleLogResponseBody: false,
+                  customHeaders: [[maskValue: true,name: 'X-Okapi-Token',value: "$okapiToken"], 
+                                  [maskValue: false,name: 'X-Okapi-Tenant',value: 'supertenant']],
                   httpMode: 'GET',
                   validResponseCodes: '200',
                   outputFile:  "${modId}-disc.json",
