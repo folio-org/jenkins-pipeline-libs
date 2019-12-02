@@ -197,12 +197,14 @@ def subPreviewMods(List previewMods, List mods) {
         exists = true
       }
     }
-    if (!exists) { 
-      def newMap = [:]
-      newMap.put('id', previewMod)
-      newMap.put('action', previewModAction)
-      mods << newMap
-    }
+  /*  Uncomment this if we want to generate a new okapi-install.json based on dep resolution
+   * if (!exists) { 
+   *   def newMap = [:]
+   *   newMap.put('id', previewMod)
+   *   newMap.put('action', previewModAction)
+   *   mods << newMap
+   * }
+  */
   }
   return mods
 }
