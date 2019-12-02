@@ -17,6 +17,8 @@ def call(Map previewOpts = [:]) {
   httpRequest acceptType: 'APPLICATION_JSON_UTF8',
               contentType: 'APPLICATION_JSON_UTF8',
               consoleLogResponseBody: false,
+              customHeaders: [[maskValue: true,name: 'X-Okapi-Token',value: "$okapiToken"], 
+                              [maskValue: false,name: 'X-Okapi-Tenant',value: 'supertenant']],
               httpMode: 'POST',
               validResponseCodes: '200',
               requestBody: "{ \"urls\" : [ \"${defaultOkapiUrl}\" ]}",
@@ -32,13 +34,10 @@ def call(Map previewOpts = [:]) {
       echo "$modId is a preview module"
     }
     else {
-      // post new DD to preview env.
 
       httpRequest acceptType: 'APPLICATION_JSON_UTF8',
                   contentType: 'APPLICATION_JSON_UTF8',
                   consoleLogResponseBody: false,
-                  customHeaders: [[maskValue: true,name: 'X-Okapi-Token',value: "$okapiToken"], 
-                                  [maskValue: false,name: 'X-Okapi-Tenant',value: 'supertenant']],
                   httpMode: 'GET',
                   validResponseCodes: '200',
                   outputFile:  "${modId}-disc.json",
