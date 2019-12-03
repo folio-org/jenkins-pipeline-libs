@@ -26,10 +26,11 @@ def call(Map previewOpts = [:]) {
        
 
   // Get stripes MDs
-  final stripesMds = sh(script: 'ls -1 ModuleDescriptors', returnStdout: true).split()
+  def stripesMds = findFiles(glob: 'ModuleDescriptors/*.json') 
 
   stripesMds.each {
-    def stripesMdFile = it.id
+    def stripesMdFile = it.name
+    echo "$stripesMdFile"
     def stripesMd = readFile "ModuleDescriptors/${stripesMdFile}"
    
     // post module's MD to preview Okapi 
