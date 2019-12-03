@@ -25,6 +25,25 @@ def call(Map previewOpts = [:]) {
               url: "${previewOkapiUrl}/_/proxy/pull/modules"
        
 
+  // Get stripes MDs
+  final stripesMds = sh(script: 'ls -1 ModuleDescriptors', returnStdout: true).split()
+
+  stripesMds.each {
+    def stripesMdFile = it.id
+    def stripesMd = readFile "ModuleDescriptors/${stripesMdFile}"
+   
+    // post module's MD to preview Okapi 
+    httpRequest acceptType: 'APPLICATION_JSON_UTF8',
+                contentType: 'APPLICATION_JSON_UTF8',
+                consoleLogResponseBody: true,
+                customHeaders: [[maskValue: true,name: 'X-Okapi-Token',value: env.okapiToken],
+                               [maskValue: false,name: 'X-Okapi-Tenant',value: 'supertenant']],
+                httpMode: 'POST',
+                validResponseCodes: '201,400',
+                requestBody: stripesMd,
+                url: "${previewOkapiUrl}/_/proxy/modules"
+  }
+
   def okapiInstall = readJSON file: 'okapi-install.json'
 
   okapiInstall.each {
