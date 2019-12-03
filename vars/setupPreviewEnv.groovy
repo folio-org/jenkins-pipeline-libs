@@ -56,7 +56,8 @@ def call(Map previewOpts = [:]) {
                                          httpMode: 'GET',
                                          validResponseCodes: '200,404',
                                          url: "${previewOkapiUrl}/_/discovery/modules/${modId}"
-
+      echo "$modPreviewExists.status"
+      // fix this.  
       if (modPreviewExists.status != '200') { 
         // post module's DD to preview Okapi 
         def modDd = readFile file: "${modId}-preview.json"
@@ -66,7 +67,7 @@ def call(Map previewOpts = [:]) {
                     customHeaders: [[maskValue: true,name: 'X-Okapi-Token',value: env.okapiToken], 
                                    [maskValue: false,name: 'X-Okapi-Tenant',value: 'supertenant']],
                     httpMode: 'POST',
-                    validResponseCodes: '201',
+                    validResponseCodes: '201,400',
                     requestBody: modDd, 
                     url: "${previewOkapiUrl}/_/discovery/modules"
       }
