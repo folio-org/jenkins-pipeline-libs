@@ -82,7 +82,9 @@ push_readme() {
     printf "Successfully pushed README to Docker Hub: ${image} \n"
   else
     printf "Unable to push README to Docker Hub, response code: %s\n" "${code}"
-    exit 1
+    # just warn here for now
+    #exit 1
+    exit 0
   fi
 }
 
