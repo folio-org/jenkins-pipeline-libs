@@ -6,7 +6,7 @@
  */
 
 
-def call() {
+def call(Boolean loadData = true) {
 
   dir("${env.WORKSPACE}/folio-infrastructure") {
     checkout([$class: 'GitSCM', branches: [[name: '*/master']],
@@ -39,7 +39,8 @@ def call() {
                       extraVars: [ okapi_url: "${env.okapiUrl}",
                                    tenant: "${env.tenant}",
                                    build_module_list_files: "${env.WORKSPACE}",
-                                   platform: "${env.folioPlatform}" ]
+                                   platform: "${env.folioPlatform}",
+                                   load_data: loadData ]
     }
   }
 } 
