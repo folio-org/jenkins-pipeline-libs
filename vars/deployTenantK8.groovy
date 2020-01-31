@@ -6,9 +6,11 @@
  */
 
 
-def call() {
+def call(String loadData = 'true') {
 
-  def loadData = false
+  if (loadData ==~ /(?i)(Y|YES|T|TRUE)/) { loadData = true }
+  if (loadData ==~ /(?i)(N|NO|F|FALSE)/) { loadData = false }
+
 
   dir("${env.WORKSPACE}/folio-infrastructure") {
     checkout([$class: 'GitSCM', branches: [[name: '*/master']],
