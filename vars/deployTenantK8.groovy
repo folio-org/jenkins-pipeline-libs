@@ -8,6 +8,8 @@
 
 def call() {
 
+  def loadData = false
+
   dir("${env.WORKSPACE}/folio-infrastructure") {
     checkout([$class: 'GitSCM', branches: [[name: '*/master']],
               doGenerateSubmoduleConfigurations: false,
@@ -40,7 +42,7 @@ def call() {
                                    tenant: "${env.tenant}",
                                    build_module_list_files: "${env.WORKSPACE}",
                                    platform: "${env.folioPlatform}",
-                                   load_data: false]
+                                   load_data: loadData]
     }
   }
 } 
