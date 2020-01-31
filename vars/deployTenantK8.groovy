@@ -39,7 +39,8 @@ def call() {
                       extraVars: [ okapi_url: "${env.okapiUrl}",
                                    tenant: "${env.tenant}",
                                    build_module_list_files: "${env.WORKSPACE}",
-                                   platform: "${env.folioPlatform}"]
+                                   platform: "${env.folioPlatform}",
+                                   load_data: false]
     }
   }
 } 
