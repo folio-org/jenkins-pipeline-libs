@@ -40,7 +40,6 @@ def call(String loadData = 'true') {
                       playbook: 'platform-pr-k8.yml',
                       sudoUser: null, 
                       vaultCredentialsId: 'ansible-vault-pass',
-                      extras: '-vvv',
                       extraVars: [ okapi_url: "${env.okapiUrl}",
                                    tenant: "${env.tenant}",
                                    build_module_list_files: "${env.WORKSPACE}",
