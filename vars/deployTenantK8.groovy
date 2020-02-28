@@ -6,7 +6,11 @@
  */
 
 
-def call() {
+def call(String loadData = 'true') {
+
+  if (loadData ==~ /(?i)(Y|YES|T|TRUE)/) { loadData = true }
+  if (loadData ==~ /(?i)(N|NO|F|FALSE)/) { loadData = false }
+
 
   dir("${env.WORKSPACE}/folio-infrastructure") {
     checkout([$class: 'GitSCM', branches: [[name: '*/master']],
@@ -39,7 +43,8 @@ def call() {
                       extraVars: [ okapi_url: "${env.okapiUrl}",
                                    tenant: "${env.tenant}",
                                    build_module_list_files: "${env.WORKSPACE}",
-                                   platform: "${env.folioPlatform}" ]
+                                   platform: "${env.folioPlatform}",
+                                   load_data: loadData]
     }
   }
 } 
