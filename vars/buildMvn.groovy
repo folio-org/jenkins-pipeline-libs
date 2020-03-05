@@ -50,8 +50,7 @@ def call(body) {
 
   // deploy module to Kubernetes. Default is false
   def doKubeDeploy = config.doKubeDeploy ?: false
-  // set to false until fixed. --malc
-  if (doKubeDeploy ==~ /(?i)(Y|YES|T|TRUE)/) { doKubeDeploy = false }
+  if (doKubeDeploy ==~ /(?i)(Y|YES|T|TRUE)/) { doKubeDeploy = true }
   if (doKubeDeploy ==~ /(?i)(N|NO|F|FALSE)/) { doKubeDeploy = false }
 
   // location of Maven MD
