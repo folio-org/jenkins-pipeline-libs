@@ -6,7 +6,8 @@
 
 def call(String namespace, String targetModule) {
   echo "install ansible kubernetes deps"
-  sh "pip -q install openshift"
+  sh "pip -q install wheel"
+  sh "pip -q install openshift==0.10.2"
   
   echo "clone folio-infrastructre"
   checkout([$class: 'GitSCM', 
