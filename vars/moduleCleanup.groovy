@@ -12,7 +12,7 @@ def call(String namespace, String targetModule) {
 
     writeFile file: 'requirements.txt', text: libraryResource('org/folio/requirements.txt')
     sh "pip3 -q install wheel"
-    sh "pip3 -w install requirements.txt"
+    sh "pip3 -r install requirements.txt"
     sh "pip3 freeze"
 
   }
