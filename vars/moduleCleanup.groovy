@@ -4,7 +4,7 @@
  * cleanup modules from kubernetes
  */
 
-def call(String namespace, String targetModule) {
+def call(String scriptArgs) {
 
   dir("${env.WORKSPACE}") {
     withCredentials([file(credentialsId: 'jenkins-folio-rancher', variable: 'KUBECONFIG')]) {
@@ -22,7 +22,8 @@ def call(String namespace, String targetModule) {
 
       // run script
       withCredentials([usernamePassword(credentialsId: 'okapi-preview-superuser', passwordVariable: 'pass', usernameVariable: 'user')]) {
-        sh "python3 module-cleanup.py --dry-run -r 3 -s 2 -u $user -p $pass -o https://okapi-default.ci.folio.org"
+        //sh "python3 module-cleanup.py --dry-run -r 3 -s 2 -u $user -p $pass -o https://okapi-default.ci.folio.org"
+        sh "python3 module-cleanup.py ${scriptArgs}"
      }
     }
   }
