@@ -21,7 +21,9 @@ def call(String namespace, String targetModule) {
       sh "pip3 freeze"
 
       // run script
-      sh "python3 module-cleanup.py --dry-run -r 3 -s 2 -u $OKAPI_USER -p $OKAPI_PASS -o https://okapi-default.ci.folio.org"
+      withCredentials([usernamePassword(credentialsId: 'okapi-preview-superuser', passwordVariable: 'pass', usernameVariable: 'user')]) {
+        sh "python3 module-cleanup.py --dry-run -r 3 -s 2 -u $user -p $pass -o https://okapi-default.ci.folio.org"
+     }
     }
   }
 }
