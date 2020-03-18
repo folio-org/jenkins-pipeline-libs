@@ -7,8 +7,10 @@
 def call(String namespace, String targetModule) {
 
   dir("${env.WORKSPACE}") {
-    withCredentials([usernamePassword(credentialsId: 'jenkins-folio-rancher', variable: 'KUBECONFIG')]) {
-      echo "$KUBECONFIG"
+    withCredentials([file(credentialsId: 'jenkins-folio-rancher', variable: 'KUBECONFIG')]) {
+      sh "mkdir -p /home/jenkins/.kube"
+      sh "cp \$$KUBECONFIG /home/jenkins/.kube/config"
+      sh "head -n 3 /home/jenkins/.kube/config"
       echo "install deps"
 
       writeFile file: 'requirements.txt', text: libraryResource('org/folio/requirements.txt')
