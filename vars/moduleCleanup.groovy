@@ -21,7 +21,7 @@ def call(String scriptArgs) {
       sh "pip3 freeze"
 
       // run script
-      withCredentials([usernamePassword(credentialsId: 'okapi-preview-superuser', passwordVariable: 'pass', usernameVariable: 'user')]) {
+      withCredentials([usernamePassword(credentialsId: 'okapi-default-superuser', passwordVariable: 'pass', usernameVariable: 'user')]) {
         //sh "python3 module-cleanup.py --dry-run -r 3 -s 2 -u $user -p $pass -o https://okapi-default.ci.folio.org"
         sh "python3 module-cleanup.py ${scriptArgs}"
      }
