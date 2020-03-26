@@ -10,14 +10,18 @@ def call(Map previewOpts = [:]) {
   withCredentials([usernamePassword(credentialsId: 'okapi-preview-superuser', passwordVariable: 'pass', usernameVariable: 'user')]) {
     writeFile file: 'getOkapiToken.sh', text: libraryResource('org/folio/getOkapiToken.sh')
     sh 'chmod +x getOkapiToken.sh' 
-    env.okapiToken = sh(returnStdout: true, script: "./getOkapiToken.sh -t supertenant -o $previewOkapiUrl -u $user -p $pass").trim()
+    env.okapiPreviewToken = sh(returnStdout: true, script: "./getOkapiToken.sh -t supertenant -o $previewOkapiUrl -u $user -p $pass").trim()
+  }
+  
+  withCredentials([usernamePassword(credentialsId: 'okapi-default-superuser', passwordVariable: 'pass', usernameVariable: 'user')]) {
+    env.okapiDefaultToken = sh(returnStdout: true, script: "./getOkapiToken.sh -t supertenant -o $defaultOkapiUrl -u $user -p $pass").trim()
   }
 
   // sync MDs from okapi-default
   httpRequest acceptType: 'APPLICATION_JSON_UTF8',
               contentType: 'APPLICATION_JSON_UTF8',
               consoleLogResponseBody: false,
-              customHeaders: [[maskValue: true,name: 'X-Okapi-Token',value: env.okapiToken], 
+              customHeaders: [[maskValue: true,name: 'X-Okapi-Token',value: env.okapiPreviewToken], 
                               [maskValue: false,name: 'X-Okapi-Tenant',value: 'supertenant']],
               httpMode: 'POST',
               validResponseCodes: '200',
@@ -37,7 +41,7 @@ def call(Map previewOpts = [:]) {
     httpRequest acceptType: 'APPLICATION_JSON_UTF8',
                 contentType: 'APPLICATION_JSON_UTF8',
                 consoleLogResponseBody: true,
-                customHeaders: [[maskValue: true,name: 'X-Okapi-Token',value: env.okapiToken],
+                customHeaders: [[maskValue: true,name: 'X-Okapi-Token',value: env.okapiPreviewToken],
                                [maskValue: false,name: 'X-Okapi-Tenant',value: 'supertenant']],
                 httpMode: 'POST',
                 validResponseCodes: '201,400',
@@ -61,6 +65,8 @@ def call(Map previewOpts = [:]) {
                   httpMode: 'GET',
                   validResponseCodes: '200',
                   outputFile:  "${modId}-disc.json",
+                  customHeaders: [[maskValue: true,name: 'X-Okapi-Token',value: env.okapiDefaultToken],
+                                 [maskValue: false,name: 'X-Okapi-Tenant',value: 'supertenant']],
                   url: "${defaultOkapiUrl}/_/discovery/modules/${modId}"
 
 
@@ -75,6 +81,8 @@ def call(Map previewOpts = [:]) {
       def modPreviewExists = httpRequest contentType: 'APPLICATION_JSON_UTF8',
                                          httpMode: 'GET',
                                          validResponseCodes: '200,404',
+                                         customHeaders: [[maskValue: true,name: 'X-Okapi-Token',value: env.okapiPreviewToken],
+                                                        [maskValue: false,name: 'X-Okapi-Tenant',value: 'supertenant']],
                                          url: "${previewOkapiUrl}/_/discovery/modules/${modId}"
       echo "$modPreviewExists.status"
       // fix this.  
@@ -84,7 +92,7 @@ def call(Map previewOpts = [:]) {
         httpRequest acceptType: 'APPLICATION_JSON_UTF8',
                     contentType: 'APPLICATION_JSON_UTF8',
                     consoleLogResponseBody: true,
-                    customHeaders: [[maskValue: true,name: 'X-Okapi-Token',value: env.okapiToken], 
+                    customHeaders: [[maskValue: true,name: 'X-Okapi-Token',value: env.okapiPreviewToken], 
                                    [maskValue: false,name: 'X-Okapi-Tenant',value: 'supertenant']],
                     httpMode: 'POST',
                     validResponseCodes: '201,400',
