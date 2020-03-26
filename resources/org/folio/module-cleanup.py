@@ -98,6 +98,7 @@ def okapi_auth(okapi, username, password, tenant):
     }
     r = requests.post(okapi + '/authn/login',
                       headers=headers, json=payload)
+    print(r.content)
     try:
         r.raise_for_status()
     except requests.exceptions.HTTPError as e:
