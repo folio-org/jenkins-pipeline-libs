@@ -4,7 +4,7 @@
  * deploy a module to kubernetes
  */
 
-def call(String namespace, String targetModule, okapiUrl String = "http://okapi:9130") {
+def call(String namespace, String targetModule, String okapiUrl = "http://okapi:9130") {
   echo "install ansible kubernetes deps"
   sh "pip -q install wheel"
   sh "pip -q install openshift==0.10.2"
