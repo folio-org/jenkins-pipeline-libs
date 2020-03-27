@@ -170,4 +170,43 @@ def currentDateTime() {
   return dateFormat.format(date)
 }
 
+// substitute tenant modules
+@NonCPS
+def subPreviewMods(List previewMods, List mods) {
+
+   def previewMod
+   def previewModAction
+   def matches
+   def previewModName
+   def Boolean exists = false
+
+  previewMods.each {
+    exists = false
+    previewMod = it.id
+    previewModAction = it.action
+    matches = (it.id =~ /^(.*?)\-(\d+.*)/)
+    previewModName = matches[0][1]
+
+    echo "Substituting: " + previewModName + "-->" + previewMod
+    echo "Action: " + previewModAction
+
+    mods.each { 
+      if (it.id ==~ /^${previewModName}-\d+.*/) {
+        it.id = previewMod
+        it.action = previewModAction
+        exists = true
+      }
+    }
+  /*  Uncomment this if we want to generate a new okapi-install.json based on dep resolution
+   * if (!exists) { 
+   *   def newMap = [:]
+   *   newMap.put('id', previewMod)
+   *   newMap.put('action', previewModAction)
+   *   mods << newMap
+   * }
+  */
+  }
+  return mods
+}
+
 
