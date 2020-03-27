@@ -10,15 +10,12 @@ def call(String scriptArgs) {
     withCredentials([file(credentialsId: 'jenkins-folio-rancher', variable: 'KUBECONFIG')]) {
       sh "mkdir -p /home/jenkins/.kube"
       sh "cp $KUBECONFIG /home/jenkins/.kube/config"
-      sh "head -n 3 /home/jenkins/.kube/config"
-      echo "install deps"
 
       // set up python environment
       writeFile file: 'requirements.txt', text: libraryResource('org/folio/requirements.txt')
       writeFile file: 'module-cleanup.py', text: libraryResource('org/folio/module-cleanup.py')
       sh "pip3 -q install wheel"
       sh "pip3 install -r requirements.txt"
-      sh "pip3 freeze"
 
       // run script
       withCredentials([usernamePassword(credentialsId: 'okapi-default-superuser', passwordVariable: 'pass', usernameVariable: 'user')]) {
