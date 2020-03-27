@@ -199,7 +199,7 @@ def call(body) {
                           "\"name\" : \"${env.name}\"," +
                           "\"version\" : \"${previewId}\"," +
                           "\"deploy\":true" +
-                       "}]")
+                       "}]", "http://okapi-preview:9130")
           }
         }
 
