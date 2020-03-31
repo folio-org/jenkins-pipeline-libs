@@ -183,7 +183,7 @@ def call(body) {
                             "\"name\" : \"${env.name}\"," +
                             "\"version\" : \"${env.version}\"," +
                             "\"deploy\":true" +
-                         "}]", "http://okapi-preview:9130")
+                         "}]")
             }
           }
         } else if (env.CHANGE_ID && publishPreview) {
@@ -199,7 +199,7 @@ def call(body) {
                           "\"name\" : \"${env.name}\"," +
                           "\"version\" : \"${previewId}\"," +
                           "\"deploy\":true" +
-                       "}]")
+                       "}]", "http://okapi-preview:9130")
           }
         }
 
