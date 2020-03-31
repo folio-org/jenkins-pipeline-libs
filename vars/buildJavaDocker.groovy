@@ -133,12 +133,14 @@ EOF
           sh "docker push ${env.dockerRepo}/${env.name}:latest"
         }
         // publish readme
+        /* FOLIO-2541 Temporarily move code to enable test branch build
         echo "Publish Readme Docker Hub"
         withCredentials([usernamePassword(credentialsId: 'DockerHubIDJenkins', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
           writeFile file: 'dockerHubPublishMetadata.sh', text: libraryResource('org/folio/dockerHubPublishMetadata.sh')
           sh 'chmod +x dockerHubPublishMetadata.sh'
           sh "./dockerHubPublishMetadata.sh ${env.dockerRepo}/${env.name} ${env.projectName} ${env.projUrl}"
         }
+        */
       } else if (env.CHANGE_ID && publishPreview) {
         echo "Publishing Preview Docker images"
         def previewId = "${env.bareVersion}.${env.CHANGE_ID}.${env.BUILD_NUMBER}"
@@ -147,6 +149,12 @@ EOF
           sh "docker push docker-registry.ci.folio.org/${env.name}:${previewId}"
           sh "docker rmi docker-registry.ci.folio.org/${env.name}:${previewId}"
         }
+      }
+      echo "FOLIO-2541: Publish Readme Docker Hub"
+      withCredentials([usernamePassword(credentialsId: 'DockerHubIDJenkins', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+        writeFile file: 'dockerHubPublishMetadata.sh', text: libraryResource('org/folio/dockerHubPublishMetadata.sh')
+        sh 'chmod +x dockerHubPublishMetadata.sh'
+        sh "./dockerHubPublishMetadata.sh ${env.dockerRepo}/${env.name} ${env.projectName} ${env.projUrl}"
       }
     } // end dir()
 
