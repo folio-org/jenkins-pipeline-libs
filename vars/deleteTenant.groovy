@@ -16,39 +16,54 @@ def call(String targetOkapi, String targetTenant, Boolean secured = true) {
     env.okapiToken = ''
   }
 
-  def getResult = httpRequest acceptType: 'APPLICATION_JSON_UTF8',
+  def checkResult = httpRequest acceptType: 'APPLICATION_JSON_UTF8',
               contentType: 'APPLICATION_JSON_UTF8',
               consoleLogResponseBody: false,
               httpMode: 'GET',
-              validResponseCodes: '200',
-              outputFile:  "mods-enabled.json",
+              validResponseCodes: '404',
               customHeaders: [[maskValue: true,name: 'X-Okapi-Token',value: env.okapiToken],
                              [maskValue: false,name: 'X-Okapi-Tenant',value: 'supertenant']],
-              url: "${targetOkapi}/_/proxy/tenants/${targetTenant}/modules"
-
-  sh "cat mods-enabled.json | jq '[.[] + {\"action\" : \"disable\"}]' > disable.json"
-  def disable = readFile file: 'disable.json'
-  echo "${disable}"
-
-  def purgeResult = httpRequest acceptType: 'APPLICATION_JSON_UTF8',
-              contentType: 'APPLICATION_JSON_UTF8',
-              consoleLogResponseBody: true,
-              customHeaders: [[maskValue: true,name: 'X-Okapi-Token',value: env.okapiToken], 
-                              [maskValue: false,name: 'X-Okapi-Tenant',value: 'supertenant']],
-              httpMode: 'POST',
-              validResponseCodes: '200',
-              requestBody: disable,
-              url: "${targetOkapi}/_/proxy/tenants/${targetTenant}/install?purge=true"
-
-  def deleteResult = httpRequest acceptType: 'APPLICATION_JSON_UTF8',
-              contentType: 'APPLICATION_JSON_UTF8',
-              consoleLogResponseBody: true,
-              customHeaders: [[maskValue: true,name: 'X-Okapi-Token',value: env.okapiToken], 
-                              [maskValue: false,name: 'X-Okapi-Tenant',value: 'supertenant']],
-              httpMode: 'DELETE',
-              validResponseCodes: '200',
               url: "${targetOkapi}/_/proxy/tenants/${targetTenant}"
 
-  return(deleteResult.status)
+  if (checkResult.status.equals(200)) {
+    def getResult = httpRequest acceptType: 'APPLICATION_JSON_UTF8',
+                contentType: 'APPLICATION_JSON_UTF8',
+                consoleLogResponseBody: false,
+                httpMode: 'GET',
+                validResponseCodes: '200',
+                outputFile:  "mods-enabled.json",
+                customHeaders: [[maskValue: true,name: 'X-Okapi-Token',value: env.okapiToken],
+                               [maskValue: false,name: 'X-Okapi-Tenant',value: 'supertenant']],
+                url: "${targetOkapi}/_/proxy/tenants/${targetTenant}/modules"
+
+    sh "cat mods-enabled.json | jq '[.[] + {\"action\" : \"disable\"}]' > disable.json"
+    def disable = readFile file: 'disable.json'
+    echo "${disable}"
+
+    def purgeResult = httpRequest acceptType: 'APPLICATION_JSON_UTF8',
+                contentType: 'APPLICATION_JSON_UTF8',
+                consoleLogResponseBody: true,
+                customHeaders: [[maskValue: true,name: 'X-Okapi-Token',value: env.okapiToken], 
+                                [maskValue: false,name: 'X-Okapi-Tenant',value: 'supertenant']],
+                httpMode: 'POST',
+                validResponseCodes: '200',
+                requestBody: disable,
+                url: "${targetOkapi}/_/proxy/tenants/${targetTenant}/install?purge=true"
+
+    def deleteResult = httpRequest acceptType: 'APPLICATION_JSON_UTF8',
+                contentType: 'APPLICATION_JSON_UTF8',
+                consoleLogResponseBody: true,
+                customHeaders: [[maskValue: true,name: 'X-Okapi-Token',value: env.okapiToken], 
+                                [maskValue: false,name: 'X-Okapi-Tenant',value: 'supertenant']],
+                httpMode: 'DELETE',
+                validResponseCodes: '204',
+              result  url: "${targetOkapi}/_/proxy/tenants/${targetTenant}"
+
+    def result = "deleted tenant ${targetTenant}"
+  } else {
+    def result = "tenant ${targetTenant} does not exist, skipping deletion..."
+  }
+
+  return(result)
 
 }
