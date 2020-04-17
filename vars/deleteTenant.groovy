@@ -20,7 +20,7 @@ def call(String targetOkapi, String targetTenant, Boolean secured = true) {
               contentType: 'APPLICATION_JSON_UTF8',
               consoleLogResponseBody: false,
               httpMode: 'GET',
-              validResponseCodes: '404',
+              validResponseCodes: '200,404',
               customHeaders: [[maskValue: true,name: 'X-Okapi-Token',value: env.okapiToken],
                              [maskValue: false,name: 'X-Okapi-Tenant',value: 'supertenant']],
               url: "${targetOkapi}/_/proxy/tenants/${targetTenant}"
@@ -63,6 +63,4 @@ def call(String targetOkapi, String targetTenant, Boolean secured = true) {
   } else {
     echo "tenant ${targetTenant} does not exist, skipping deletion..."
   }
-
-  return(true)
 }
