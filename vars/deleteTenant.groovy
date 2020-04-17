@@ -27,19 +27,28 @@ def call(String targetOkapi, String targetTenant, Boolean secured = true) {
               url: "${targetOkapi}/_/proxy/tenants/${targetTenant}/modules"
 
   sh "cat mods-enabled.json | jq '[.[] + {\"action\" : \"disable\"}]' > disable.json"
-  def disableJSON = readJSON file: 'disable.json'
-  echo "${disableJSON}"
+  def disable = readFile file: 'disable.json'
+  echo "${disable}"
 
   def purgeResult = httpRequest acceptType: 'APPLICATION_JSON_UTF8',
               contentType: 'APPLICATION_JSON_UTF8',
-              consoleLogResponseBody: false,
+              consoleLogResponseBody: true,
               customHeaders: [[maskValue: true,name: 'X-Okapi-Token',value: env.okapiToken], 
                               [maskValue: false,name: 'X-Okapi-Tenant',value: 'supertenant']],
               httpMode: 'POST',
               validResponseCodes: '200',
-              requestBody: disableJSON
-              url: "${targetOkapi}/_/proxy/tenants/${targetTenant}/install?simulate=true"
+              requestBody: disable,
+              url: "${targetOkapi}/_/proxy/tenants/${targetTenant}/install?purge=true"
 
-  return(true)
+  def deleteResult = httpRequest acceptType: 'APPLICATION_JSON_UTF8',
+              contentType: 'APPLICATION_JSON_UTF8',
+              consoleLogResponseBody: true,
+              customHeaders: [[maskValue: true,name: 'X-Okapi-Token',value: env.okapiToken], 
+                              [maskValue: false,name: 'X-Okapi-Tenant',value: 'supertenant']],
+              httpMode: 'DELETE',
+              validResponseCodes: '200',
+              url: "${targetOkapi}/_/proxy/tenants/${targetTenant}"
+
+  return(deleteResult.status)
 
 }
