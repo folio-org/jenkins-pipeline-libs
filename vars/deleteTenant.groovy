@@ -57,13 +57,12 @@ def call(String targetOkapi, String targetTenant, Boolean secured = true) {
                                 [maskValue: false,name: 'X-Okapi-Tenant',value: 'supertenant']],
                 httpMode: 'DELETE',
                 validResponseCodes: '204',
-              result  url: "${targetOkapi}/_/proxy/tenants/${targetTenant}"
+                url: "${targetOkapi}/_/proxy/tenants/${targetTenant}"
 
-    def result = "deleted tenant ${targetTenant}"
+    echo "deleted tenant ${targetTenant}"
   } else {
-    def result = "tenant ${targetTenant} does not exist, skipping deletion..."
+    echo "tenant ${targetTenant} does not exist, skipping deletion..."
   }
 
-  return(result)
-
+  return(true)
 }
