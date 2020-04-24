@@ -20,7 +20,7 @@ def call(String scriptArgs) {
                        credentialsId: 'jenkins-aws',
                        secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']) {
         echo "$user"
-        sh "python3 module-cleanup.py ${scriptArgs} -u $user -p $pass"
+        sh "python3 preview-tenant-cleanup.py ${scriptArgs} -u $user -p $pass"
      }
     }
   }

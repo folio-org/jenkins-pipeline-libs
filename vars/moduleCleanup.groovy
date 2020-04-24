@@ -19,7 +19,7 @@ def call(String scriptArgs) {
 
       // run script
       withCredentials([usernamePassword(credentialsId: 'okapi-default-superuser', passwordVariable: 'pass', usernameVariable: 'user')]) {
-        sh "python3 preview-tenant-cleanup.py ${scriptArgs} -u $user -p $pass"
+        sh "python3 module-cleanup.py ${scriptArgs} -u $user -p $pass"
      }
     }
   }
