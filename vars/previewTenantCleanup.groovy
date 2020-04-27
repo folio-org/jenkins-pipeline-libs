@@ -14,14 +14,13 @@ def call(String scriptArgs) {
       sh "pip3 install -r requirements.txt"
 
       // run script
-      withCredentials([usernamePassword(credentialsId: 'okapi-preview-superuser', passwordVariable: 'pass', usernameVariable: 'user')],
+      withCredentials([usernamePassword(credentialsId: 'okapi-preview-superuser', passwordVariable: 'pass', usernameVariable: 'user',
                       [$class: 'AmazonWebServicesCredentialsBinding',
                        accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                        credentialsId: 'jenkins-aws',
-                       secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']) {
+                       secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
         echo "$user"
         sh "python3 preview-tenant-cleanup.py ${scriptArgs} -u $user -p $pass"
-     }
-    }
+      }
   }
 }
