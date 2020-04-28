@@ -12,6 +12,8 @@ ORGANIZATION = "folio-org"
 #python tenant-cleanup.py -o https://okapi-preview.ci.folio.org -u okapi_preview_admin -p okapi_preview_admin3657 --dry-run
 
 def main():
+    AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID', None)
+    AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY', None)
     args = parse_command_line_args()
     token = okapi_auth(
                 args.okapi_url, args.username, args.password, "supertenant"
@@ -124,7 +126,7 @@ def delete_bucket(bucket_name):
     deleted = False
     s3 = boto3.resource('s3', 
                         aws_access_key_id=AWS_ACCESS_KEY_ID,
-                        aws_secret_access_key=AWS_ACCESS_KEY_SECRET)
+                        aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
     bucket = s3.Bucket(bucket_name) 
     print(bucket.name)
     try:
