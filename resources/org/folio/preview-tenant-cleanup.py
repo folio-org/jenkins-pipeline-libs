@@ -65,7 +65,7 @@ def parse_command_line_args():
                         action='store_true', required=False)
     parser.add_argument('-o', '--okapi-url', help='okapi url check for tenants and enabled modules',
                         default='https://okapi-preview.ci.folio.org', required=False)
-    parser.add_argument('-u', '--username', help='Supertenant username', default="okapi_preview_admin" required=True)
+    parser.add_argument('-u', '--username', help='Supertenant username', default="okapi_preview_admin", required=True)
     parser.add_argument('-p', '--password', help='supertenant password', required=True)
 
     args = parser.parse_args()
