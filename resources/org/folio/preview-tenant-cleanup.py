@@ -11,9 +11,6 @@ import sys
 ORGANIZATION = "folio-org"
 
 def main():
-    AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
-    print(AWS_ACCESS_KEY_ID)
-    AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
     args = parse_command_line_args()
     token = okapi_auth(
                 args.okapi_url, args.username, args.password, "supertenant"
@@ -69,6 +66,8 @@ def parse_command_line_args():
                         default='https://okapi-preview.ci.folio.org', required=False)
     parser.add_argument('-u', '--username', help='Supertenant username', default="okapi_preview_admin", required=True)
     parser.add_argument('-p', '--password', help='supertenant password', required=True)
+    parser.add_argument('-k', '--aws-key', help='aws access key', required=True)
+    parser.add_argument('-i', '--aws-id', help='aws access key id', required=True)
 
     args = parser.parse_args()
 
