@@ -19,8 +19,6 @@ def call(String scriptArgs) {
 
       // run script
       withCredentials([usernamePassword(credentialsId: 'okapi-default-superuser', passwordVariable: 'pass', usernameVariable: 'user')]) {
-        //sh "python3 module-cleanup.py --dry-run -r 3 -s 2 -u $user -p $pass -o https://okapi-default.ci.folio.org"
-        echo "$user"
         sh "python3 module-cleanup.py ${scriptArgs} -u $user -p $pass"
      }
     }
