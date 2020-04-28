@@ -9,11 +9,11 @@ import requests
 import sys
 
 ORGANIZATION = "folio-org"
-#python tenant-cleanup.py -o https://okapi-preview.ci.folio.org -u okapi_preview_admin -p okapi_preview_admin3657 --dry-run
 
 def main():
-    AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID', None)
-    AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY', None)
+    AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+    print(AWS_ACCESS_KEY_ID)
+    AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
     args = parse_command_line_args()
     token = okapi_auth(
                 args.okapi_url, args.username, args.password, "supertenant"
