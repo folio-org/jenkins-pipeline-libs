@@ -33,7 +33,7 @@ def main():
                 if args.dry_run == False:
                     purge_modules(args.okapi_url, t, token)
                     delete_tenant(args.okapi_url, t, token)
-                    delete_bucket("-".join([pr_repo, pr_number]))
+                    delete_bucket("-".join([pr_repo, pr_number]), args.aws_id, args.aws_key)
                 else:
                     print("Dry run, no action taken")
             elif closed == False:
@@ -121,11 +121,11 @@ def delete_tenant(okapi_url, tenant, token):
     
     return deleted
 
-def delete_bucket(bucket_name):
+def delete_bucket(bucket_name, aws_id, aws_key):
     deleted = False
     s3 = boto3.resource('s3', 
-                        aws_access_key_id=args.aws_id,
-                        aws_secret_access_key=args.aws_key)
+                        aws_id,
+                        aws__key)
     bucket = s3.Bucket(bucket_name) 
     print(bucket.name)
     try:
