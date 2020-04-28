@@ -124,8 +124,8 @@ def delete_tenant(okapi_url, tenant, token):
 def delete_bucket(bucket_name):
     deleted = False
     s3 = boto3.resource('s3', 
-                        aws_access_key_id=AWS_ACCESS_KEY_ID,
-                        aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
+                        aws_access_key_id=args.aws_id,
+                        aws_secret_access_key=args.aws_key)
     bucket = s3.Bucket(bucket_name) 
     print(bucket.name)
     try:
