@@ -125,7 +125,7 @@ def delete_bucket(bucket_name, aws_id, aws_key):
     deleted = False
     s3 = boto3.resource('s3', 
                         aws_id,
-                        aws__key)
+                        aws_key)
     bucket = s3.Bucket(bucket_name) 
     print(bucket.name)
     try:
