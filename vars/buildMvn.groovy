@@ -40,7 +40,8 @@ def call(body) {
 
   // publish preview mod descriptor to folio-registry. Default is false
   def publishPreview = config.publishPreview ?: false
-  if (publishPreview ==~ /(?i)(Y|YES|T|TRUE)/) { publishPreview = true }
+  // disable for now --malc 
+  if (publishPreview ==~ /(?i)(Y|YES|T|TRUE)/) { publishPreview = false }
   if (publishPreview ==~ /(?i)(N|NO|F|FALSE)/) { publishPreview = false }
 
   // publish API documentation to foliodocs. Default is false
@@ -50,7 +51,8 @@ def call(body) {
 
   // deploy module to Kubernetes. Default is false
   def doKubeDeploy = config.doKubeDeploy ?: false
-  if (doKubeDeploy ==~ /(?i)(Y|YES|T|TRUE)/) { doKubeDeploy = true }
+  // set to false globally for now. --malc
+  if (doKubeDeploy ==~ /(?i)(Y|YES|T|TRUE)/) { doKubeDeploy = false }
   if (doKubeDeploy ==~ /(?i)(N|NO|F|FALSE)/) { doKubeDeploy = false }
 
   // location of Maven MD
