@@ -20,7 +20,7 @@ def call(String runTestOptions = '') {
     def XVFB = 'xvfb-run --server-args="-screen 0 1024x768x24"'
 
     env.NODE_OPTIONS="--max-old-space-size=3076"
-    sh "echo $NODE_OPTIONS"
+    sh "echo NODE_OPTIONS=$NODE_OPTIONS"
 
     withEnv([ 
       'CHROME_BIN=/usr/bin/google-chrome-stable',
