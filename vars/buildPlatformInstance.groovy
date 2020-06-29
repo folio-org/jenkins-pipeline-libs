@@ -8,6 +8,8 @@
 
 def call(String ec2Group, String folioHostname, String tenant) {
 
+  env.ANSIBLE_CONFIG = "${env.WORKSPACE}/folio-infrastructure/CI/ansible/ansible.cfg"
+
   dir("${env.WORKSPACE}/folio-infrastructure") {
     checkout([$class: 'GitSCM', branches: [[name: '*/master']],
               doGenerateSubmoduleConfigurations: false,
