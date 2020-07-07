@@ -330,15 +330,6 @@ def call(body) {
                        reportFiles: 'index.html',
                        reportName: 'LCov Coverage Report',
                        reportTitles: 'LCov Coverage Report'])
-
-          // archive cypress artifacts if they exist
-          if (fileExists('project/cypress/artifacts')) {
-            sh 'tar -zcf cypress.tar.gz --directory project/cypress artifacts'
-            archiveArtifacts artifacts: 'cypress.tar.gz', allowEmptyArchive: true
-          }
-          else {
-            echo "No cypress artifacts to be archived."
-          }
         }
         sendNotifications currentBuild.result
       }
