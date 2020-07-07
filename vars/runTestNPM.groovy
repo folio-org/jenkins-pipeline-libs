@@ -48,6 +48,14 @@ def call(String runTestOptions = '') {
           @NonCPS
           def comment = pullRequest.comment(message) 
         }
+        // archive cypress artifacts if they exist
+        if (fileExists('cypress/artifacts')) {
+          sh 'tar -zcf cypress.tar.gz --directory cypress artifacts'
+          archiveArtifacts artifacts: 'cypress.tar.gz', allowEmptyArchive: true
+        }
+        else {
+          echo "No cypress artifacts to be archived."
+        }
         error(message)
       }
       else {
