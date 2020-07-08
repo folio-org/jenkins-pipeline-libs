@@ -45,6 +45,7 @@ def call(String scriptName, String scriptArgs) {
         if (fileExists('cypress/artifacts')) {
           sh 'tar -zcf cypress.tar.gz --directory cypress artifacts'
           archiveArtifacts artifacts: 'cypress.tar.gz', allowEmptyArchive: true
+          archiveArtifacts artifacts: 'cypress/artifacts/**/*(failed).png', allowEmptyArchive: true
         }
         else {
           echo "No cypress artifacts to be archived."
