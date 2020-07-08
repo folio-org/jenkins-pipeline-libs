@@ -41,6 +41,14 @@ def call(String scriptName, String scriptArgs) {
           @NonCPS
           comment = pullRequest.comment(errorMessage)
         }
+        // archive cypress artifacts if they exist
+        if (fileExists('cypress/artifacts')) {
+          sh 'tar -zcf cypress.tar.gz --directory cypress artifacts'
+          archiveArtifacts artifacts: 'cypress.tar.gz', allowEmptyArchive: true
+        }
+        else {
+          echo "No cypress artifacts to be archived."
+        }
         error(errorMessage)
       }
     } 
