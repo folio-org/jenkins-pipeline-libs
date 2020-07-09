@@ -330,6 +330,11 @@ def call(body) {
                        reportFiles: 'index.html',
                        reportName: 'LCov Coverage Report',
                        reportTitles: 'LCov Coverage Report'])
+          publishHTML([allowMissing: true, alwaysLinkToLastBuild: false,
+                       keepAll: true, reportDir: 'project/coverage/lcov-report',
+                       reportFiles: 'index.html',
+                       reportName: 'LCov Coverage Report',
+                       reportTitles: 'LCov Coverage Report'])
         }
         sendNotifications currentBuild.result
       }
