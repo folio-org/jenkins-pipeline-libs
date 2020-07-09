@@ -6,7 +6,7 @@
  */
 
 
-def call(String lcovPath = 'artifacts/coverage') {
+def call(String lcovPath = 'artifacts/coverage', String lcovPath2 = 'coverage/') {
   withCredentials([[$class: 'StringBinding', 
                         credentialsId: '6b0ebf62-3a12-4e6b-b77e-c45817b5791b', 
                         variable: 'GITHUB_ACCESS_TOKEN']]) {
@@ -22,7 +22,7 @@ def call(String lcovPath = 'artifacts/coverage') {
           "-Dsonar.sources=. " +
           "-Dsonar.language=js " +
           "-Dsonar.exclusions=${excludeFiles} " +
-          "-Dsonar.javascript.lcov.reportPaths=${lcovPath}/lcov.info " +
+          "-Dsonar.javascript.lcov.reportPaths=${lcovPath}/lcov.info,${lcovPath2}/lcov.info " +
           "-Dsonar.pullrequest.base=master " +
           "-Dsonar.pullrequest.key=${env.CHANGE_ID} " +
           "-Dsonar.pullrequest.branch=${env.BRANCH_NAME} " +
@@ -41,7 +41,7 @@ def call(String lcovPath = 'artifacts/coverage') {
             "-Dsonar.sources=. " +
             "-Dsonar.language=js " +
             "-Dsonar.exclusions=${excludeFiles} " +
-            "-Dsonar.javascript.lcov.reportPaths=${lcovPath}/lcov.info" 
+            "-Dsonar.javascript.lcov.reportPaths=${lcovPath}/lcov.info,${lcovPath2}/lcov.info" 
         }
         else {
           sh "${scannerHome}/bin/sonar-scanner " +
@@ -51,7 +51,7 @@ def call(String lcovPath = 'artifacts/coverage') {
             "-Dsonar.sources=. " +
             "-Dsonar.language=js " +
             "-Dsonar.exclusions=${excludeFiles} " +
-            "-Dsonar.javascript.lcov.reportPaths=${lcovPath}/lcov.info"      
+            "-Dsonar.javascript.lcov.reportPaths=${lcovPath}/lcov.info,${lcovPath2}/lcov.info"      
         }
       }
 
