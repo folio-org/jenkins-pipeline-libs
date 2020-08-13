@@ -55,6 +55,7 @@ def call() {
     env.javaInstall = 'openjdk-8-jenkins-slave-all'
   }
 
+  echo "JDK: $env.javaInstall"
   echo "Maven Project Name: $env.name"
   echo "Maven Project Version: $env.version"
   echo "Git Project Name: $env.projectName"
