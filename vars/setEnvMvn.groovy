@@ -10,7 +10,7 @@ def call() {
   def foliociLib = new org.folio.foliociCommands()
 
   // static vars
-  env.okapiUrl = 'http://folio-snapshot-stable.aws.indexdata.com:9130'
+  env.okapiUrl = 'https://folio-snapshot-stable-okapi.dev.folio.org'
   env.folioRegistry = 'http://folio-registry.aws.indexdata.com'
 
   echo "Okapi URL: ${env.okapiUrl}"

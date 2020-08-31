@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# 2020-08-31 FOLIO-2704: This script is not used since we moved to ELB
+
 # ec2_group
 group_tag=$1
 base_build=$2
