@@ -49,6 +49,11 @@ def call(body) {
   if (publishAPI ==~ /(?i)(Y|YES|T|TRUE)/) { publishAPI = true }
   if (publishAPI ==~ /(?i)(N|NO|F|FALSE)/) { publishAPI = false }
 
+  // build debian package. Default is false
+  def buildDeb = config.buildDeb ?: false
+  if (buildDeb ==~ /(?i)(Y|YES|T|TRUE)/) { buildDeb = true }
+  if (buildDeb ==~ /(?i)(N|NO|F|FALSE)/) { buildDeb = false }
+
   // deploy module to Kubernetes. Default is false
   def doKubeDeploy = config.doKubeDeploy ?: false
   // set to false globally for now. --malc
@@ -188,7 +193,9 @@ def call(body) {
                          "}]")
             }
           }
-        } else if (env.CHANGE_ID && publishPreview) {
+        } 
+
+        if (env.CHANGE_ID && publishPreview) {
           stage('Publish Preview Module Descriptor') {
             echo "Publishing preview module descriptor to CI preview okapi"
             postPreviewMD()
@@ -202,6 +209,13 @@ def call(body) {
                           "\"version\" : \"${previewId}\"," +
                           "\"deploy\":true" +
                        "}]", "http://okapi-preview:9130")
+          }
+        }
+
+        if (env.isRelease && buildDeb) {
+          stage('Build Debian package') {
+            build job: 'Automation/build-debian-package',
+                        parameters: [string(name: 'GIT_RELEASE_TAG', value: "${env.BRANCH_NAME}"), string(name: 'GIT_REPO_URL', value: "${env.projUrl}")]
           }
         }
 
