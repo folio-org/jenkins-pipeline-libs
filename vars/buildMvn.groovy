@@ -3,7 +3,7 @@
 /*
  * Main build script for Maven-based FOLIO projects
  *
- * Configurable parameters: 
+ * Configurable parameters:
  *
  * doDocker:  Build, test, and publish Docker image via 'buildJavaDocker' (Default: 'no'/false)
  * mvnDeploy: Deploy built artifacts to Maven repository (Default: 'no'/false)
@@ -12,7 +12,7 @@
  * publishAPI: Publish API RAML documentation.  (Default: 'no'/false)
  * runLintRamlCop: Run 'raml-cop' on back-end modules that have declared RAML in api.yml (Default: 'no'/false)
 */
- 
+
 
 
 def call(body) {
@@ -25,8 +25,8 @@ def call(body) {
 
   // Lint RAML for RAMLCop.  default is false
   def doLintRamlCop = config.runLintRamlCop ?: false
-  if (doLintRamlCop ==~ /(?i)(Y|YES|T|TRUE)/) { doLintRamlCop = true } 
-  if (doLintRamlCop ==~ /(?i)(N|NO|F|FALSE)/) { doLintRamlCop = false } 
+  if (doLintRamlCop ==~ /(?i)(Y|YES|T|TRUE)/) { doLintRamlCop = true }
+  if (doLintRamlCop ==~ /(?i)(N|NO|F|FALSE)/) { doLintRamlCop = false }
 
   // publish maven artifacts to Maven repo.  Default is false
   def mvnDeploy = config.mvnDeploy ?: false
@@ -40,7 +40,7 @@ def call(body) {
 
   // publish preview mod descriptor to folio-registry. Default is false
   def publishPreview = config.publishPreview ?: false
-  // disable for now --malc 
+  // disable for now --malc
   if (publishPreview ==~ /(?i)(Y|YES|T|TRUE)/) { publishPreview = false }
   if (publishPreview ==~ /(?i)(N|NO|F|FALSE)/) { publishPreview = false }
 
@@ -53,7 +53,6 @@ def call(body) {
   def buildDeb = config.buildDeb ?: false
   if (buildDeb ==~ /(?i)(Y|YES|T|TRUE)/) { buildDeb = true }
   if (buildDeb ==~ /(?i)(N|NO|F|FALSE)/) { buildDeb = false }
-  
 
   // deploy module to Kubernetes. Default is false
   def doKubeDeploy = config.doKubeDeploy ?: false
@@ -110,14 +109,14 @@ def call(body) {
 
         stage('Maven Build') {
           echo "Building Maven artifact: ${env.name} Version: ${env.version}"
-          withMaven(jdk: 'openjdk-8-jenkins-slave-all',  
-                    maven: 'maven3-jenkins-slave-all',  
-                    mavenSettingsConfig: 'folioci-maven-settings') {
-    
+          withMaven(jdk: "${env.javaInstall}",
+                    maven: "maven3-jenkins-slave-all",
+                    mavenSettingsConfig: "folioci-maven-settings") {
+
             // Check to see if we have snapshot deps in release
             if (env.isRelease) {
-              def snapshotDeps = foliociLib.checkMvnReleaseDeps() 
-              if (snapshotDeps) { 
+              def snapshotDeps = foliociLib.checkMvnReleaseDeps()
+              if (snapshotDeps) {
                 echo "$snapshotDeps"
                 error('Snapshot dependencies found in release')
               }
@@ -132,7 +131,7 @@ def call(body) {
 
         // Run Sonarqube
         stage('SonarQube Analysis') {
-          sonarqubeMvn() 
+          sonarqubeMvn()
         }
 
         if ( env.isRelease && fileExists(modDescriptor) ) {
@@ -140,16 +139,16 @@ def call(body) {
             okapiModDepCheck(modDescriptor)
           }
         }
-        
+
         // Docker stuff
         if (config.doDocker) {
           stage('Docker Build') {
-            echo "Building Docker image for $env.name:$env.version" 
+            echo "Building Docker image for $env.name:$env.version"
             config.doDocker.delegate = this
             config.doDocker.resolveStrategy = Closure.DELEGATE_FIRST
 	    config.doDocker.call()
           }
-        } 
+        }
 
         // master branch or tagged releases
         if (( env.BRANCH_NAME == 'master' ) || ( env.isRelease )) {
@@ -158,15 +157,15 @@ def call(body) {
           if (publishModDescriptor) {
             stage('Publish Module Descriptor') {
               echo "Publishing Module Descriptor to FOLIO registry"
-              postModuleDescriptor(modDescriptor) 
+              postModuleDescriptor(modDescriptor)
             }
           }
           if (mvnDeploy) {
             stage('Maven Deploy') {
               echo "Deploying artifacts to Maven repository"
-              withMaven(jdk: 'openjdk-8-jenkins-slave-all', 
-                      maven: 'maven3-jenkins-slave-all', 
-                      mavenSettingsConfig: 'folioci-maven-settings') {
+              withMaven(jdk: "${env.javaInstall}",
+                      maven: "maven3-jenkins-slave-all",
+                      mavenSettingsConfig: "folioci-maven-settings") {
                 sh 'mvn -DskipTests deploy'
               }
             }
@@ -175,9 +174,9 @@ def call(body) {
             stage('Publish API Docs') {
               echo "Publishing API docs"
               sh "python3 /usr/local/bin/generate_api_docs.py -r $env.projectName -l info -o folio-api-docs"
-              withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', 
-                   accessKeyVariable: 'AWS_ACCESS_KEY_ID', 
-                   credentialsId: 'jenkins-aws', 
+              withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
+                   accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                   credentialsId: 'jenkins-aws',
                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                 sh 'aws s3 sync folio-api-docs s3://foliodocs/api'
               }
@@ -200,7 +199,7 @@ def call(body) {
           stage('Publish Preview Module Descriptor') {
             echo "Publishing preview module descriptor to CI preview okapi"
             postPreviewMD()
-          } 
+          }
           stage('Kubernetes Deploy') {
             def previewId = "${env.bareVersion}.${env.CHANGE_ID}.${env.BUILD_NUMBER}"
             echo "Deploying to kubernetes cluster"
@@ -212,14 +211,13 @@ def call(body) {
                        "}]", "http://okapi-preview:9130")
           }
         }
-    
+
         if (env.isRelease && buildDeb) {
           stage('Build Debian package') {
-            build job: 'Automation/build-debian-package', 
+            build job: 'Automation/build-debian-package',
                         parameters: [string(name: 'GIT_RELEASE_TAG', value: "${env.BRANCH_NAME}"), string(name: 'GIT_REPO_URL', value: "${env.projUrl}")]
           }
         }
-        
 
 
         if (doLintRamlCop) {
@@ -239,5 +237,5 @@ def call(body) {
       }
     } //end timeout
   } // end node
-} 
+}
 
