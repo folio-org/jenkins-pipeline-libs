@@ -1,24 +1,21 @@
-#!/bin/bash 
+#!/bin/bash
 
 # for testing only
 #BUILD_NUMBER=123
 
-if [ ! -e package.json ]; then 
+if [ ! -e package.json ]; then
    echo "package.json file not found"
    exit 2
 fi
 
-python=`which python`
+hasjq=`which jq`
 
-if [ -z "$python" ]; then
-  echo "python not found"
+if [ -z "$hasjq" ]; then
+  echo "jq not found"
   exit 2
-else 
-  export PYTHONIOENCODING=utf8
 fi
 
-cur_ver=`cat package.json | 
-         python -c "import sys, json; print json.load(sys.stdin)['version']"`
+cur_ver=`cat package.json | jq -r .version`
 
 maj_ver=$(echo $cur_ver | awk -F '.' '{ print $1 }')
 min_ver=$(echo $cur_ver | awk -F '.' '{ print $2 }')
