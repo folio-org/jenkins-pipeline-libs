@@ -11,7 +11,7 @@ def call(String lcovPath = 'artifacts/coverage', String lcovPath2 = 'coverage') 
                         credentialsId: '6b0ebf62-3a12-4e6b-b77e-c45817b5791b', 
                         variable: 'GITHUB_ACCESS_TOKEN']]) {
     withSonarQubeEnv('SonarCloud') {
-      def scannerHome = tool 'SonarQube Scanner'
+      def scannerHome = tool 'SonarQube-Scanner-4'
       def excludeFiles = '**/docs/**,**/node_modules/**,**/artifacts/**,**/ci/**,Jenkinsfile,**/LICENSE,**/*.css,**/*.md,**/*.json,**/tests/**,**/stories/*.js,**/test/**,**/.stories.js,**/resources/bigtest/interactors/**,**/resources/bigtest/network/**,**/*-test.js,**/*.test.js,**/*-spec.js,**/karma.conf.js'
 
       if (env.CHANGE_ID) {

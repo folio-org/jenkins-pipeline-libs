@@ -88,7 +88,7 @@ def call(body) {
 
   // use the smaller nodejs build node since most 
   // Nodejs builds are Stripes.
-  def buildNode = config.buildNode ?: 'jenkins-slave-all'
+  def buildNode = config.buildNode ?: 'jenkins-agent-java11'
 
 
   properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '', 
