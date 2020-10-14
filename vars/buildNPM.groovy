@@ -218,7 +218,7 @@ def call(body) {
                     // do some clean up before publishing package
                     // .gitignore should cover 'artifacts'
                     // sh 'rm -rf node_modules artifacts ci'
-                    sh 'rm -rf node_modules ci'
+                    sh 'rm -rf node_modules ci junit.xml'
                
                     // npm is more flexible than yarn for this stage. 
                     echo "Deploying NPM packages to Nexus repository"
@@ -322,10 +322,14 @@ def call(body) {
                          reportName: "Yarn Lock",
                          reportTitles: "Yarn Lock"])
 
-          // publish junit tests if available
+          // publish junit tests if available (default: BigTest)
           junit allowEmptyResults: true, testResults: 'project/artifacts/runTest/*.xml'
 
-          // publish lcov coverage html reports if available
+          // publish jest junit results if available
+          junit allowEmptyResults: true, testResults: 'project/junit.xml'
+  
+
+          // publish lcov coverage html reports if available (default BigTest)
           publishHTML([allowMissing: true, alwaysLinkToLastBuild: false,
                        keepAll: true, reportDir: 'project/artifacts/coverage/lcov-report',
                        reportFiles: 'index.html',
@@ -336,6 +340,13 @@ def call(body) {
                        reportFiles: 'index.html',
                        reportName: 'LCov Coverage Report',
                        reportTitles: 'LCov Coverage Report'])
+
+          // publish separate jest coverage report
+          publishHTML([allowMissing: true, alwaysLinkToLastBuild: false,
+                       keepAll: true, reportDir: 'project/artifacts/coverage-jest/lcov-report',
+                       reportFiles: 'index.html',
+                       reportName: 'Jest LCov Coverage Report',
+                       reportTitles: 'Jest LCov Coverage Report'])
         }
         sendNotifications currentBuild.result
       }
