@@ -218,7 +218,7 @@ def call(body) {
                     // do some clean up before publishing package
                     // .gitignore should cover 'artifacts'
                     // sh 'rm -rf node_modules artifacts ci'
-                    sh 'rm -rf node_modules ci junit.xml'
+                    sh 'rm -rf node_modules ci'
                
                     // npm is more flexible than yarn for this stage. 
                     echo "Deploying NPM packages to Nexus repository"
@@ -326,7 +326,7 @@ def call(body) {
           junit allowEmptyResults: true, testResults: 'project/artifacts/runTest/*.xml'
 
           // publish jest junit results if available
-          junit allowEmptyResults: true, testResults: 'project/junit.xml'
+          junit allowEmptyResults: true, testResults: 'project/artifacts/jest-junit/*.xml'
   
 
           // publish lcov coverage html reports if available (default BigTest)
