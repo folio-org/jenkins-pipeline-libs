@@ -6,13 +6,13 @@
  * TODO: Move to src/org/folio
  */
 
-def call(String tenant,String installJson) {
+def call(String tenant,String installJson,String okapiVersion = 'latest') {
 
  
   def okapiPull = "{ \"urls\" : [ \"${env.folioRegistry}\" ]}"
   def tenantJson = "{\"id\":\"${tenant}\"}"
 
-  docker.image('folioorg/okapi:latest').withRun('', 'dev') { container ->
+  docker.image("folioorg/okapi:${okapiVersion}").withRun('', 'dev') { container ->
     def okapiIp = sh(returnStdout:true, script: "docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${container.id}").trim()
 
     if (env.releaseOnly == 'true') {
