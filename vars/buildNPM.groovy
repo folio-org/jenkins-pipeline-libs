@@ -322,10 +322,14 @@ def call(body) {
                          reportName: "Yarn Lock",
                          reportTitles: "Yarn Lock"])
 
-          // publish junit tests if available
+          // publish junit tests if available (default: BigTest)
           junit allowEmptyResults: true, testResults: 'project/artifacts/runTest/*.xml'
 
-          // publish lcov coverage html reports if available
+          // publish jest junit results if available
+          junit allowEmptyResults: true, testResults: 'project/artifacts/jest-junit/*.xml'
+  
+
+          // publish lcov coverage html reports if available (default BigTest)
           publishHTML([allowMissing: true, alwaysLinkToLastBuild: false,
                        keepAll: true, reportDir: 'project/artifacts/coverage/lcov-report',
                        reportFiles: 'index.html',
@@ -336,6 +340,13 @@ def call(body) {
                        reportFiles: 'index.html',
                        reportName: 'LCov Coverage Report',
                        reportTitles: 'LCov Coverage Report'])
+
+          // publish separate jest coverage report
+          publishHTML([allowMissing: true, alwaysLinkToLastBuild: false,
+                       keepAll: true, reportDir: 'project/artifacts/coverage-jest/lcov-report',
+                       reportFiles: 'index.html',
+                       reportName: 'Jest LCov Coverage Report',
+                       reportTitles: 'Jest LCov Coverage Report'])
         }
         sendNotifications currentBuild.result
       }

@@ -25,7 +25,8 @@ def call(String runTestOptions = '') {
     withEnv([ 
       'CHROME_BIN=/usr/bin/google-chrome-stable',
       'FIREFOX_BIN=/usr/bin/firefox',
-      'DEBIAN_FRONTEND=noninteractive'
+      'DEBIAN_FRONTEND=noninteractive',
+      'JEST_JUNIT_OUTPUT_DIR=./artifacts/jest-junit'
     ]) { 
 
       // disabled since we build new build images every week. 
