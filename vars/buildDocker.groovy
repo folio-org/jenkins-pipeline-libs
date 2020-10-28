@@ -29,8 +29,11 @@ def call(body) {
 
   try { 
     dir("${env.WORKSPACE}/${buildContext}") {
+         
       // build docker image
-      sh "docker build --no-cache=true --pull=true -t ${env.name}:${env.version} ."
+      docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-ci-pull-account') {
+        sh "docker build --no-cache=true --pull=true -t ${env.name}:${env.version} ."
+      }
 
       // Test container using container healthcheck
       if ((config.healthChk ==~ /(?i)(Y|YES|T|TRUE)/) && (config.healthChkCmd)) {

@@ -95,13 +95,14 @@ EOF
       }
       
       // build docker image
-      if (buildArg) {
-        sh "docker build --pull=true --no-cache=true -t ${env.name}:${env.version} --build-arg='VERTICLE_FILE=${fatJar}' . "
+      docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-ci-pull-account') {
+        if (buildArg) {
+          sh "docker build --pull=true --no-cache=true -t ${env.name}:${env.version} --build-arg='VERTICLE_FILE=${fatJar}' . "
+        }
+        else {
+          sh "docker build --pull=true --no-cache=true -t ${env.name}:${env.version} ."
+        }
       }
-      else {
-        sh "docker build --pull=true --no-cache=true -t ${env.name}:${env.version} ."
-      }
-
       // Test container using container healthcheck
       if ( healthChk && config.healthChkCmd ) {
 
