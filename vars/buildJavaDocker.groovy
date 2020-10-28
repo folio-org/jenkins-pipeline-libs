@@ -95,7 +95,7 @@ EOF
       }
       
       // build docker image
-      docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-ci-pull-account') {
+      docker.withRegistry('https://docker.io/v2/', 'dockerhub-ci-pull-account') {
         if (buildArg) {
           sh "docker build --pull=true --no-cache=true -t ${env.name}:${env.version} --build-arg='VERTICLE_FILE=${fatJar}' . "
         }
