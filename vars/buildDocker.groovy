@@ -31,7 +31,7 @@ def call(body) {
     dir("${env.WORKSPACE}/${buildContext}") {
          
       // build docker image
-      docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-ci-pull-account') {
+      docker.withRegistry('https://docker.io/v2/', 'dockerhub-ci-pull-account') {
         sh "docker build --no-cache=true --pull=true -t ${env.name}:${env.version} ."
       }
 

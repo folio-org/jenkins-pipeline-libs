@@ -11,7 +11,7 @@ def call(String mdFile) {
   def md = readFile(mdFile)
   
 
-  docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-ci-pull-account') {
+  docker.withRegistry('https://docker.io/v2/', 'dockerhub-ci-pull-account') {
     docker.image('folioorg/okapi:latest').withRun('', 'dev') { container ->
       def okapiIp = sh(returnStdout:true, script: "docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${container.id}").trim()
 
