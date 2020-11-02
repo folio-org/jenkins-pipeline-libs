@@ -9,7 +9,6 @@
 def call(String ec2Group, String folioHostname, String tenant) {
 
   env.ANSIBLE_CONFIG = "${env.WORKSPACE}/folio-infrastructure/CI/ansible/ansible.cfg"
-  env.DOCKER_REGISTRIES = credentials('okapi-docker-registries-pull-json')
 
   dir("${env.WORKSPACE}/folio-infrastructure") {
     checkout([$class: 'GitSCM', branches: [[name: '*/master']],
@@ -30,7 +29,9 @@ def call(String ec2Group, String folioHostname, String tenant) {
     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
                            accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                            credentialsId: 'jenkins-aws',
-                           secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                           secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'],
+                           string(credentialsId: 'okapi-docker-registries-pull-json', 
+                           variable: 'DOCKER_REGISTRIES')]) {
 
           ansiblePlaybook credentialsId: '11657186-f4d4-4099-ab72-2a32e023cced',
                           disableHostKeyChecking: true,
