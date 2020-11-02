@@ -9,6 +9,7 @@
 def call(String ec2Group, String folioHostname, String tenant) {
 
   env.ANSIBLE_CONFIG = "${env.WORKSPACE}/folio-infrastructure/CI/ansible/ansible.cfg"
+  env.DOCKER_REGISTRIES = credentials('okapi-docker-registries-pull-json')
 
   dir("${env.WORKSPACE}/folio-infrastructure") {
     checkout([$class: 'GitSCM', branches: [[name: '*/master']],
