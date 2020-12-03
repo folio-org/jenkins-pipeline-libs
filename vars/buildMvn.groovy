@@ -27,6 +27,13 @@ def call(body) {
   def doLintRamlCop = config.runLintRamlCop ?: false
   if (doLintRamlCop ==~ /(?i)(Y|YES|T|TRUE)/) { doLintRamlCop = true }
   if (doLintRamlCop ==~ /(?i)(N|NO|F|FALSE)/) { doLintRamlCop = false }
+  // API lint and API doc
+  def doApiLint = config.doApiLint ?: false
+  if (doApiLint ==~ /(?i)(Y|YES|T|TRUE)/) { doApiLint = true }
+  if (doApiLint ==~ /(?i)(N|NO|F|FALSE)/) { doApiLint = false }
+  def apiTypes = config.apiTypes ?: ''
+  def apiDirectories = config.apiTypes ?: ''
+  def apiExcludes = config.apiExcludes ?: ''
 
   // publish maven artifacts to Maven repo.  Default is false
   def mvnDeploy = config.mvnDeploy ?: false
@@ -104,6 +111,12 @@ def call(body) {
         if (doLintRamlCop) {
           stage('Lint raml-cop') {
             runLintRamlCop()
+          }
+        }
+
+        if (doApiLint) {
+          stage('Lint API') {
+            runApiLint(apiTypes, apiDirectories, apiExcludes)
           }
         }
 
