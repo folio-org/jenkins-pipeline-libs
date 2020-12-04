@@ -31,9 +31,9 @@ def call(body) {
   def doApiLint = config.doApiLint ?: false
   if (doApiLint ==~ /(?i)(Y|YES|T|TRUE)/) { doApiLint = true }
   if (doApiLint ==~ /(?i)(N|NO|F|FALSE)/) { doApiLint = false }
-  def apiTypes = config.apiTypes ?: ''
-  def apiDirectories = config.apiTypes ?: ''
-  def apiExcludes = config.apiExcludes ?: ''
+  def apiTypes = config.apiTypes.replaceAll(/[, ]+/, " ") ?: ''
+  def apiDirectories = config.apiTypes.replaceAll(/[, ]+/, " ") ?: ''
+  def apiExcludes = config.apiExcludes.replaceAll(/[, ]+/, " ") ?: ''
 
   // publish maven artifacts to Maven repo.  Default is false
   def mvnDeploy = config.mvnDeploy ?: false
