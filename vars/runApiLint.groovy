@@ -27,6 +27,7 @@ def call(String apiTypes, String apiDirectories, String apiExcludes) {
   if (lintStatus != 0) {
     echo "${errorMessage}"
     sh "echo '${errorMessage}' >> ci/apiLint.html"
+  }
   else {
     lintStatus = sh(script: "python3 /usr/local/bin/api_lint.py --loglevel info " +
                             "--types ${types} --directories ${directories} " +
