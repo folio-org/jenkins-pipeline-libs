@@ -14,18 +14,17 @@ def call(String apiTypes, String apiDirectories, String apiExcludes) {
   if (types == '') {
     lintStatus = 2
     errorMessage = "${errorMessage}\n" +
-                   "'apiTypes' is a required property.\n" +
+                   "apiTypes: Missing required property.\n" +
                    "    Space-separated list. One or more of: RAML OAS"
   }
   if (directories == '') {
     lintStatus = 2
     errorMessage = "${errorMessage}\n" +
-                   "'apiDirectories' is a required property.\n" +
+                   "apiDirectories: Missing required property.\n" +
                    "    Space-separated list of directories to be searched."
   }
 
   if (lintStatus != 0) {
-    echo "${errorMessage}"
     sh "echo '${errorMessage}' >> ci/apiLint.html"
   }
   else {
