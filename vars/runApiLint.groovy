@@ -5,7 +5,7 @@ def call(String apiTypes, String apiDirectories, String apiExcludes) {
   sh 'mkdir -p ci'
   sh 'echo "<html><body><pre>" > ci/apiLint.html'
 
-  def types = apiTypes.tr('a-z', 'A-Z')
+  def types = "${apiTypes}.toUpperCase()"
   def lintStatus = sh(script: "python3 /usr/local/bin/api_lint.py --loglevel info " +
                               "--types ${types} --directories ${apiDirectories} " +
                               "--excludes ${apiExcludes} --output folio-api-docs " +
