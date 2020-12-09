@@ -11,6 +11,7 @@
  * publishPreview: publish preview image to preview CI environment (Default: 'no'/false)
  * publishAPI: Publish API RAML documentation.  (Default: 'no'/false)
  * runLintRamlCop: Run 'raml-cop' on back-end modules that have declared RAML in api.yml (Default: 'no'/false)
+ * doApiLint: Assess API definition files (RAML OAS) (Default: false)
 */
 
 
@@ -115,7 +116,7 @@ def call(body) {
         }
 
         if (doApiLint) {
-          stage('Lint API') {
+          stage('API lint') {
             runApiLint(apiTypes, apiDirectories, apiExcludes)
           }
         }
