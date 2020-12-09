@@ -5,9 +5,13 @@ def call(String apiTypes, String apiDirectories, String apiExcludes) {
   sh 'mkdir -p ci'
   sh 'echo "<html><body><pre>" > ci/apiLint.html'
 
+  def types = apiTypes.replaceAll(/[, ]+/, " ").toUpperCase()
+  def directories = apiDirectories.replaceAll(/[, ]+/, " ")
+  def excludes = apiExcludes.replaceAll(/[, ]+/, " ")
+
   def lintStatus = sh(script: "python3 /usr/local/bin/api_lint.py --loglevel info " +
-                              "--types ${apiTypes} --directories ${apiDirectories} " +
-                              "--excludes ${apiExcludes} --output folio-api-docs " +
+                              "--types ${types} --directories ${directories} " +
+                              "--excludes ${excludes} --output folio-api-docs " +
                               ">> ci/apiLint.html", returnStatus:true)
 
   sh 'echo "</pre><body></html>" >> ci/apiLint.html'
