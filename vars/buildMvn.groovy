@@ -11,6 +11,7 @@
  * publishPreview: publish preview image to preview CI environment (Default: 'no'/false)
  * publishAPI: Publish API RAML documentation.  (Default: 'no'/false)
  * runLintRamlCop: Run 'raml-cop' on back-end modules that have declared RAML in api.yml (Default: 'no'/false)
+ * doApiLint: Assess API definition files (RAML OAS) (Default: false)
 */
 
 
@@ -27,6 +28,13 @@ def call(body) {
   def doLintRamlCop = config.runLintRamlCop ?: false
   if (doLintRamlCop ==~ /(?i)(Y|YES|T|TRUE)/) { doLintRamlCop = true }
   if (doLintRamlCop ==~ /(?i)(N|NO|F|FALSE)/) { doLintRamlCop = false }
+  // API lint and API doc
+  def doApiLint = config.doApiLint ?: false
+  if (doApiLint ==~ /(?i)(Y|YES|T|TRUE)/) { doApiLint = true }
+  if (doApiLint ==~ /(?i)(N|NO|F|FALSE)/) { doApiLint = false }
+  def apiTypes = config.apiTypes ?: ''
+  def apiDirectories = config.apiDirectories ?: ''
+  def apiExcludes = config.apiExcludes ?: ''
 
   // publish maven artifacts to Maven repo.  Default is false
   def mvnDeploy = config.mvnDeploy ?: false
@@ -104,6 +112,12 @@ def call(body) {
         if (doLintRamlCop) {
           stage('Lint raml-cop') {
             runLintRamlCop()
+          }
+        }
+
+        if (doApiLint) {
+          stage('API lint') {
+            runApiLint(apiTypes, apiDirectories, apiExcludes)
           }
         }
 
