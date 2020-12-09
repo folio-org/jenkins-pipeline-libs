@@ -31,7 +31,7 @@ def call(body) {
   def doApiLint = config.doApiLint ?: false
   if (doApiLint ==~ /(?i)(Y|YES|T|TRUE)/) { doApiLint = true }
   if (doApiLint ==~ /(?i)(N|NO|F|FALSE)/) { doApiLint = false }
-  def apiTypes = config.apiTypes.replaceAll(/[, ]+/, " ") ?: ''
+  def apiTypes = config.apiTypes.replaceAll(/[, ]+/, " ").toUpperCase() ?: ''
   def apiDirectories = config.apiTypes.replaceAll(/[, ]+/, " ") ?: ''
   def apiExcludes = config.apiExcludes.replaceAll(/[, ]+/, " ") ?: ''
 
