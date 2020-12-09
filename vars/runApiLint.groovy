@@ -5,14 +5,34 @@ def call(String apiTypes, String apiDirectories, String apiExcludes) {
   sh 'mkdir -p ci'
   sh 'echo "<html><body><pre>" > ci/apiLint.html'
 
+  def lintStatus = 0
+  def errorMessage = 'Jenkinsfile configuration errors for doApiLint:'
   def types = apiTypes.replaceAll(/[, ]+/, " ").toUpperCase()
   def directories = apiDirectories.replaceAll(/[, ]+/, " ")
   def excludes = apiExcludes.replaceAll(/[, ]+/, " ")
 
-  def lintStatus = sh(script: "python3 /usr/local/bin/api_lint.py --loglevel info " +
-                              "--types ${types} --directories ${directories} " +
-                              "--excludes ${excludes} --output folio-api-docs " +
-                              ">> ci/apiLint.html", returnStatus:true)
+  if (types == '') {
+    lintStatus = 2
+    errorMessage = "${errorMessage}\n" +
+                   "'apiTypes' is a required property.\n" +
+                   "    Space-separated list. One or more of: RAML OAS"
+  }
+  if (directories == '') {
+    lintStatus = 2
+    errorMessage = "${errorMessage}\n" +
+                   "'apiDirectories' is a required property.\n" +
+                   "    Space-separated list of directories to be searched."
+  }
+
+  if (lintStatus != 0) {
+    echo "${errorMessage}"
+    sh "echo '${errorMessage}' >> ci/apiLint.html"
+  else {
+    lintStatus = sh(script: "python3 /usr/local/bin/api_lint.py --loglevel info " +
+                            "--types ${types} --directories ${directories} " +
+                            "--excludes ${excludes} --output folio-api-docs " +
+                            ">> ci/apiLint.html", returnStatus:true)
+  }
 
   sh 'echo "</pre><body></html>" >> ci/apiLint.html'
 
