@@ -1,7 +1,7 @@
 #!/usr/bin/env groovy
 
 def call(String apiTypes, String apiDirectories, String apiExcludes) {
-  echo "Assessing API definition files ..."
+  echo "Assessing API description files ..."
   sh 'mkdir -p ci'
   sh 'echo "<html><body><pre>" > ci/apiLint.html'
 

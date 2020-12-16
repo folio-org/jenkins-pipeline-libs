@@ -11,7 +11,7 @@
  * publishPreview: publish preview image to preview CI environment (Default: 'no'/false)
  * publishAPI: Publish API RAML documentation.  (Default: 'no'/false)
  * runLintRamlCop: Run 'raml-cop' on back-end modules that have declared RAML in api.yml (Default: 'no'/false)
- * doApiLint: Assess API definition files (RAML OAS) (Default: false)
+ * doApiLint: Assess API description files (RAML OAS) (Default: false)
 */
 
 
