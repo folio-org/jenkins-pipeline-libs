@@ -180,7 +180,7 @@ def call(body) {
               withMaven(jdk: "${env.javaInstall}",
                       maven: "maven3-jenkins-slave-all",
                       mavenSettingsConfig: "folioci-maven-settings") {
-                sh 'mvn -DskipTests deploy'
+                sh 'mvn -DskipTests clean deploy'
               }
             }
           }
