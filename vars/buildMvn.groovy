@@ -233,10 +233,15 @@ def call(body) {
           }
         }
 
-
         if (doLintRamlCop) {
           stage('Lint raml schema') {
             runLintRamlSchema()
+          }
+        }
+
+        if (doApiLint) {
+          stage('API schema lint') {
+            runApiSchemaLint(apiDirectories, apiExcludes)
           }
         }
       } // end try
