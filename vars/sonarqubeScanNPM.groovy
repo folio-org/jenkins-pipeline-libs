@@ -6,7 +6,7 @@
  */
 
 
-def call(String lcovPath = 'artifacts/coverage', String lcovPath2 = 'coverage' String sonarScanDirs) {
+def call(String lcovPath = 'artifacts/coverage', String lcovPath2 = 'coverage', String sonarScanDirs) {
   withCredentials([[$class: 'StringBinding',
                         credentialsId: '6b0ebf62-3a12-4e6b-b77e-c45817b5791b',
                         variable: 'GITHUB_ACCESS_TOKEN']]) {
