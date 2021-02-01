@@ -20,6 +20,7 @@
  * runTest: Run unit tests via 'yarn test' (Default: 'no')
  * runTestOptions:  Extra opts to pass to 'yarn test'
  * stripesPlatform (DISABLED): Map consisting of modules's stripes platform and branch (Default: []) 
+ * sonarScanDirs: A string that lists directories (comma-separated) the Sonarqube scanner should scan.  Default: './src'
 */
 
 
@@ -72,6 +73,9 @@ def call(body) {
 
   // default runSonarqube 
   def runSonarqube = config.runSonarqube ?: false
+
+  // set Sonarqube root directories to scan. Default to './src'
+  def sonarScanDirs = config.sonarScanDirs ?: './src'
 
   // default runDupeCheck
   def runDupeCheck = config.runDupeCheck ?: false
@@ -171,7 +175,7 @@ def call(body) {
               // Run Sonarqube scanner       
               if (runSonarqube) {
                 stage('Run Sonarqube') {
-                  sonarqubeScanNPM() 
+                  sonarqubeScanNPM(sonarScanDirs) 
                 }
               }
          
