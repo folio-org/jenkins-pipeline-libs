@@ -85,7 +85,7 @@ def gitTag() {
 
 // get git committer/author
 def gitAuthor(String commit) {
-  def authorName = sh(script: "git log -n 1 ${commit} --format=%cN", returnStdout: true).trim()
+  def authorName = sh(script: "git log -n 1 ${commit} --format=%aN", returnStdout: true).trim()
   return authorName 
 }
 
