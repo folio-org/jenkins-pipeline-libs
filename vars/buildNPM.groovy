@@ -151,7 +151,8 @@ def call(body) {
                 runLintNPM()
               } 
 
-              if (runTest) {
+              // Skip unit tests if just committing localisations FOLIO-2972
+              if ((runTest) && (env.gitAuthor != 'FOLIO Translations Bot')) {
                 runTestNPM(runTestOptions)
               }
 

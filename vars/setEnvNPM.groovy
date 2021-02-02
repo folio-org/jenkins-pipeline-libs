@@ -57,6 +57,10 @@ def call() {
 
   //git commit sha1
   env.gitCommit = foliociLib.gitCommit()
+
+  // Git Author/Committer
+  env.gitCommitter = foliociLib.gitAuthor(env.gitCommit)
+
   env.projUrl = foliociLib.getProjUrl()
 
   echo "NPM Package Name: $env.npmName"
@@ -66,6 +70,7 @@ def call() {
   echo "Git Project Name: $env.projectName"
   echo "Git Project Url: $env.projUrl"
   echo "Git Commit SHA1: $env.gitCommit"
+  echo "Git Committer: $env.gitCommitter"
 
   // Check to ensure git tag and NPM version match if release
   if (env.isRelease) {
