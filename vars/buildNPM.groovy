@@ -162,7 +162,7 @@ def call(body) {
 
               // Stage 'Run NPM scripts' - as parallel jobs
               // Hints: https://issues.jenkins-ci.org/browse/JENKINS-38268
-              if (runScripts.size() >= 1) { 
+              if ((runScripts.size() >= 1) && (env.gitAuthor != 'FOLIO Translations Bot')) { 
                 def scriptJobs = [:]
                 runScripts.each { 
                   it.each { 
