@@ -152,7 +152,7 @@ def call(body) {
               } 
 
               // Skip unit tests if just committing localisations FOLIO-2972
-              if ((runTest) && !(env.gitAuthor ==~ /^(?i)(FOLIO Translations Bot)/)) {
+              if ((runTest) && !(env.gitCommitter ==~ /^(?i)(FOLIO Translations Bot)/)) {
                 runTestNPM(runTestOptions)
               }
 
@@ -162,7 +162,7 @@ def call(body) {
 
               // Stage 'Run NPM scripts' - as parallel jobs
               // Hints: https://issues.jenkins-ci.org/browse/JENKINS-38268
-              if ((runScripts.size() >= 1) && !(env.gitAuthor ==~ /^(?i)(FOLIO Translations Bot)/)) { 
+              if ((runScripts.size() >= 1) && !(env.gitCommitter ==~ /^(?i)(FOLIO Translations Bot)/)) { 
                 def scriptJobs = [:]
                 runScripts.each { 
                   it.each { 
