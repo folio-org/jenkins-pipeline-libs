@@ -143,9 +143,12 @@ def call(body) {
           }
         }
 
-        // Run Sonarqube
-        stage('SonarQube Analysis') {
-          sonarqubeMvn()
+        // Run Sonarqube,
+        // but not on jenkins-slave-all as Sonarqube no longer supports Java 8
+        if (buildNode != 'jenkins-slave-all') {
+          stage('SonarQube Analysis') {
+            sonarqubeMvn()
+          }
         }
 
         if ( env.isRelease && fileExists(modDescriptor) ) {
@@ -160,7 +163,7 @@ def call(body) {
             echo "Building Docker image for $env.name:$env.version"
             config.doDocker.delegate = this
             config.doDocker.resolveStrategy = Closure.DELEGATE_FIRST
-	    config.doDocker.call()
+            config.doDocker.call()
           }
         }
 
