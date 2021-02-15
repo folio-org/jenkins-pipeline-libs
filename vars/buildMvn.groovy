@@ -12,6 +12,7 @@
  * publishAPI: Publish API RAML documentation.  (Default: 'no'/false)
  * runLintRamlCop: Run 'raml-cop' on back-end modules that have declared RAML in api.yml (Default: 'no'/false)
  * doApiLint: Assess API description files (RAML OAS) (Default: false)
+ * doUploadApidocs: Publish build-generated API documentation (Default: false)
 */
 
 
@@ -25,6 +26,7 @@ def call(body) {
   def foliociLib = new org.folio.foliociCommands()
 
   // Lint RAML for RAMLCop.  default is false
+  // Deprecated: Replaced by doApiLint
   def doLintRamlCop = config.runLintRamlCop ?: false
   if (doLintRamlCop ==~ /(?i)(Y|YES|T|TRUE)/) { doLintRamlCop = true }
   if (doLintRamlCop ==~ /(?i)(N|NO|F|FALSE)/) { doLintRamlCop = false }
@@ -32,6 +34,9 @@ def call(body) {
   def doApiLint = config.doApiLint ?: false
   if (doApiLint ==~ /(?i)(Y|YES|T|TRUE)/) { doApiLint = true }
   if (doApiLint ==~ /(?i)(N|NO|F|FALSE)/) { doApiLint = false }
+  def doUploadApidocs = config.doUploadApidocs ?: false
+  if (doUploadApidocs ==~ /(?i)(Y|YES|T|TRUE)/) { doUploadApidocs = true }
+  if (doUploadApidocs ==~ /(?i)(N|NO|F|FALSE)/) { doUploadApidocs = false }
   def apiTypes = config.apiTypes ?: ''
   def apiDirectories = config.apiDirectories ?: ''
   def apiExcludes = config.apiExcludes ?: ''
@@ -185,6 +190,11 @@ def call(body) {
                       mavenSettingsConfig: "folioci-maven-settings") {
                 sh 'mvn -DskipTests clean deploy'
               }
+            }
+          }
+          if (doUploadApidocs) {
+            stage('Upload build-time API docs') {
+              runUploadApidocs('mvn')
             }
           }
           if (publishAPI) {
