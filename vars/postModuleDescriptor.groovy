@@ -9,7 +9,7 @@
 def call(String modDescriptor) {
 
   def folioRegistryUrl
-  def folioRegistry = 'http://folio-registry.aws.indexdata.com'
+  def folioRegistry = 'https://folio-registry.dev.folio.org'
    
   // if this is a release, verify dep resolution against releases only.
   if (env.isRelease) {
@@ -30,6 +30,7 @@ def call(String modDescriptor) {
               httpMode: 'POST', 
               consoleLogResponseBody: true,
               requestBody: request, 
+              authentication: 'folio-registry',
               url: folioRegistryUrl
       
 }
