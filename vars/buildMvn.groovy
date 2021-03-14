@@ -268,6 +268,12 @@ def call(body) {
             runApiSchemaLint(apiDirectories, apiExcludes)
           }
         }
+        // test FOLIO-2898
+        if (doApiDoc) {
+          stage('Generate API docs') {
+            runApiDoc(apiTypes, apiDirectories, apiExcludes)
+          }
+        }
       } // end try
       catch (Exception err) {
         currentBuild.result = 'FAILED'
