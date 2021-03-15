@@ -30,7 +30,7 @@ def call(String apiTypes, String apiDirectories, String apiExcludes) {
   else {
     lintStatus = sh(script: "python3 /usr/local/bin/api_lint.py --loglevel info " +
                             "--types ${types} --directories ${directories} " +
-                            "--excludes ${excludes} --output folio-api-docs " +
+                            "--excludes ${excludes} " +
                             ">> ci/apiLint.html", returnStatus:true)
   }
 
@@ -59,15 +59,5 @@ def call(String apiTypes, String apiDirectories, String apiExcludes) {
   }
   else {
     echo "No issues detected."
-  }
-
-  // Publish the generated configuration file.
-  if (env.BRANCH_NAME == 'master') {
-    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
-                     accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                     credentialsId: 'jenkins-aws',
-                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-      sh 'aws s3 sync folio-api-docs s3://foliodocs/api'
-    }
   }
 }
