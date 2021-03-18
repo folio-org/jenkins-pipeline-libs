@@ -200,9 +200,8 @@ def call(body) {
                 }
               } 
 
-              // interface dep check.  releases only for now. We can skip the stripes project since 
-              // it is a metapackage.
-              if ((env.isRelease) && (env.name != 'stripes')) {
+                
+              if ((env.isRelease) && (publishModDescriptor)) {
                 stage('Dependency Check') {
                   echo "Checking mod descriptor dependencies"
                   okapiModDepCheck(modDescriptor)
