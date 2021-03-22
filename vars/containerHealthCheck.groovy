@@ -2,10 +2,10 @@
 
 def call(String dockerImage, String checkCmd, String runArgs) {  
    
-   def timeout = '2s'
-   def retries = 2
+   def timeout = '3s'
+   def retries = 3
    def cidFile = "${dockerImage}-${env.BUILD_NUMBER}.cid"
-   def maxStartupWait = 40
+   def maxStartupWait = 60
    def health = ''
 
    try {
