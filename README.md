@@ -14,9 +14,9 @@ A typical Stripes or UI module Jenkinsfile configuration might look like the fol
 
 ```
 buildNPM {
-  publishModDescriptor = 'yes'
-  runLint = 'yes'
-  runTest = 'yes'
+  publishModDescriptor = true
+  runLint = true
+  runTest = true
   runTestOptions = '--karma.singleRun --karma.browsers=ChromeDocker'  (for karma-based testing)
   runRegression = 'partial'
 }
@@ -46,23 +46,18 @@ the following.
 
 ```
 buildMvn {
-  publishModDescriptor = 'yes'
-  publishAPI = 'yes'
-  mvnDeploy = 'yes'
+  publishModDescriptor = true
+  mvnDeploy = true
 
   doDocker = {
     buildJavaDocker {
-      publishMaster = 'yes'
-      healthChk = 'yes'
+      publishMaster = true
+      healthChk = true
       healthChkCmd = 'curl -sS --fail -o /dev/null  http://localhost:8081/apidocs/ || exit 1'
     }
   }
 }
 ```
-
- * 'publishAPI' - Convert RAML-based API to HTML and publish to https://dev.folio.org/reference/api/ 
-
- * `runLintRamlCop` - Run 'raml-cop' on back-end modules that have declared RAML in api.yml
 
  * 'mvnDeploy' - Deploy Maven artifacts to FOLIO Maven repository.
 
@@ -77,6 +72,10 @@ If we are creating and deploying a Docker image as part of the module's artifact
  * 'healthChkCmd' - Use the specified command to perform container health check.   The
 command is run *inside* the container and typically tests a REST endpoint to determine the 
 health of the application running inside the container. 
+
+Investigate the configuration of other similar repositories, e.g.
+[mod-notes](https://github.com/folio-org/mod-notes) and
+[ui-checkin](https://github.com/folio-org/ui-checkin).
 
 There are other options available to 'buildNPM', 'buildMvn', and 'buildJavaDocker' for certain 
 corner cases.  Check these scripts directly for additional information.

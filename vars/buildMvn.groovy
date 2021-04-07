@@ -9,8 +9,11 @@
  * mvnDeploy: Deploy built artifacts to Maven repository (Default: 'no'/false)
  * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no'/false)
  * publishPreview: publish preview image to preview CI environment (Default: 'no'/false)
- * publishAPI: Publish API RAML documentation.  (Default: 'no'/false)
- * runLintRamlCop: Run 'raml-cop' on back-end modules that have declared RAML in api.yml (Default: 'no'/false)
+ * publishAPI: Publish API RAML documentation. Deprecated, use doApiDoc. (Default: 'no'/false)
+ * runLintRamlCop: Run 'raml-cop' on back-end modules that have declared RAML in api.yml file. Deprecated, use doApiLint. (Default: 'no'/false)
+ * doApiLint: Assess API description files (RAML OAS) (Default: false)
+ * doApiDoc: Generate and publish documentation from API description files. (RAML OAS) (Default: false)
+ * doUploadApidocs: Publish build-generated API documentation (Default: false)
 */
 
 
@@ -24,9 +27,23 @@ def call(body) {
   def foliociLib = new org.folio.foliociCommands()
 
   // Lint RAML for RAMLCop.  default is false
+  // Deprecated: Replaced by doApiLint
   def doLintRamlCop = config.runLintRamlCop ?: false
   if (doLintRamlCop ==~ /(?i)(Y|YES|T|TRUE)/) { doLintRamlCop = true }
   if (doLintRamlCop ==~ /(?i)(N|NO|F|FALSE)/) { doLintRamlCop = false }
+  // API lint and API doc
+  def doApiLint = config.doApiLint ?: false
+  if (doApiLint ==~ /(?i)(Y|YES|T|TRUE)/) { doApiLint = true }
+  if (doApiLint ==~ /(?i)(N|NO|F|FALSE)/) { doApiLint = false }
+  def doApiDoc = config.doApiDoc ?: false
+  if (doApiDoc ==~ /(?i)(Y|YES|T|TRUE)/) { doApiDoc = true }
+  if (doApiDoc ==~ /(?i)(N|NO|F|FALSE)/) { doApiDoc = false }
+  def doUploadApidocs = config.doUploadApidocs ?: false
+  if (doUploadApidocs ==~ /(?i)(Y|YES|T|TRUE)/) { doUploadApidocs = true }
+  if (doUploadApidocs ==~ /(?i)(N|NO|F|FALSE)/) { doUploadApidocs = false }
+  def apiTypes = config.apiTypes ?: ''
+  def apiDirectories = config.apiDirectories ?: ''
+  def apiExcludes = config.apiExcludes ?: ''
 
   // publish maven artifacts to Maven repo.  Default is false
   def mvnDeploy = config.mvnDeploy ?: false
@@ -45,6 +62,7 @@ def call(body) {
   if (publishPreview ==~ /(?i)(N|NO|F|FALSE)/) { publishPreview = false }
 
   // publish API documentation to foliodocs. Default is false
+  // Deprecated, use doApiDoc.
   def publishAPI = config.publishAPI ?: false
   if (publishAPI ==~ /(?i)(Y|YES|T|TRUE)/) { publishAPI = true }
   if (publishAPI ==~ /(?i)(N|NO|F|FALSE)/) { publishAPI = false }
@@ -107,6 +125,12 @@ def call(body) {
           }
         }
 
+        if (doApiLint) {
+          stage('API lint') {
+            runApiLint(apiTypes, apiDirectories, apiExcludes)
+          }
+        }
+
         stage('Maven Build') {
           echo "Building Maven artifact: ${env.name} Version: ${env.version}"
           withMaven(jdk: "${env.javaInstall}",
@@ -129,9 +153,12 @@ def call(body) {
           }
         }
 
-        // Run Sonarqube
-        stage('SonarQube Analysis') {
-          sonarqubeMvn()
+        // Run Sonarqube,
+        // but not on jenkins-slave-all as Sonarqube no longer supports Java 8
+        if (buildNode != 'jenkins-slave-all') {
+          stage('SonarQube Analysis') {
+            sonarqubeMvn()
+          }
         }
 
         if ( env.isRelease && fileExists(modDescriptor) ) {
@@ -146,7 +173,7 @@ def call(body) {
             echo "Building Docker image for $env.name:$env.version"
             config.doDocker.delegate = this
             config.doDocker.resolveStrategy = Closure.DELEGATE_FIRST
-	    config.doDocker.call()
+            config.doDocker.call()
           }
         }
 
@@ -166,11 +193,17 @@ def call(body) {
               withMaven(jdk: "${env.javaInstall}",
                       maven: "maven3-jenkins-slave-all",
                       mavenSettingsConfig: "folioci-maven-settings") {
-                sh 'mvn -DskipTests deploy'
+                sh 'mvn -DskipTests clean deploy'
               }
             }
           }
+          if (doUploadApidocs) {
+            stage('Upload build-time API docs') {
+              runUploadApidocs('mvn')
+            }
+          }
           if (publishAPI) {
+            // Deprecated, use doApiDoc
             stage('Publish API Docs') {
               echo "Publishing API docs"
               sh "python3 /usr/local/bin/generate_api_docs.py -r $env.projectName -l info -o folio-api-docs"
@@ -180,6 +213,11 @@ def call(body) {
                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                 sh 'aws s3 sync folio-api-docs s3://foliodocs/api'
               }
+            }
+          }
+          if (doApiDoc) {
+            stage('Generate API docs') {
+              runApiDoc(apiTypes, apiDirectories, apiExcludes)
             }
           }
           if (doKubeDeploy) {
@@ -219,10 +257,15 @@ def call(body) {
           }
         }
 
-
         if (doLintRamlCop) {
           stage('Lint raml schema') {
             runLintRamlSchema()
+          }
+        }
+
+        if (doApiLint) {
+          stage('API schema lint') {
+            runApiSchemaLint(apiDirectories, apiExcludes)
           }
         }
       } // end try

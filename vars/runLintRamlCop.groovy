@@ -26,7 +26,7 @@ def call() {
   if (lintStatus != 0) {
     echo "Issues detected:"
     echo "$lintReport"
-    def message = "$lintReport\n\nNote: When those errors are fixed, then the INFO messages will be gone too. See Jenkins \"Artifacts\" tab."
+    def message = "$lintReport\n\nNote: When those ERRORs are fixed, then any INFO and WARNING messages will be gone too. See Jenkins \"Artifacts\" tab for LintRamlCopReport."
     // PR
     if (env.CHANGE_ID) {
       // Requires https://github.com/jenkinsci/pipeline-github-plugin

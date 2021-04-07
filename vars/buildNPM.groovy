@@ -20,6 +20,7 @@
  * runTest: Run unit tests via 'yarn test' (Default: 'no')
  * runTestOptions:  Extra opts to pass to 'yarn test'
  * stripesPlatform (DISABLED): Map consisting of modules's stripes platform and branch (Default: []) 
+ * sonarScanDirs: A string that lists directories (comma-separated) the Sonarqube scanner should scan.  Default: './src'
 */
 
 
@@ -72,6 +73,9 @@ def call(body) {
 
   // default runSonarqube 
   def runSonarqube = config.runSonarqube ?: false
+
+  // set Sonarqube root directories to scan. Default to './src'
+  def sonarScanDirs = config.sonarScanDirs ?: './src'
 
   // default runDupeCheck
   def runDupeCheck = config.runDupeCheck ?: false
@@ -147,7 +151,8 @@ def call(body) {
                 runLintNPM()
               } 
 
-              if (runTest) {
+              // Skip unit tests if just committing localisations FOLIO-2972
+              if ((runTest) && !(env.gitCommitter ==~ /^(?i)(FOLIO Translations Bot)/)) {
                 runTestNPM(runTestOptions)
               }
 
@@ -157,7 +162,7 @@ def call(body) {
 
               // Stage 'Run NPM scripts' - as parallel jobs
               // Hints: https://issues.jenkins-ci.org/browse/JENKINS-38268
-              if (runScripts.size() >= 1) { 
+              if ((runScripts.size() >= 1) && !(env.gitCommitter ==~ /^(?i)(FOLIO Translations Bot)/)) { 
                 def scriptJobs = [:]
                 runScripts.each { 
                   it.each { 
@@ -171,7 +176,7 @@ def call(body) {
               // Run Sonarqube scanner       
               if (runSonarqube) {
                 stage('Run Sonarqube') {
-                  sonarqubeScanNPM() 
+                  sonarqubeScanNPM(sonarScanDirs) 
                 }
               }
          
@@ -195,9 +200,8 @@ def call(body) {
                 }
               } 
 
-              // interface dep check.  releases only for now. We can skip the stripes project since 
-              // it is a metapackage.
-              if ((env.isRelease) && (env.name != 'stripes')) {
+                
+              if ((env.isRelease) && (publishModDescriptor)) {
                 stage('Dependency Check') {
                   echo "Checking mod descriptor dependencies"
                   okapiModDepCheck(modDescriptor)

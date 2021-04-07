@@ -8,7 +8,6 @@
 
 def call() {
 
-  //def sonarMvnPluginVer = '3.5.0.1254' 
   def sonarMvnPluginVer = '3.6.0.1398' 
 
   if (env.CHANGE_ID) {
