@@ -11,7 +11,7 @@ done
 
 # include latest okapi log for good measure
 if [ -f /var/log/folio/okapi/okapi.log ]; then 
-  cp /var/log/folio/okapi/okapi.log /tmp/${identifier}
+  cp /var/log/folio/okapi/okapi*.log /tmp/${identifier}
 fi
 
 cd /tmp
