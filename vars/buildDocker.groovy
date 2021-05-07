@@ -4,7 +4,7 @@
 /*
  *  Build, Test and Publish docker images.
  *
- *  Configurable parameters: 
+ *  Configurable parameters:
  *
  *  dockerfile:     Name of dockerfile. Default: 'Dockerfile'
  *  buildContext:   Relative path to docker build context. Default: Jenkins $WORKSPACE
@@ -12,7 +12,7 @@
  *  healthChk:      Perform container health check with 'healthChkCmd' Default: false
  *  healthChkCmd:   Specify health check command.  Default:  none
  *  runArgs:  	    Additional container runtime arguments.  Default: none
- *     
+ *
  */
 
 def call(body) {
@@ -22,14 +22,14 @@ def call(body) {
   body()
 
 
-  // Defaults if not defined. 
+  // Defaults if not defined.
   def dockerfile = config.dockerfile ?: 'Dockerfile'
   def buildContext = config.dockerDir ?: '.'
   def publishMaster = config.publishMaster ?: 'yes'
 
-  try { 
+  try {
     dir("${env.WORKSPACE}/${buildContext}") {
-         
+
       // build docker image
       docker.withRegistry('https://docker.io/v2/', 'dockerhub-ci-pull-account') {
         sh "docker build --no-cache=true --pull=true -t ${env.name}:${env.version} ."
@@ -38,14 +38,14 @@ def call(body) {
       // Test container using container healthcheck
       if ((config.healthChk ==~ /(?i)(Y|YES|T|TRUE)/) && (config.healthChkCmd)) {
 
-        def runArgs = config.runArgs ?: ' ' 
+        def runArgs = config.runArgs ?: ' '
         def healthChkCmd = config.healthChkCmd
         def dockerImage = "${env.name}:${env.version}"
         def health = containerHealthCheck(dockerImage,healthChkCmd,runArgs)
-          
-        if (health != 'healthy') {  
+
+        if (health != 'healthy') {
           echo "Container health check failed: $health"
-          sh 'exit 1' 
+          sh 'exit 1'
         }
         else {
           echo "Container health check passed."
@@ -56,9 +56,7 @@ def call(body) {
       }
 
       // publish image if master branch
-      if ((env.BRANCH_NAME == 'master') ||
-          (env.isRelease) &&
-          (publishMaster ==~ /(?i)(Y|YES|T|TRUE)/)) {
+      if ( env.isRelease || ((env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'main') && publishMaster) ) {
         // publish images to ci docker repo
         echo "Publishing Docker images"
         docker.withRegistry('https://index.docker.io/v1/', 'DockerHubIDJenkins') {
@@ -83,7 +81,7 @@ def call(body) {
   catch (Exception err) {
     println(err.getMessage());
     throw err
-  } 
+  }
 
   finally {
     echo "Clean up any temporary docker artifacts"
