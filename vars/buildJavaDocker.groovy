@@ -4,7 +4,7 @@
 /*
  *  Build, Test and Publish Java-based docker images.
  *
- *  Configurable parameters: 
+ *  Configurable parameters:
  *
  *  dockerfile:     Name of dockerfile. Default: 'Dockerfile'
  *  buildContext:   Relative path to docker build context. Default: Jenkins $WORKSPACE
@@ -14,7 +14,7 @@
  *  healthChk:      Perform container health check with 'healthChkCmd' Default: false
  *  healthChkCmd:   Specify health check command.  Default:  none
  *  runArgs:  	    Additional container runtime arguments.  Default: none
- *     
+ *
  */
 
 def call(body) {
@@ -24,14 +24,14 @@ def call(body) {
   body()
 
 
-  // Defaults if not defined. 
+  // Defaults if not defined.
   def dockerfile = config.dockerfile ?: 'Dockerfile'
   def buildContext = config.dockerDir ?: env.WORKSPACE
 
   def overrideConfig = config.overrideConfig ?: false
   if (overrideConfig ==~ /(?i)(Y|YES|T|TRUE)/) { overrideConfig = true }
   if (overrideConfig ==~ /(?i)(N|NO|F|FALSE)/) { overrideConfig = false}
-  
+
   def publishMaster = config.publishMaster ?: true
   if (publishMaster ==~ /(?i)(Y|YES|T|TRUE)/) { publishMaster = true }
   if (publishMaster ==~ /(?i)(N|NO|F|FALSE)/) { publishMaster = false}
@@ -39,7 +39,7 @@ def call(body) {
   def publishPreview = config.publishPreview ?: false
   if (publishPreview ==~ /(?i)(Y|YES|T|TRUE)/) { publishPreview = true }
   if (publishPreview ==~ /(?i)(N|NO|F|FALSE)/) { publishPreview = false}
-  
+
   def healthChk = config.healthChk ?: false
   if (healthChk ==~ /(?i)(Y|YES|T|TRUE)/) { healthChk = true }
   if (healthChk ==~ /(?i)(N|NO|F|FALSE)/) { healthChk = false}
@@ -47,9 +47,9 @@ def call(body) {
   // default
   def Boolean buildArg = false
 
-  try { 
+  try {
     dir("$buildContext") {
-   
+
       // if 'overrideConfig' is true, create our own Dockerfile, otherwise
       // use project's Dockerfile
       if (overrideConfig) {
@@ -65,18 +65,18 @@ def call(body) {
         }
         else {
           echo "Unable to locate Jar file for this project."
-          echo "Trying fallback to local Dockerfile." 
+          echo "Trying fallback to local Dockerfile."
         }
-      }    
+      }
       else {
         if (fileExists(dockerfile)) {
-          echo "Found existing Dockerfile." 
+          echo "Found existing Dockerfile."
         }
         else {
           echo "No Dockerfile called $dockerfile found in $buildContext"
         }
-      }	
-     
+      }
+
       // create a .dockerignore file if one does not exist.
 
       if (fileExists('.dockerignore')) {
@@ -93,7 +93,7 @@ def call(body) {
 EOF
         """
       }
-      
+
       // build docker image
       docker.withRegistry('https://docker.io/v2/', 'dockerhub-ci-pull-account') {
         if (buildArg) {
@@ -106,14 +106,14 @@ EOF
       // Test container using container healthcheck
       if ( healthChk && config.healthChkCmd ) {
 
-        def runArgs = config.runArgs ?: ' ' 
+        def runArgs = config.runArgs ?: ' '
         def healthChkCmd = config.healthChkCmd
         def dockerImage = "${env.name}:${env.version}"
         def health = containerHealthCheck(dockerImage,healthChkCmd,runArgs)
-          
-        if (health != 'healthy') {  
+
+        if (health != 'healthy') {
           echo "Container health check failed: $health"
-          sh 'exit 1' 
+          sh 'exit 1'
         }
         else {
           echo "Container health check passed."
@@ -122,9 +122,9 @@ EOF
       else {
         echo "No health check configured. Skipping container health check."
       }
-      
+
       // publish image if master branch
-      if ( (env.BRANCH_NAME == 'master' && publishMaster) || env.isRelease ) {
+      if ( env.isRelease || ((env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'main') && publishMaster) ) {
         // publish images to ci docker repo
         echo "Publishing Docker images"
         docker.withRegistry('https://index.docker.io/v1/', 'DockerHubIDJenkins') {
@@ -156,7 +156,7 @@ EOF
   catch (Exception err) {
     println(err.getMessage());
     throw err
-  } 
+  }
 
   finally {
     echo "Clean up any temporary docker artifacts"
