@@ -62,4 +62,6 @@ def call() {
   echo "Git Project Url: $env.projUrl"
   echo "Git Commit SHA1: $env.gitCommit"
 
+  env.isBranchPrimary = foliociLib.isBranchPrimary()
+  echo "Git branch is primary: $env.isBranchPrimary"
 }

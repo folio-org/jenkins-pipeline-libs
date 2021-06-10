@@ -113,7 +113,6 @@ def call(body) {
           ])
 
           echo "Checked out branch: $env.BRANCH_NAME"
-          echo "Branch is primary: $env.BRANCH_IS_PRIMARY"
         }
 
         stage('Set Environment') {

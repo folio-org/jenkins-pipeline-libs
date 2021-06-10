@@ -167,6 +167,22 @@ def checkMvnReleaseDeps() {
   return deps
 }
 
+/* Determine if the checked out branch is primary default branch.
+ * Jenkins docs indicate that env.BRANCH_IS_PRIMARY might not be reliable for all SCMs.
+ * It is okay for GitHub.
+ * So use specific branch names.
+*/
+def boolean isBranchPrimary() {
+  if ( env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'trunk' ||
+       env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'primary' ||
+       env.BRANCH_NAME == 'default'
+     ) {
+    return true
+  }
+  else {
+    return false
+  }
+}
   
 @NonCPS
 def currentDateTime() {
