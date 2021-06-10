@@ -72,6 +72,9 @@ def call() {
   echo "Git Commit SHA1: $env.gitCommit"
   echo "Git Committer: $env.gitCommitter"
 
+  env.isBranchPrimary = foliociLib.isBranchPrimary()
+  echo "Git branch is primary: $env.isBranchPrimary"
+
   // Check to ensure git tag and NPM version match if release
   if (env.isRelease) {
     if ( !foliociLib.tagMatch(env.version) ) {
