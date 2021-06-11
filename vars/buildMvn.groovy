@@ -113,6 +113,9 @@ def call(body) {
           ])
 
           echo "Checked out branch: $env.BRANCH_NAME"
+          if ( env.BRANCH_IS_PRIMARY ) {
+            echo "Branch is primary: true"
+          }
         }
 
         stage('Set Environment') {
@@ -177,8 +180,8 @@ def call(body) {
           }
         }
 
-        // master branch or tagged releases
-        if (( env.BRANCH_NAME == 'master' ) || ( env.isRelease )) {
+        // main branch or tagged releases
+        if (( env.BRANCH_IS_PRIMARY ) || ( env.isRelease )) {
 
           // publish MD must come before maven deploy
           if (publishModDescriptor) {
