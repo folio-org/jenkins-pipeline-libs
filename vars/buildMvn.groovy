@@ -180,8 +180,8 @@ def call(body) {
           }
         }
 
-        // master branch or tagged releases
-        if (( env.BRANCH_NAME == 'master' ) || ( env.isRelease )) {
+        // main branch or tagged releases
+        if (( env.BRANCH_IS_PRIMARY ) || ( env.isRelease )) {
 
           // publish MD must come before maven deploy
           if (publishModDescriptor) {

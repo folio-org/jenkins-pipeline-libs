@@ -32,7 +32,7 @@ def call(body) {
 
   def foliociLib = new org.folio.foliociCommands()
   
-  // default is to deploy to npm repo when branch is master
+  // default is to deploy to npm repo when branch is main
   // Note: this doesn't really work.  If set to boolean false, 
   // then the default boolean true will be set.  Set as string
   // 'false' or 'no'
@@ -212,7 +212,7 @@ def call(body) {
               }
 
 
-              if (( env.BRANCH_NAME == 'master' ) ||  ( env.isRelease )) {
+              if (( env.BRANCH_IS_PRIMARY ) || ( env.isRelease )) {
                 if (publishModDescriptor) {
                   // We assume that MDs are included in package.json
                   stage('Publish Module Descriptor') {
@@ -248,7 +248,7 @@ def call(body) {
             }
           } 
 
-          if (( env.BRANCH_NAME == 'master' ) || ( env.isRelease )) {
+          if (( env.BRANCH_IS_PRIMARY ) || ( env.isRelease )) {
 
             if (publishAPI) {
               stage('Publish API Docs') {
