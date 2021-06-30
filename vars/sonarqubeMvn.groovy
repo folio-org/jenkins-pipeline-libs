@@ -13,7 +13,7 @@ def call() {
   if (env.CHANGE_ID) {
     echo "PR request: $env.CHANGE_ID"
     withCredentials([[$class: 'StringBinding', 
-                      credentialsId: '6b0ebf62-3a12-4e6b-b77e-c45817b5791b', 
+                      credentialsId: 'id-jenkins-github-personal-token', 
                       variable: 'GITHUB_ACCESS_TOKEN']]) {
       withSonarQubeEnv('SonarCloud') {
         sh "mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:${sonarMvnPluginVer}:sonar " +
