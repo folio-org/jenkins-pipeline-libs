@@ -18,7 +18,7 @@ def call(Boolean loadData = true) {
                                      reference: '',
                                      trackingSubmodules: true]],
               submoduleCfg: [],
-              userRemoteConfigs: [[credentialsId: 'folio-jenkins-github-token',
+              userRemoteConfigs: [[credentialsId: 'id-jenkins-github-personal-token-with-username',
                                     url: 'https://github.com/folio-org/folio-infrastructure']]])
   }
 
