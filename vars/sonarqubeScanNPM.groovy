@@ -6,7 +6,7 @@
  */
 
 
-def call(String lcovPath = 'artifacts/coverage-jest', String sonarScanDirs) {
+def call(String lcovPath = 'artifacts/coverage-jest', String sonarScanDirs, String defaultBranch) {
   withCredentials([[$class: 'StringBinding',
                         credentialsId: 'id-jenkins-github-personal-token',
                         variable: 'GITHUB_ACCESS_TOKEN']]) {
@@ -23,7 +23,7 @@ def call(String lcovPath = 'artifacts/coverage-jest', String sonarScanDirs) {
           "-Dsonar.language=js " +
           "-Dsonar.exclusions=${excludeFiles} " +
           "-Dsonar.javascript.lcov.reportPaths=${lcovPath}/lcov.info " +
-          "-Dsonar.pullrequest.base=master " +
+          "-Dsonar.pullrequest.base=${defaultBranch} " +
           "-Dsonar.pullrequest.key=${env.CHANGE_ID} " +
           "-Dsonar.pullrequest.branch=${env.BRANCH_NAME} " +
           "-Dsonar.pullrequest.provider=github " +
@@ -32,7 +32,7 @@ def call(String lcovPath = 'artifacts/coverage-jest', String sonarScanDirs) {
       }
       else {
         if (env.BRANCH_NAME != 'master' ) {
-          sh "git fetch --no-tags ${env.projUrl} +refs/heads/master:refs/remotes/origin/master"
+          sh "git fetch --no-tags ${env.projUrl} +refs/heads/${defaultBranch}:refs/remotes/origin/${defaultBranch}"
           sh "${scannerHome}/bin/sonar-scanner " +
             "-Dsonar.organization=folio-org " +
             "-Dsonar.projectKey=org.folio:${env.projectName} " +
