@@ -14,6 +14,7 @@
  * doApiLint: Assess API description files (RAML OAS) (Default: false)
  * doApiDoc: Generate and publish documentation from API description files. (RAML OAS) (Default: false)
  * doUploadApidocs: Publish build-generated API documentation (Default: false)
+ * defaultBranch: Assist with migration. (Default: 'master')
 */
 
 
@@ -25,6 +26,8 @@ def call(body) {
   body()
 
   def foliociLib = new org.folio.foliociCommands()
+
+  def defaultBranch = config.defaultBranch ?: 'master'
 
   // Lint RAML for RAMLCop.  default is false
   // Deprecated: Replaced by doApiLint
@@ -160,7 +163,7 @@ def call(body) {
         // but not on jenkins-slave-all as Sonarqube no longer supports Java 8
         if (buildNode != 'jenkins-slave-all') {
           stage('SonarQube Analysis') {
-            sonarqubeMvn()
+            sonarqubeMvn(defaultBranch)
           }
         }
 

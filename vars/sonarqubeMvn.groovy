@@ -6,7 +6,7 @@
  */
 
 
-def call() {
+def call(String defaultBranch) {
 
   def sonarMvnPluginVer = '3.6.0.1398' 
 
@@ -19,7 +19,7 @@ def call() {
         sh "mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:${sonarMvnPluginVer}:sonar " +
                 "-Dsonar.organization=folio-org -Dsonar.verbose=true " +
                 "-Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml " +
-                "-Dsonar.pullrequest.base=master " +
+                "-Dsonar.pullrequest.base=${defaultBranch} " +
                 "-Dsonar.pullrequest.branch=${env.BRANCH_NAME} " +
                 "-Dsonar.pullrequest.key=${env.CHANGE_ID} " +
                 "-Dsonar.pullrequest.provider=github " + 
@@ -31,7 +31,7 @@ def call() {
   else {  
     withSonarQubeEnv('SonarCloud') {
       if (env.BRANCH_NAME != 'master') {
-        sh "git fetch --no-tags ${env.projUrl} +refs/heads/master:refs/remotes/origin/master"
+        sh "git fetch --no-tags ${env.projUrl} +refs/heads/${defaultBranch}:refs/remotes/origin/${defaultBranch}"
         sh "mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:${sonarMvnPluginVer}:sonar " +
              "-Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml " +
              "-Dsonar.organization=folio-org -Dsonar.verbose=true " +

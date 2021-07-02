@@ -21,6 +21,7 @@
  * runTestOptions:  Extra opts to pass to 'yarn test'
  * stripesPlatform (DISABLED): Map consisting of modules's stripes platform and branch (Default: []) 
  * sonarScanDirs: A string that lists directories (comma-separated) the Sonarqube scanner should scan.  Default: './src'
+ * defaultBranch: Assist with migration. (Default: 'master')
 */
 
 
@@ -31,6 +32,8 @@ def call(body) {
   body()
 
   def foliociLib = new org.folio.foliociCommands()
+
+  def defaultBranch = config.defaultBranch ?: 'master'
   
   // default is to deploy to npm repo when branch is main
   // Note: this doesn't really work.  If set to boolean false, 
@@ -179,7 +182,7 @@ def call(body) {
               // Run Sonarqube scanner       
               if (runSonarqube) {
                 stage('Run Sonarqube') {
-                  sonarqubeScanNPM(sonarScanDirs) 
+                  sonarqubeScanNPM(sonarScanDirs, defaultBranch) 
                 }
               }
          
