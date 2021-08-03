@@ -7,7 +7,7 @@
  *
  * (List) sqBranch: Branch names  we want to run SQ analysis (map option in BuildMvn.groovy).
  *
- * By default, analysis is run on GitHub PRs and 'master' branch. 
+ * By default, analysis is run on GitHub PRs and mainline branch. 
  *
  */
 
@@ -32,7 +32,7 @@ def call() {
     }
   }
   else {  
-    if (env.BRANCH_NAME == 'master') {
+    if ( env.BRANCH_IS_PRIMARY ) {
       stage('SonarQube Analysis') {
         withSonarQubeEnv('SonarCloud') {
           sh "mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:3.3.0.603:sonar " +

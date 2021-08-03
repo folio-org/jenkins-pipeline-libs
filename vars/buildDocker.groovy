@@ -8,7 +8,7 @@
  *
  *  dockerfile:     Name of dockerfile. Default: 'Dockerfile'
  *  buildContext:   Relative path to docker build context. Default: Jenkins $WORKSPACE
- *  publishMaster:  Publish image to Docker repo (master branch only): Default: true
+ *  publishMaster:  Publish image to Docker repo (mainline branch only): Default: true
  *  healthChk:      Perform container health check with 'healthChkCmd' Default: false
  *  healthChkCmd:   Specify health check command.  Default:  none
  *  runArgs:  	    Additional container runtime arguments.  Default: none
@@ -55,8 +55,8 @@ def call(body) {
         echo "No health check configured. Skipping container health check."
       }
 
-      // publish image if master branch
-      if ( env.isRelease || ((env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'main') && publishMaster) ) {
+      // publish image if mainline branch
+      if ( env.isRelease || (env.BRANCH_IS_PRIMARY && publishMaster) ) {
         // publish images to ci docker repo
         echo "Publishing Docker images"
         docker.withRegistry('https://index.docker.io/v1/', 'DockerHubIDJenkins') {
