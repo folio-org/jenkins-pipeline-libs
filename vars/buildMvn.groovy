@@ -14,7 +14,7 @@
  * doApiLint: Assess API description files (RAML OAS) (Default: false)
  * doApiDoc: Generate and publish documentation from API description files. (RAML OAS) (Default: false)
  * doUploadApidocs: Publish build-generated API documentation (Default: false)
- * defaultBranch: Assist with migration. (Default: 'master')
+ * defaultBranch: Assist with migration. (Default: 'master') FOLIO-3226
 */
 
 

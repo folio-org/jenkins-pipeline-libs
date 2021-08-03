@@ -21,7 +21,7 @@
  * runTestOptions:  Extra opts to pass to 'yarn test'
  * stripesPlatform (DISABLED): Map consisting of modules's stripes platform and branch (Default: []) 
  * sonarScanDirs: A string that lists directories (comma-separated) the Sonarqube scanner should scan.  Default: './src'
- * defaultBranch: Assist with migration. (Default: 'master')
+ * defaultBranch: Assist with migration. (Default: 'master') FOLIO-3226
 */
 
 

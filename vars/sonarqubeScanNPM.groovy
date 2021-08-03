@@ -31,7 +31,7 @@ def call(String lcovPath = 'artifacts/coverage-jest', String sonarScanDirs, Stri
           // "-Dsonar.pullrequest.github.endpoint=https://api.github.com"
       }
       else {
-        if (env.BRANCH_NAME != 'master' ) {
+        if ( !env.BRANCH_IS_PRIMARY ) {
           sh "git fetch --no-tags ${env.projUrl} +refs/heads/${defaultBranch}:refs/remotes/origin/${defaultBranch}"
           sh "${scannerHome}/bin/sonar-scanner " +
             "-Dsonar.organization=folio-org " +
