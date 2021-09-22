@@ -31,7 +31,8 @@ def call(String defaultBranch) {
   else {  
     withSonarQubeEnv('SonarCloud') {
       if ( !env.BRANCH_IS_PRIMARY ) {
-        sh "git fetch --no-tags ${env.projUrl} +refs/heads/${defaultBranch}:refs/remotes/origin/${defaultBranch}"
+        // sh "git fetch --no-tags ${env.projUrl} +refs/heads/${defaultBranch}:refs/remotes/origin/${defaultBranch}"
+        sh "git fetch --no-tags --no-recurse-submodules ${env.projUrl} +refs/heads/${defaultBranch}:refs/remotes/origin/${defaultBranch}"
         sh "mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:${sonarMvnPluginVer}:sonar " +
              "-Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml " +
              "-Dsonar.organization=folio-org -Dsonar.verbose=true " +
