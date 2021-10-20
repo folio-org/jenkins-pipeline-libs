@@ -9,11 +9,6 @@ do
   sudo docker logs $container >& /tmp/${identifier}/${module}.log
 done
 
-# include latest okapi log for good measure
-if [ -f /var/log/folio/okapi/okapi.log ]; then 
-  cp /var/log/folio/okapi/okapi*.log /tmp/${identifier}
-fi
-
 cd /tmp
 tar cf ${HOME}/${identifier}.tar ${identifier} 
 gzip ${HOME}/${identifier}.tar
