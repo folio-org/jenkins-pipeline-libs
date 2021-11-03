@@ -10,6 +10,7 @@
  * publishModDescriptor:  POST generated module descriptor to FOLIO registry (Default: 'no'/false)
  * publishPreview: publish preview image to preview CI environment (Default: 'no'/false)
  * publishAPI: Publish API RAML documentation. Deprecated, use doApiDoc. (Default: 'no'/false)
+ * runSonarqube: Run a SQ scan.  (Default: true)
  * runLintRamlCop: Run 'raml-cop' on back-end modules that have declared RAML in api.yml file. Deprecated, use doApiLint. (Default: 'no'/false)
  * doApiLint: Assess API description files (RAML OAS) (Default: false)
  * doApiDoc: Generate and publish documentation from API description files. (RAML OAS) (Default: false)
@@ -80,6 +81,12 @@ def call(body) {
   // set to false globally for now. --malc
   if (doKubeDeploy ==~ /(?i)(Y|YES|T|TRUE)/) { doKubeDeploy = false }
   if (doKubeDeploy ==~ /(?i)(N|NO|F|FALSE)/) { doKubeDeploy = false }
+
+  // Execute SQ scan.  Default is true
+  def runSonarqube = config.runSonarqube ?: true
+  if (runSonarqube ==~ /(?i)(Y|YES|T|TRUE)/) { runSonarqube = true }
+  if (runSonarqube ==~ /(?i)(N|NO|F|FALSE)/) { runSonarqube = false }
+  
 
   // location of Maven MD
   def modDescriptor =  'target/ModuleDescriptor.json'
@@ -161,7 +168,8 @@ def call(body) {
 
         // Run Sonarqube,
         // but not on jenkins-slave-all as Sonarqube no longer supports Java 8
-        if (buildNode != 'jenkins-slave-all') {
+        // or if 'runSonarqube = false'
+        if ((buildNode != 'jenkins-slave-all') && (runSonarqube))  {
           stage('SonarQube Analysis') {
             sonarqubeMvn(defaultBranch)
           }
