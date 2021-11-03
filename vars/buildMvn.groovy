@@ -85,7 +85,7 @@ def call(body) {
   // Execute SQ scan.  Default is true
   def runSonarqube = config.runSonarqube ?: true
   if (runSonarqube ==~ /(?i)(Y|YES|T|TRUE)/) { runSonarqube = true }
-  if (runSonarqube ==~ /(?i)(N|NO|F|FALSE)/) { runSonarqube = !runSonarqube }
+  if (runSonarqube ==~ /(?i)(N|NO|F|FALSE)/) { runSonarqube = false }
   
 
   // location of Maven MD
@@ -169,9 +169,11 @@ def call(body) {
         // Run Sonarqube,
         // but not on jenkins-slave-all as Sonarqube no longer supports Java 8
         // or if 'runSonarqube = false'
-        if ((buildNode != 'jenkins-slave-all') && (runSonarqube))  {
-          stage('SonarQube Analysis') {
-            sonarqubeMvn(defaultBranch)
+        if (buildNode != 'jenkins-slave-all') {
+          if (runSonarqube) {
+             stage('SonarQube Analysis') {
+               sonarqubeMvn(defaultBranch)
+             }
           }
         }
 
