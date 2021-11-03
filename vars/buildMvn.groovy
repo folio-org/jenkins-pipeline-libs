@@ -84,8 +84,8 @@ def call(body) {
 
   // Execute SQ scan.  Default is true
   def runSonarqube = config.runSonarqube ?: true
-  if (runSonarqube ==~ /(?i)(Y|YES|T|TRUE)/) { runSonarqube = true }
-  if (runSonarqube ==~ /(?i)(N|NO|F|FALSE)/) { runSonarqube = false }
+  //if (runSonarqube ==~ /(?i)(Y|YES|T|TRUE)/) { runSonarqube = true }
+  //if (runSonarqube ==~ /(?i)(N|NO|F|FALSE)/) { runSonarqube = false }
   
 
   // location of Maven MD
