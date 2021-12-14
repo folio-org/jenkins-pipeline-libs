@@ -168,7 +168,7 @@ def call(body) {
 
               // Stage 'Run NPM scripts' - as parallel jobs
               // Hints: https://issues.jenkins-ci.org/browse/JENKINS-38268
-              if ((runScripts.size() >= 1) { 
+              if ((runScripts.size() >= 1)) { 
                 def scriptJobs = [:]
                 runScripts.each { 
                   it.each { 
