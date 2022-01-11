@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-def call(String apiTypes, String apiDirectories, String apiExcludes) {
+def call(String apiTypes, String apiDirectories, String apiExcludes, Boolean apiWarnings) {
   echo "Assessing API description files ..."
   sh 'mkdir -p ci'
   sh 'echo "<html><body><pre>" > ci/apiLint.html'
@@ -10,6 +10,7 @@ def call(String apiTypes, String apiDirectories, String apiExcludes) {
   def types = apiTypes.replaceAll(/[, ]+/, " ").toUpperCase()
   def directories = apiDirectories.replaceAll(/[, ]+/, " ")
   def excludes = apiExcludes.replaceAll(/[, ]+/, " ")
+  def optionWarnings = ""
 
   if (types == '') {
     lintStatus = 2
@@ -24,13 +25,17 @@ def call(String apiTypes, String apiDirectories, String apiExcludes) {
                    "    Space-separated list of directories to be searched."
   }
 
+  if (apiWarnings) {
+    optionWarnings = "--warnings"
+  }
+
   if (lintStatus != 0) {
     sh "echo '${errorMessage}' >> ci/apiLint.html"
   }
   else {
     lintStatus = sh(script: "python3 /usr/local/bin/api_lint.py --loglevel info " +
                             "--types ${types} --directories ${directories} " +
-                            "--excludes ${excludes} " +
+                            "--excludes ${excludes} ${optionWarnings} " +
                             ">> ci/apiLint.html", returnStatus:true)
   }
 
