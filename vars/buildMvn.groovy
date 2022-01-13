@@ -48,6 +48,9 @@ def call(body) {
   def apiTypes = config.apiTypes ?: ''
   def apiDirectories = config.apiDirectories ?: ''
   def apiExcludes = config.apiExcludes ?: ''
+  def apiWarnings = config.apiWarnings ?: false
+  if (apiWarnings ==~ /(?i)(Y|YES|T|TRUE)/) { apiWarnings = true }
+  if (apiWarnings ==~ /(?i)(N|NO|F|FALSE)/) { apiWarnings = false }
 
   // publish maven artifacts to Maven repo.  Default is false
   def mvnDeploy = config.mvnDeploy ?: false
@@ -143,7 +146,7 @@ def call(body) {
 
         if (doApiLint) {
           stage('API lint') {
-            runApiLint(apiTypes, apiDirectories, apiExcludes)
+            runApiLint(apiTypes, apiDirectories, apiExcludes, apiWarnings)
           }
         }
 
