@@ -200,7 +200,7 @@ def call(body) {
                 else {
                   echo "Generating Stripes module descriptor from package.json"
                   sh "mkdir -p artifacts/md"
-                  sh "yarn stripes mod descriptor --full --strict | jq '.[]' " +
+                  sh "./node_modules/bin/stripes mod descriptor --full --strict | jq '.[]' " +
                      "> artifacts/md/${env.folioName}.json"
                   modDescriptor = "${env.WORKSPACE}/project/artifacts/md/${env.folioName}.json"
                 }
