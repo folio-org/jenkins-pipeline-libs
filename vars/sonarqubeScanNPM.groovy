@@ -11,7 +11,7 @@ def call(String lcovPath = 'artifacts/coverage-jest', String sonarScanDirs, Stri
                         credentialsId: 'id-jenkins-github-personal-token',
                         variable: 'GITHUB_ACCESS_TOKEN']]) {
     withSonarQubeEnv('SonarCloud') {
-      def scannerHome = tool 'SonarQube-Scanner-4'
+      def scannerHome = tool name: 'SonarQube-Scanner-4', type: 'hudson.plugins.sonar.SonarRunnerInstallation' 
       def excludeFiles = '**/platform/alias-service.js,**/docs/**,**/node_modules/**,**/examples/**,**/artifacts/**,**/ci/**,Jenkinsfile,**/LICENSE,**/*.css,**/*.md,**/*.json,**/tests/**,**/stories/*.js,**/test/**,**/.stories.js,**/resources/bigtest/interactors/**,**/resources/bigtest/network/**,**/*-test.js,**/*.test.js,**/*-spec.js,**/karma.conf.js,**/jest.config.js'
 
       if (env.CHANGE_ID) {
