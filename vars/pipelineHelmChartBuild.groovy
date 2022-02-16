@@ -20,7 +20,7 @@ def call() {
       stage('Build') {
         steps {
           script {
-            sh "gradle build"
+            sh "gradlew build"
           }
         }
         post {
