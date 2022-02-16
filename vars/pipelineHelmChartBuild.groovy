@@ -7,12 +7,6 @@ def call() {
     }
 
     stages {
-      stage('SCM') {
-        steps {
-          git.checkout() 
-        }
-      }
-
 //      stage('Prepare ENV') {
 //        steps {
 //          withCredentials([
