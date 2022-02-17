@@ -1,4 +1,4 @@
-import org.folio.ProjectVersion
+import org.folio.version.ProjectVersion
 
 def call() {
   ProjectVersion projectVersion
