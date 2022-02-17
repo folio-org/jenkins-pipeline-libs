@@ -61,7 +61,7 @@ class ProjectVersion implements Serializable {
   private verifyBranchVersionMatch() {
     if (branch == MASTER_BRANCH && !(version ==~ "^\\d+\\.\\d+\\.\\d+\$")) {
       pipeline.error("Version '${version}' doesn't match expected 'x.x.x' format.")
-    } else if (!(version ==~ "^\\d+\\.\\d+\\.\\d+-SNAPSHOT\$")) {
+    } else if (branch != MASTER_BRANCH && !(version ==~ "^\\d+\\.\\d+\\.\\d+-SNAPSHOT\$")) {
       pipeline.error("Version '${version}' doesn't match expected 'x.x.x-SNAPSHOT' format.")
     }
   }
