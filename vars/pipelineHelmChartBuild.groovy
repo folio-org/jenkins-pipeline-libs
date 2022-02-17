@@ -21,6 +21,7 @@ def call() {
         steps {
           script {
             sh "curl -LSs https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash -s -- --version v3.8.0"
+            sh "helm version --client"
           }
         }
       }
