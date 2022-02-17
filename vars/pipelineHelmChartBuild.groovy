@@ -20,7 +20,7 @@ def call() {
       stage("Configure environment") {
         steps {
           script {
-            sh "curl -LSs https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash -s -- --version 3.8.0"
+            sh "curl -LSs https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash -s -- --version v3.8.0"
           }
         }
       }
