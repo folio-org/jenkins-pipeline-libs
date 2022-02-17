@@ -44,7 +44,7 @@ class ProjectVersion implements Serializable {
     } else {
       retVal = "${version.substring(0, version.length() - SNAPSHOT_POSTFIX.length())}-${branch}-${timestamp}"
     }
-    return projectVersion.replaceAll('/', '-')
+    return retVal.replaceAll('/', '-')
   }
 
   def getJarProjectVersion() {
@@ -54,7 +54,7 @@ class ProjectVersion implements Serializable {
     } else {
       retVal = "${version.substring(0, version.length() - SNAPSHOT_POSTFIX.length())}-${branch}-${SNAPSHOT_POSTFIX}"
     }
-    return projectVersion.replaceAll('/', '-')
+    return retVal.replaceAll('/', '-')
   }
 
   @NonCPS
