@@ -29,7 +29,6 @@ def call() {
           }
         }
       }
-      ProjectVersion
 
       stage('Build') {
         steps {
