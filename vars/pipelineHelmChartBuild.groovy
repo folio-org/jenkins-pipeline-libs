@@ -7,16 +7,6 @@ def call() {
     }
 
     stages {
-//      stage('Prepare ENV') {
-//        steps {
-//          withCredentials([
-//            usernamePassword(credentialsId: 'nexus_pull', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')
-//          ]) {
-//            prepareSemanticGradleEnvironment()
-//          }
-//        }
-//      }
-
       stage("Configure environment") {
         steps {
           script {
@@ -29,7 +19,11 @@ def call() {
       stage('Build') {
         steps {
           script {
-            sh "./gradlew build -PhelmRegistryUrl=url -PhelmRegistryUsername=user -PhelmRegistryPassword=pass"
+            withCredentials([
+              usernamePassword(credentialsId: 'jenkins-nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')
+            ]) {
+              sh "./gradlew build -PhelmRegistryUrl=https://repository.folio.org/repository/helm-hosted/ -PhelmRegistryUsername=${NEXUS_USERNAME} -PhelmRegistryPassword=${NEXUS_PASSWORD}"
+            }
           }
         }
         post {
@@ -39,24 +33,23 @@ def call() {
         }
       }
 
-//      stage("Publish all artifacts") {
-//        steps {
-//          script {
-//            additionalParams = "-Phelm.executable=/usr/local/bin/helm3"
-//            if (BRANCH_NAME == 'master') {
-//              runGradleCmd("release publish syncBack ${additionalParams} " +
-//                "-PprojectVersion=${semanticVersion.timestampVersion}")
-//            } else {
-//              runGradleCmd("release publish ${additionalParams} " +
-//                "-PprojectVersion=${semanticVersion.timestampVersion}")
-//            }
+      stage("Publish all artifacts") {
+        steps {
+          script {
+            withCredentials([
+              usernamePassword(credentialsId: 'jenkins-nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')
+            ]) {
+              sh "./gradlew publish -PhelmRegistryUrl=https://repository.folio.org/repository/helm-hosted/ -PhelmRegistryUsername=${NEXUS_USERNAME} -PhelmRegistryPassword=${NEXUS_PASSWORD}"
+            }
+
+
 //            currentBuild.description = "--- helm charts ---\n"
 //            findFiles(glob: '**/helm/charts/*.tgz').each { file ->
 //              currentBuild.description += "${file.name}\n"
 //            }
-//          }
-//        }
-//      }
+          }
+        }
+      }
     }
   }
 }
