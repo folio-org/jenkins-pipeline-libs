@@ -1,4 +1,4 @@
-package org.folio
+package org.folio.version
 
 /**
  * Project version
