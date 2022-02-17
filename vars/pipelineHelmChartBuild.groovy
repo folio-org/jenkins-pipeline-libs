@@ -1,4 +1,8 @@
+import org.folio.ProjectVersion
+
 def call() {
+  ProjectVersion projectVersion
+
   pipeline {
     agent { label 'jenkins-agent-java11' }
 
@@ -16,13 +20,24 @@ def call() {
         }
       }
 
+      stage("Calculate version") {
+        steps {
+          script {
+            def props = readProperties file: 'gradle.properties'
+            projectVersion = new ProjectVersion(this, props.version, BRANCH_NAME)
+            echo "Calculated version: ${projectVersion.getProjectVersion()}"
+          }
+        }
+      }
+      ProjectVersion
+
       stage('Build') {
         steps {
           script {
             withCredentials([
               usernamePassword(credentialsId: 'jenkins-nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')
             ]) {
-              sh "./gradlew build -PhelmRegistryUrl=https://repository.folio.org/repository/helm-hosted/ -PhelmRegistryUsername=${NEXUS_USERNAME} -PhelmRegistryPassword=${NEXUS_PASSWORD}"
+              sh "./gradlew build -PprojectVersion=${projectVersion.getProjectVersion()} -PhelmRegistryUrl=https://repository.folio.org/repository/helm-hosted/ -PhelmRegistryUsername=${NEXUS_USERNAME} -PhelmRegistryPassword=${NEXUS_PASSWORD}"
             }
           }
         }
@@ -39,14 +54,13 @@ def call() {
             withCredentials([
               usernamePassword(credentialsId: 'jenkins-nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')
             ]) {
-              sh "./gradlew publish -PhelmRegistryUrl=https://repository.folio.org/repository/helm-hosted/ -PhelmRegistryUsername=${NEXUS_USERNAME} -PhelmRegistryPassword=${NEXUS_PASSWORD}"
+              sh "./gradlew publish -PprojectVersion=${projectVersion.getProjectVersion()} -PhelmRegistryUrl=https://repository.folio.org/repository/helm-hosted/ -PhelmRegistryUsername=${NEXUS_USERNAME} -PhelmRegistryPassword=${NEXUS_PASSWORD}"
             }
 
-
-//            currentBuild.description = "--- helm charts ---\n"
-//            findFiles(glob: '**/helm/charts/*.tgz').each { file ->
-//              currentBuild.description += "${file.name}\n"
-//            }
+            currentBuild.description = "--- helm charts ---\n"
+            findFiles(glob: '**/helm/charts/*.tgz').each { file ->
+              currentBuild.description += "${file.name}\n"
+            }
           }
         }
       }
