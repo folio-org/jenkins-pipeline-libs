@@ -1,5 +1,7 @@
 package org.folio.version
 
+import com.cloudbees.groovy.cps.NonCPS
+
 /**
  * Project version
  */
@@ -55,6 +57,7 @@ class ProjectVersion implements Serializable {
     return projectVersion.replaceAll('/', '-')
   }
 
+  @NonCPS
   private verifyBranchVersionMatch() {
     if (branch == MASTER_BRANCH && !(version == ~"^\\d+\\.\\d+\\.\\d+\$")) {
       pipeline.error("Version '${version}' doesn't match expected 'x.x.x' format.")
