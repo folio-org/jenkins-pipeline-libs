@@ -40,9 +40,9 @@ class ProjectVersion implements Serializable {
     if (branch == MASTER_BRANCH) {
       retVal = version
     } else if (branch == DEVELOP_BRANCH) {
-      retVal = "${version.substring(0, version.length() - SNAPSHOT_POSTFIX.length())}-${timestamp}"
+      retVal = "${version.substring(0, version.length() - SNAPSHOT_POSTFIX.length())}${timestamp}"
     } else {
-      retVal = "${version.substring(0, version.length() - SNAPSHOT_POSTFIX.length())}-${branch}-${timestamp}"
+      retVal = "${version.substring(0, version.length() - SNAPSHOT_POSTFIX.length())}${branch}-${timestamp}"
     }
     return retVal.replaceAll('/', '-')
   }
@@ -52,7 +52,7 @@ class ProjectVersion implements Serializable {
     if (branch == MASTER_BRANCH || branch == DEVELOP_BRANCH) {
       retVal = version
     } else {
-      retVal = "${version.substring(0, version.length() - SNAPSHOT_POSTFIX.length())}-${branch}-${SNAPSHOT_POSTFIX}"
+      retVal = "${version.substring(0, version.length() - SNAPSHOT_POSTFIX.length())}${branch}-${SNAPSHOT_POSTFIX}"
     }
     return retVal.replaceAll('/', '-')
   }
