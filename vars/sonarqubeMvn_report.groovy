@@ -12,6 +12,7 @@
  */
 
 
+// This file is deprecated. See vars/sonarqubeMvn.groovy instead.
 def call() {
 
   def sonarMvnPluginVer = '3.9.1.2184'
