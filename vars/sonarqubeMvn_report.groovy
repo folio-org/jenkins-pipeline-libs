@@ -14,6 +14,8 @@
 
 def call() {
 
+  def sonarMvnPluginVer = '3.9.1.2184'
+
   if (env.CHANGE_ID) {
     stage('SonarQube Analysis') {
       echo "PR request: $env.CHANGE_ID"
@@ -21,7 +23,7 @@ def call() {
                         credentialsId: 'id-jenkins-github-personal-token', 
                         variable: 'GITHUB_ACCESS_TOKEN']]) {
         withSonarQubeEnv('SonarCloud') {
-          sh "mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:3.3.0.603:sonar " +
+          sh "mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:${sonarMvnPluginVer}:sonar " +
                   "-Dsonar.organization=folio-org -Dsonar.verbose=true " +
                   "-Dsonar.analysis.mode=preview " +
                   "-Dsonar.github.pullRequest=${env.CHANGE_ID} " +
@@ -35,7 +37,7 @@ def call() {
     if ( env.BRANCH_IS_PRIMARY ) {
       stage('SonarQube Analysis') {
         withSonarQubeEnv('SonarCloud') {
-          sh "mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:3.3.0.603:sonar " +
+          sh "mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:${sonarMvnPluginVer}:sonar " +
                "-Dsonar.organization=folio-org -Dsonar.verbose=true"
         }
       }
@@ -44,7 +46,7 @@ def call() {
     else { 
       stage('SonarQube Analysis') {
         withSonarQubeEnv('SonarCloud') {
-          sh "mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:3.3.0.603:sonar " +
+          sh "mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:${sonarMvnPluginVer}:sonar " +
                "-Dsonar.organization=folio-org -Dsonar.verbose=true " +
                "-Dsonar.analysis.mode=preview -Dsonar.issueReport.html.enable=true"
         }
