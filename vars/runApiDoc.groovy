@@ -3,7 +3,7 @@
 def call(String apiTypes, String apiDirectories, String apiExcludes) {
   echo "Generating docs from API description files ..."
   sh 'mkdir -p ci'
-  sh 'echo "<html><body><pre>" > ci/apiDoc.html'
+  sh 'echo "<pre>" > ci/apiDoc.html'
 
   def apiDocStatus = 0
   def errorMessage = 'Jenkinsfile configuration errors for doApiDoc:'
@@ -41,7 +41,7 @@ def call(String apiTypes, String apiDirectories, String apiExcludes) {
                     returnStatus:true)
   }
 
-  sh 'echo "</pre><body></html>" >> ci/apiDoc.html'
+  sh 'echo "</pre>" >> ci/apiDoc.html'
 
   def apiDocReport = readFile('ci/apiDoc.html')
 
