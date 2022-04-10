@@ -3,7 +3,7 @@
 def call(String apiDirectories, String apiExcludes) {
   echo "Assessing API schema files ..."
   sh 'mkdir -p ci'
-  sh 'echo "<html><body><pre>" > ci/apiSchemaLint.html'
+  sh 'echo "<pre>" > ci/apiSchemaLint.html'
 
   def lintStatus = 0
   def errorMessage = 'Jenkinsfile configuration errors for doApiLint:'
@@ -27,7 +27,7 @@ def call(String apiDirectories, String apiExcludes) {
                             ">> ci/apiSchemaLint.html", returnStatus:true)
   }
 
-  sh 'echo "</pre><body></html>" >> ci/apiSchemaLint.html'
+  sh 'echo "</pre>" >> ci/apiSchemaLint.html'
 
   def lintReport = readFile('ci/apiSchemaLint.html')
 
