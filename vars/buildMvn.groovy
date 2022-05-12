@@ -99,7 +99,7 @@ def call(body) {
 
 
 
-  def buildNode = config.buildNode ?: 'jenkins-slave-all'
+  def buildNode = config.buildNode ?: 'jenkins-agent-java11'
 
   properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '',
                                           artifactNumToKeepStr: '15',
