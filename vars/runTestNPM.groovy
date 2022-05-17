@@ -24,7 +24,6 @@ def call(String runTestOptions = '') {
 
     withEnv([
       'CHROME_BIN=/usr/bin/google-chrome-stable',
-      'FIREFOX_BIN=/usr/bin/firefox',
       'DEBIAN_FRONTEND=noninteractive',
       'JEST_JUNIT_OUTPUT_DIR=./artifacts/jest-junit'
     ]) {
@@ -37,7 +36,6 @@ def call(String runTestOptions = '') {
 
       // display available browsers/version
       sh "$CHROME_BIN --version"
-      sh "$FIREFOX_BIN --version"
 
       def testStatus = sh(returnStatus:true, script: "$XVFB yarn test $runTestOptions")
 

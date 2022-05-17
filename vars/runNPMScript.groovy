@@ -24,13 +24,11 @@ def call(String scriptName, String scriptArgs) {
   stage("Run yarn $scriptName") {
     withEnv([ 
       'CHROME_BIN=/usr/bin/google-chrome-stable',
-      'FIREFOX_BIN=/usr/bin/firefox',
       'DEBIAN_FRONTEND=noninteractive'
     ]) { 
 
       // display available browsers/version
       sh "$CHROME_BIN --version"
-      sh "$FIREFOX_BIN --version"
 
       scriptStatus = sh(returnStatus:true, script: "$XVFB yarn ${scriptName} ${scriptArgs}")
 
