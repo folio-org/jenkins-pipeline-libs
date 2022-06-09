@@ -11,13 +11,10 @@ def call(String host) {
    writeFile file: 'collect-okapi-container-log.sh', 
              text: libraryResource('org/folio/collect-okapi-container-log.sh')
 
-   echo "HOST: $host"
    sh 'chmod +x collect-okapi-container-log.sh'
    withCredentials([sshUserPrivateKey(credentialsId: '11657186-f4d4-4099-ab72-2a32e023cced', keyFileVariable: 'SSH_KEY')]) {
       sh "scp -i $SSH_KEY -o StrictHostKeyChecking=no collect-okapi-container-log.sh ubuntu@${host}:."
       echo "Collecting Okapi container log..."
-      // Jenkins/Groovy interpolation weirdness
-      //sh 'ssh -i $SSH_KEY ' + "-o StrictHostKeyChecking=no ubuntu@${host} ./collect-okapi-container-log.sh"
       sh "ssh -i $SSH_KEY -o StrictHostKeyChecking=no ubuntu@${host} ./collect-okapi-container-log.sh"
       sh "scp -i $SSH_KEY -o StrictHostKeyChecking=no  ubuntu@${host}:./okapi.log.bz2 ."
    }
