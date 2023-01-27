@@ -13,7 +13,8 @@ def call(String tenant,String installJson,String okapiVersion = 'latest') {
   def tenantJson = "{\"id\":\"${tenant}\"}"
 
   docker.withRegistry('https://docker.io/v2/', 'dockerhub-ci-pull-account') {
-    docker.image("folioorg/okapi:${okapiVersion}").withRun('', 'dev') { container ->
+    sh "docker pull folioci/okapi:${okapiVersion}"
+    docker.image("folioci/okapi:${okapiVersion}").withRun('', 'dev') { container ->
       def okapiIp = sh(returnStdout:true, script: "docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${container.id}").trim()
 
       if (env.releaseOnly == 'true') {
