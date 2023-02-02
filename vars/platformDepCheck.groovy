@@ -21,7 +21,7 @@ def call(String tenant,String installJson,String okapiVersion = 'latest') {
 
   docker.withRegistry('https://docker.io/v2/', 'dockerhub-ci-pull-account') {
     sh "docker pull ${dockerRepo}/okapi:${okapiVersion}"
-    docker.image("folioci/okapi:${okapiVersion}").withRun('', 'dev') { container ->
+    docker.image("${dockerRepo}/okapi:${okapiVersion}").withRun('', 'dev') { container ->
       def okapiIp = sh(returnStdout:true, script: "docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${container.id}").trim()
 
       if (env.releaseOnly == 'true') {
