@@ -1,7 +1,7 @@
 boto3==1.12.34
 botocore==1.15.34
 cachetools==3.1.1
-certifi==2019.9.11
+certifi==2022.12.7
 chardet==3.0.4
 docutils==0.15.2
 google-auth==1.7.0
@@ -16,8 +16,8 @@ python-dateutil==2.8.1
 PyYAML==5.4
 requests==2.22.0
 requests-oauthlib==1.2.0
-rsa==4.0
+rsa==4.9
 s3transfer==0.3.3
 six==1.13.0
-urllib3==1.25.6
+urllib3==1.25.11
 websocket-client==0.56.0
