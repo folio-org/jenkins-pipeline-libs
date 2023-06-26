@@ -1,15 +1,17 @@
 #!/usr/bin/env groovy
 
 /*
- * Build stripes platform. 
+ * Build stripes platform.
  */
 
 
-def call(String okapiUrl, String tenant) {
+def call(String okapiUrl, String tenant, String branch='') {
 
   def foliociLib = new org.folio.foliociCommands()
 
-  sh 'rm -f yarn.lock'
+  if (!(branch =~ /^(r|R)\d{1}-\d{4}(-(rc|RC|hotfix-\d{1}))?$/)) {
+    sh 'rm -f yarn.lock'
+  }
 
   sh 'yarn install'
 
@@ -25,22 +27,22 @@ def call(String okapiUrl, String tenant) {
                reportTitles: "Yarn Lock"])
 
   // list yarn FOLIO deps
-  sh 'yarn list --pattern @folio' 
+  sh 'yarn list --pattern @folio'
 
   // generate platform mod descriptors
   // foliociLib.genStripesModDescriptors("${env.WORKSPACE}/artifacts/md")
   sh 'yarn build-module-descriptors --strict'
 
   // build webpack with stripes-cli. See STCLI-66 re: PREFIX env
-  sh "yarn build --okapi $okapiUrl --tenant $tenant ./output" 
+  sh "yarn build --okapi $okapiUrl --tenant $tenant ./output"
 
   // generate tenant stripes module list
   writeFile file: 'md2install.sh', text: libraryResource('org/folio/md2install.sh')
   sh 'chmod +x md2install.sh'
-  sh './md2install.sh --outputfile stripes-install.json ./ModuleDescriptors' 
+  sh './md2install.sh --outputfile stripes-install.json ./ModuleDescriptors'
   sh 'rm -f md2install.sh'
 
   // publish stripes bundle for debugging
   // archiveWebpack('./output')
   // end stage
-} 
+}
