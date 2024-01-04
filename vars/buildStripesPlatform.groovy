@@ -9,11 +9,11 @@ def call(String okapiUrl, String tenant, String branch='') {
 
   def foliociLib = new org.folio.foliociCommands()
 
-  if (!(branch =~ /^(r|R)\d{1}-\d{4}(-(rc|RC|hotfix-\d{1}))?$/)) {
+  if (!(branch =~ /^[rR]\d-\d{4}(-([rR][cC]|hotfix-\d))?/)) {
     sh 'rm -f yarn.lock'
   }
 
-  sh 'yarn install'
+  sh 'yarn install --frozen-lockfile'
 
   // publish generated yarn.lock for possible debugging
   sh 'mkdir -p ci'
