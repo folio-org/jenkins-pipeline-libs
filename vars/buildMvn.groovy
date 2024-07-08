@@ -87,12 +87,12 @@ def call(body) {
 
   // Execute SQ scan.  Default is true
   if (config.runSonarqube ==~ /(?i)(N|NO|F|FALSE)/) {
-    runSonarqube = false 
+    runSonarqube = false
   }
-  else { 
+  else {
     runSonarqube = true
   }
-  
+
 
   // location of Maven MD
   def modDescriptor =  'target/ModuleDescriptor.json'
@@ -198,7 +198,7 @@ def call(body) {
         }
 
         // main branch or tagged releases
-        if (( env.BRANCH_IS_PRIMARY ) || ( env.isRelease )) {
+//        if (( env.BRANCH_IS_PRIMARY ) || ( env.isRelease )) {
 
           // publish MD must come before maven deploy
           if (publishModDescriptor) {
@@ -251,7 +251,7 @@ def call(body) {
                          "}]")
             }
           }
-        } 
+//        }
 
         if (env.CHANGE_ID && publishPreview) {
           stage('Publish Preview Module Descriptor') {
