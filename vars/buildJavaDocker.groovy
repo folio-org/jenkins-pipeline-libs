@@ -132,7 +132,7 @@ EOF
           sh "docker tag ${env.name}:${env.version} ${env.dockerRepo}/${env.name}:latest"
           sh "docker push ${env.dockerRepo}/${env.name}:${env.version}"
           sh "docker push ${env.dockerRepo}/${env.name}:latest"
-          updateEurekaFile.Info("${env.name}", "${env.version}")
+
         }
         // publish readme
         echo "Publish Readme Docker Hub"
@@ -165,6 +165,7 @@ EOF
     sh "docker rmi ${env.name}:latest || exit 0"
     sh "docker rmi ${env.dockerRepo}/${env.name}:${env.version} || exit 0"
     sh "docker rmi ${env.dockerRepo}/${env.name}:latest || exit 0"
+    updateEurekaFile.Info("${env.name}", "${env.version}")
   }
 
 }
