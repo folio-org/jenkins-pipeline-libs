@@ -1,0 +1,21 @@
+import groovy.json.JsonSlurperClassic
+
+def Info(String moduleName, String version) {
+  String gitHub = 'https://github.com/folio-org/platform-complete.git'
+  sh("git clone -b snapshot --single-branch ${gitHub}")
+  dir('platform-complete') {
+    def data = new JsonSlurperClassic().parseText(readFile file: 'eureka-platform.json')
+    if (moduleName in data['id']) {
+      data['id'].each { module ->
+        if (module ==~ /${moduleName}/) {
+          module['id'] = "${moduleName}-${version}"
+        }
+      }
+    }
+    sh("rm -f eureka-platform.json")
+    writeJSON(file: "eureka-platform.json", json: data, pretty: 0)
+    withCredentials([steps.usernamePassword(credentialsId: 'id-jenkins-github-personal-token-with-username', passwordVariable: 'GIT_PASS', usernameVariable: 'GIT_USER')]) {
+      sh("set +x && git pull && git push --set-upstream https://${env.GIT_USER}:${env.GIT_PASS}@github.com/folio-org/platform-complete.git snapshot")
+    }
+  }
+}
