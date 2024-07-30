@@ -7,7 +7,7 @@ def Info(String moduleName, String version) {
     def txt = readFile file: 'eureka-platform.json'
     def data = new JsonSlurperClassic().parseText(txt as String)
     if (moduleName in data['id']) {
-      data['id'].each { module ->
+      data.each { module ->
         if (module ==~ /${moduleName}/) {
           module['id'] = "${moduleName}-${version}"
         }
