@@ -15,6 +15,7 @@ def Info(String moduleName, String version) {
     sh("rm -f eureka-platform.json")
     writeJSON(file: "eureka-platform.json", json: data, pretty: 0)
     withCredentials([steps.usernamePassword(credentialsId: 'id-jenkins-github-personal-token-with-username', passwordVariable: 'GIT_PASS', usernameVariable: 'GIT_USER')]) {
+      sh("git commit -am '[EPC] updated: ${moduleName}-${version}'")
       sh("set +x && git pull && git push --set-upstream https://${env.GIT_USER}:${env.GIT_PASS}@github.com/folio-org/platform-complete.git snapshot")
     }
   }
