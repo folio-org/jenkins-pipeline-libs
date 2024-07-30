@@ -8,7 +8,7 @@ def Info(String moduleName, String version) {
     def data = new JsonSlurperClassic().parseText(txt as String)
     if (moduleName in data['id']) {
       data.each { module ->
-        if (module['id'] ==~ /${moduleName}/) {
+        if (module['id'] =~ /${moduleName}/) {
           module['id'] = "${moduleName}-${version}"
         }
       }
