@@ -82,7 +82,6 @@ def call(body) {
 
   finally {
     echo "Clean up any temporary docker artifacts"
-    updateEurekaFile.Info("${env.name}", "${env.version}")
     sh "docker rmi ${env.name}:${env.version} || exit 0"
     sh "docker rmi ${env.name}:latest || exit 0"
     sh "docker rmi ${env.dockerRepo}/${env.name}:${env.version} || exit 0"
