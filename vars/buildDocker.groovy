@@ -54,24 +54,23 @@ def call(body) {
       }
 
       // publish image if mainline branch
-//      if (env.isRelease || (env.BRANCH_IS_PRIMARY && publishMaster)) {
+      if (env.isRelease || (env.BRANCH_IS_PRIMARY && publishMaster)) {
         // publish images to ci docker repo
         echo "Publishing Docker images"
         docker.withRegistry('https://index.docker.io/v1/', 'DockerHubIDJenkins') {
           sh "docker tag ${env.name}:${env.version} ${env.dockerRepo}/${env.name}:${env.version}"
           sh "docker tag ${env.name}:${env.version} ${env.dockerRepo}/${env.name}:latest"
-//          sh "docker push ${env.dockerRepo}/${env.name}:${env.version}"
-//          sh "docker push ${env.dockerRepo}/${env.name}:latest"
+          sh "docker push ${env.dockerRepo}/${env.name}:${env.version}"
+          sh "docker push ${env.dockerRepo}/${env.name}:latest"
         }
         // publish readme
-//        echo "Publish Readme Docker Hub"
-//        withCredentials([usernamePassword(credentialsId: 'DockerHubIDJenkins', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-//          writeFile file: 'dockerHubPublishMetadata.sh', text: libraryResource('org/folio/dockerHubPublishMetadata.sh')
-//          sh 'chmod +x dockerHubPublishMetadata.sh'
-//          sh "./dockerHubPublishMetadata.sh ${env.dockerRepo}/${env.name} ${env.projectName} ${env.projUrl}"
-//        }
-        updateEurekaFile.Info("${env.name}", "${env.version}")
-//      }
+        echo "Publish Readme Docker Hub"
+        withCredentials([usernamePassword(credentialsId: 'DockerHubIDJenkins', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+          writeFile file: 'dockerHubPublishMetadata.sh', text: libraryResource('org/folio/dockerHubPublishMetadata.sh')
+          sh 'chmod +x dockerHubPublishMetadata.sh'
+          sh "./dockerHubPublishMetadata.sh ${env.dockerRepo}/${env.name} ${env.projectName} ${env.projUrl}"
+        }
+      }
     } // end dir()
 
   } // end try
@@ -83,6 +82,7 @@ def call(body) {
 
   finally {
     echo "Clean up any temporary docker artifacts"
+    updateEurekaFile.Info("${env.name}", "${env.version}")
     sh "docker rmi ${env.name}:${env.version} || exit 0"
     sh "docker rmi ${env.name}:latest || exit 0"
     sh "docker rmi ${env.dockerRepo}/${env.name}:${env.version} || exit 0"
