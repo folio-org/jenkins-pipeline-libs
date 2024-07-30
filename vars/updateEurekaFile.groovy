@@ -4,7 +4,8 @@ def Info(String moduleName, String version) {
   String gitHub = 'https://github.com/folio-org/platform-complete.git'
   sh("git clone -b snapshot --single-branch ${gitHub}")
   dir('platform-complete') {
-    def data = new JsonSlurperClassic().parseText((readFile file: 'eureka-platform.json'))
+    def txt = readFile file: 'eureka-platform.json'
+    def data = new JsonSlurperClassic().parseText(txt as String)
     if (moduleName in data['id']) {
       data['id'].each { module ->
         if (module ==~ /${moduleName}/) {
