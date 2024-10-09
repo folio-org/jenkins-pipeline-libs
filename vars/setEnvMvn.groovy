@@ -48,11 +48,21 @@ def call() {
   env.projUrl = foliociLib.getProjUrl()
 
   //set java version
-  scriptStatus = sh(returnStatus:true, script: 'test -d "/usr/lib/jvm/java-17-openjdk-amd64"')
-  if (scriptStatus == 0) {
+  scriptStatus17 = sh(returnStatus:true, script: 'test -d "/usr/lib/jvm/java-17-openjdk-amd64"')
+  scriptStatus21 = sh(returnStatus:true, script: 'test -d "/usr/lib/jvm/java-21-openjdk-amd64"')
+  scriptStatus11 = sh(returnStatus:true, script: 'test -d "/usr/lib/jvm/java-11-openjdk-amd64"')
+
+  if (scriptStatus17 == 0) {
     env.javaInstall = 'openjdk-17-jenkins-slave-all'
-  } else {
+  }  
+  else if (scriptStatus21 == 0) {
+    env.javaInstall = 'openjdk-21-jenkins-slave-all'
+  }
+  else if (scriptStatus11 == 0) {
     env.javaInstall = 'openjdk-11-jenkins-slave-all'
+  }
+  else {
+    error('Unable to determine Java version')
   }
 
   echo "JDK: $env.javaInstall"
