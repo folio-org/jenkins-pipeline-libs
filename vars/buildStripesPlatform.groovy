@@ -9,7 +9,7 @@ def call(String okapiUrl, String tenant, String branch='') {
 
   def foliociLib = new org.folio.foliociCommands()
 
-  if (!(branch =~ /^(renovate_)?(r|R)\d{1}-\d{4}(-(rc|RC|hotfix-\d{1}))?$/)) {
+  if (!(branch =~ /(r|R)\d-\d{4}/)) {
     sh 'rm -f yarn.lock'
   }
 
