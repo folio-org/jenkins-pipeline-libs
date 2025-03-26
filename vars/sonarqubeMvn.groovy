@@ -8,7 +8,9 @@
 
 def call(String defaultBranch) {
 
-  def sonarMvnPluginVer = '4.0.0.4121'
+  //def sonarMvnPluginVer = '4.0.0.4121'
+  def sonarMvnPluginVer = '5.0.0.4389'
+  
 
   if (env.CHANGE_ID) {
     echo "PR request: $env.CHANGE_ID"
