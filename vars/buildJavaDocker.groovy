@@ -141,7 +141,7 @@ EOF
           sh "docker tag ${env.name}:${env.version} ${env.dockerRepo}/${env.name}:latest"
           sh "docker push ${env.dockerRepo}/${env.name}:${env.version}"
           sh "docker push ${env.dockerRepo}/${env.name}:latest"
-          if(env.Version.contains('SNAPSHOT')) {
+          if(env.version.contains('SNAPSHOT')) {
             updateEurekaFile.Info("${env.name}", "${env.version}")
           }
           
