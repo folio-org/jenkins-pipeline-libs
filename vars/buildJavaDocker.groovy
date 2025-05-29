@@ -141,7 +141,10 @@ EOF
           sh "docker tag ${env.name}:${env.version} ${env.dockerRepo}/${env.name}:latest"
           sh "docker push ${env.dockerRepo}/${env.name}:${env.version}"
           sh "docker push ${env.dockerRepo}/${env.name}:latest"
-          updateEurekaFile.Info("${env.name}", "${env.version}")
+          if(env.Version.contains('SNAPSHOT')) {
+            updateEurekaFile.Info("${env.name}", "${env.version}")
+          }
+          
         }
         // publish readme
         echo "Publish Readme Docker Hub"
