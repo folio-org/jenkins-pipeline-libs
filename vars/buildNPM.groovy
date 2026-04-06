@@ -145,7 +145,7 @@ def call(body) {
           withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
             withNPM(npmrcConfig: env.npmConfig) {
               stage('NPM Install') {
-                sh 'yarn install' 
+                sh 'yarn install --ignore-scripts --non-interactive' 
                 sh 'yarn list --pattern @folio'
                 // save generated yarn.lock for possible debugging
                 sh 'mkdir -p artifacts/yarn/'
