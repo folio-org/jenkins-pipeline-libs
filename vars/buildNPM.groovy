@@ -223,18 +223,21 @@ def call(body) {
                     postModuleDescriptor(modDescriptor)
                   }
                 }
-                if (npmDeploy) {
-                  stage('NPM Publish') {
-                    // do some clean up before publishing package
-                    // .gitignore should cover 'artifacts'
-                    // sh 'rm -rf node_modules artifacts ci'
-                    sh 'rm -rf node_modules ci'
-               
-                    // npm is more flexible than yarn for this stage. 
-                    echo "Deploying NPM packages to Nexus repository"
-                    sh 'npm publish'
-                  }
-                }
+              // Disable NPM publishing stage - malc April 10, 2026
+              /*
+               * if (npmDeploy) {
+               *   stage('NPM Publish') {
+               *     // do some clean up before publishing package
+               *     // .gitignore should cover 'artifacts'
+               *     // sh 'rm -rf node_modules artifacts ci'
+               *     sh 'rm -rf node_modules ci'
+               * 
+               *     // npm is more flexible than yarn for this stage. 
+               *     echo "Deploying NPM packages to Nexus repository"
+               *     sh 'npm publish'
+               *   }
+               * }
+               */
               }
 
             }  // end withNPM
