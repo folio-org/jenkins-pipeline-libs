@@ -13,7 +13,7 @@ def call(String okapiUrl, String tenant, String branch='') {
     sh 'rm -f yarn.lock'
   }
 
-  sh 'yarn install'
+  sh 'yarn install --ignore-scripts --non-interactive'
 
   // publish generated yarn.lock for possible debugging
   sh 'mkdir -p ci'

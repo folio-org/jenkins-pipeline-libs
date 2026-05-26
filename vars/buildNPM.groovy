@@ -145,7 +145,7 @@ def call(body) {
           withCredentials([string(credentialsId: 'jenkins-npm-folioci',variable: 'NPM_TOKEN')]) {
             withNPM(npmrcConfig: env.npmConfig) {
               stage('NPM Install') {
-                sh 'yarn install' 
+                sh 'yarn install --ignore-scripts --non-interactive' 
                 sh 'yarn list --pattern @folio'
                 // save generated yarn.lock for possible debugging
                 sh 'mkdir -p artifacts/yarn/'
@@ -223,18 +223,21 @@ def call(body) {
                     postModuleDescriptor(modDescriptor)
                   }
                 }
-                if (npmDeploy) {
-                  stage('NPM Publish') {
-                    // do some clean up before publishing package
-                    // .gitignore should cover 'artifacts'
-                    // sh 'rm -rf node_modules artifacts ci'
-                    sh 'rm -rf node_modules ci'
-               
-                    // npm is more flexible than yarn for this stage. 
-                    echo "Deploying NPM packages to Nexus repository"
-                    sh 'npm publish'
-                  }
-                }
+              // Disable NPM publishing stage - malc April 10, 2026
+              /*
+               * if (npmDeploy) {
+               *   stage('NPM Publish') {
+               *     // do some clean up before publishing package
+               *     // .gitignore should cover 'artifacts'
+               *     // sh 'rm -rf node_modules artifacts ci'
+               *     sh 'rm -rf node_modules ci'
+               * 
+               *     // npm is more flexible than yarn for this stage. 
+               *     echo "Deploying NPM packages to Nexus repository"
+               *     sh 'npm publish'
+               *   }
+               * }
+               */
               }
 
             }  // end withNPM

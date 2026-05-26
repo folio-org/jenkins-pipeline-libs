@@ -32,7 +32,7 @@ def call(body) {
 
       // build docker image
       docker.withRegistry('https://docker.io/v2/', 'dockerhub-ci-pull-account') {
-        sh "docker build --no-cache=true --pull=true -t ${env.name}:${env.version} ."
+        sh "docker build --platform linux/amd64 --no-cache=true --pull=true -t ${env.name}:${env.version} ."
       }
 
       // Test container using container healthcheck
