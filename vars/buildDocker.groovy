@@ -41,22 +41,20 @@ def call(body) {
         def runArgs = config.runArgs ?: ' '
         def healthChkCmd = config.healthChkCmd
         def dockerImage = "${env.name}:${env.version}"
-        def health = containerHealthCheck(dockerImage,healthChkCmd,runArgs)
+        def health = containerHealthCheck(dockerImage, healthChkCmd, runArgs)
 
         if (health != 'healthy') {
           echo "Container health check failed: $health"
           sh 'exit 1'
-        }
-        else {
+        } else {
           echo "Container health check passed."
         }
-      }
-      else {
+      } else {
         echo "No health check configured. Skipping container health check."
       }
 
       // publish image if mainline branch
-      if ( env.isRelease || (env.BRANCH_IS_PRIMARY && publishMaster) ) {
+      if (env.isRelease || (env.BRANCH_IS_PRIMARY && publishMaster)) {
         // publish images to ci docker repo
         echo "Publishing Docker images"
         docker.withRegistry('https://index.docker.io/v1/', 'DockerHubIDJenkins') {
@@ -64,8 +62,11 @@ def call(body) {
           sh "docker tag ${env.name}:${env.version} ${env.dockerRepo}/${env.name}:latest"
           sh "docker push ${env.dockerRepo}/${env.name}:${env.version}"
           sh "docker push ${env.dockerRepo}/${env.name}:latest"
+          if(env.version.contains('SNAPSHOT')) {
+            updateEurekaFile.Info("${env.name}", "${env.version}")
+          }          
         }
-         // publish readme
+        // publish readme
         echo "Publish Readme Docker Hub"
         withCredentials([usernamePassword(credentialsId: 'DockerHubIDJenkins', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
           writeFile file: 'dockerHubPublishMetadata.sh', text: libraryResource('org/folio/dockerHubPublishMetadata.sh')
@@ -73,7 +74,6 @@ def call(body) {
           sh "./dockerHubPublishMetadata.sh ${env.dockerRepo}/${env.name} ${env.projectName} ${env.projUrl}"
         }
       }
-
     } // end dir()
 
   } // end try

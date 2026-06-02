@@ -29,20 +29,36 @@ def call(body) {
   def buildContext = config.dockerDir ?: env.WORKSPACE
 
   def overrideConfig = config.overrideConfig ?: false
-  if (overrideConfig ==~ /(?i)(Y|YES|T|TRUE)/) { overrideConfig = true }
-  if (overrideConfig ==~ /(?i)(N|NO|F|FALSE)/) { overrideConfig = false}
+  if (overrideConfig ==~ /(?i)(Y|YES|T|TRUE)/) {
+    overrideConfig = true
+  }
+  if (overrideConfig ==~ /(?i)(N|NO|F|FALSE)/) {
+    overrideConfig = false
+  }
 
   def publishMaster = config.publishMaster ?: true
-  if (publishMaster ==~ /(?i)(Y|YES|T|TRUE)/) { publishMaster = true }
-  if (publishMaster ==~ /(?i)(N|NO|F|FALSE)/) { publishMaster = false}
+  if (publishMaster ==~ /(?i)(Y|YES|T|TRUE)/) {
+    publishMaster = true
+  }
+  if (publishMaster ==~ /(?i)(N|NO|F|FALSE)/) {
+    publishMaster = false
+  }
 
   def publishPreview = config.publishPreview ?: false
-  if (publishPreview ==~ /(?i)(Y|YES|T|TRUE)/) { publishPreview = true }
-  if (publishPreview ==~ /(?i)(N|NO|F|FALSE)/) { publishPreview = false}
+  if (publishPreview ==~ /(?i)(Y|YES|T|TRUE)/) {
+    publishPreview = true
+  }
+  if (publishPreview ==~ /(?i)(N|NO|F|FALSE)/) {
+    publishPreview = false
+  }
 
   def healthChk = config.healthChk ?: false
-  if (healthChk ==~ /(?i)(Y|YES|T|TRUE)/) { healthChk = true }
-  if (healthChk ==~ /(?i)(N|NO|F|FALSE)/) { healthChk = false}
+  if (healthChk ==~ /(?i)(Y|YES|T|TRUE)/) {
+    healthChk = true
+  }
+  if (healthChk ==~ /(?i)(N|NO|F|FALSE)/) {
+    healthChk = false
+  }
 
   // default
   def Boolean buildArg = false
@@ -62,17 +78,14 @@ def call(body) {
           dockerFile = libraryResource 'org/folio/Dockerfile.javaModule'
           writeFile file: 'Dockerfile', text: "$dockerFile"
           buildArg = true
-        }
-        else {
+        } else {
           echo "Unable to locate Jar file for this project."
           echo "Trying fallback to local Dockerfile."
         }
-      }
-      else {
+      } else {
         if (fileExists(dockerfile)) {
           echo "Found existing Dockerfile."
-        }
-        else {
+        } else {
           echo "No Dockerfile called $dockerfile found in $buildContext"
         }
       }
@@ -81,8 +94,7 @@ def call(body) {
 
       if (fileExists('.dockerignore')) {
         echo "Using existing .dockerignore"
-      }
-      else {
+      } else {
         echo "Creating .dockerignore"
         sh """
         cat > .dockerignore << EOF
@@ -98,33 +110,30 @@ EOF
       docker.withRegistry('https://docker.io/v2/', 'dockerhub-ci-pull-account') {
         if (buildArg) {
           sh "docker build --pull=true --no-cache=true -t ${env.name}:${env.version} --build-arg='VERTICLE_FILE=${fatJar}' . "
-        }
-        else {
+        } else {
           sh "docker build --pull=true --no-cache=true -t ${env.name}:${env.version} ."
         }
       }
       // Test container using container healthcheck
-      if ( healthChk && config.healthChkCmd ) {
+      if (healthChk && config.healthChkCmd) {
 
         def runArgs = config.runArgs ?: ' '
         def healthChkCmd = config.healthChkCmd
         def dockerImage = "${env.name}:${env.version}"
-        def health = containerHealthCheck(dockerImage,healthChkCmd,runArgs)
+        def health = containerHealthCheck(dockerImage, healthChkCmd, runArgs)
 
         if (health != 'healthy') {
           echo "Container health check failed: $health"
           sh 'exit 1'
-        }
-        else {
+        } else {
           echo "Container health check passed."
         }
-      }
-      else {
+      } else {
         echo "No health check configured. Skipping container health check."
       }
 
       // publish image if mainline branch
-      if ( env.isRelease || (env.BRANCH_IS_PRIMARY && publishMaster) ) {
+      if (env.isRelease || (env.BRANCH_IS_PRIMARY && publishMaster)) {
         // publish images to ci docker repo
         echo "Publishing Docker images"
         docker.withRegistry('https://index.docker.io/v1/', 'DockerHubIDJenkins') {
@@ -132,6 +141,10 @@ EOF
           sh "docker tag ${env.name}:${env.version} ${env.dockerRepo}/${env.name}:latest"
           sh "docker push ${env.dockerRepo}/${env.name}:${env.version}"
           sh "docker push ${env.dockerRepo}/${env.name}:latest"
+          if(env.version.contains('SNAPSHOT')) {
+            updateEurekaFile.Info("${env.name}", "${env.version}")
+          }
+          
         }
         // publish readme
         echo "Publish Readme Docker Hub"
@@ -143,7 +156,7 @@ EOF
       } else if (env.CHANGE_ID && publishPreview) {
         echo "Publishing Preview Docker images"
         def previewId = "${env.bareVersion}.${env.CHANGE_ID}.${env.BUILD_NUMBER}"
-        docker.withRegistry('https://docker-registry.ci.folio.org/v2/', 'jenkins-nexus')  {
+        docker.withRegistry('https://docker-registry.ci.folio.org/v2/', 'jenkins-nexus') {
           sh "docker tag ${env.name}:${env.version} docker-registry.ci.folio.org/${env.name}:${previewId}"
           sh "docker push docker-registry.ci.folio.org/${env.name}:${previewId}"
           sh "docker rmi docker-registry.ci.folio.org/${env.name}:${previewId}"
